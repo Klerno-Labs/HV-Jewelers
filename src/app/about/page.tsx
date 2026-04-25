@@ -56,7 +56,7 @@ export default function AboutPage() {
               </p>
               <p>
                 <em className="font-serif text-ink">HV Jewelers</em> grew
-                from that. We're not trying to be a department store. We
+                from that. We&apos;re not trying to be a department store. We
                 keep the catalog small, we describe each piece honestly,
                 and we&apos;d rather lose a sale than oversell something.
               </p>

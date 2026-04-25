@@ -12,7 +12,7 @@ export function Manifesto() {
         <FadeIn>
           <p className="text-eyebrow text-bronze">About the house</p>
           <p className="mt-12 font-serif text-display font-light italic text-ink">
-            We're small, and we'd rather stay that way.
+            We&apos;re small, and we&apos;d rather stay that way.
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
             Hong Vi Jewelers is a small archive of unworn jewelry. Some

@@ -29,9 +29,9 @@ export function JadeStory({
           </h2>
           <p className="mt-8 max-w-2xl text-subtitle leading-relaxed text-parchment-warm/85">
             It warms with skin contact and softens slowly over years.
-            We tell you the type (jadeite vs. nephrite), whether it's been
+            We tell you the type (jadeite vs. nephrite), whether it&apos;s been
             treated, and what we know about where it came from. Most jade
-            is final sale. That's noted on every piece.
+            is final sale. That&apos;s noted on every piece.
           </p>
           <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3">
             <Link
