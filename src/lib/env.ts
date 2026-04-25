@@ -44,7 +44,7 @@ const serverEnvSchema = z.object({
   SELLER_SHIP_FROM_POSTAL: z.string().min(3).optional(),
   SELLER_SHIP_FROM_PHONE: z.string().min(1).optional(),
 
-  // Vercel Cron shared secret
+  // Shared secret sent by cronjobs.org as `Authorization: Bearer …`
   CRON_SECRET: z.string().min(16).optional(),
 
   // Sentry (optional)

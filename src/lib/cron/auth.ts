@@ -1,9 +1,10 @@
 import { serverEnv } from '@/lib/env'
 
 /**
- * Cron authentication. Vercel Cron sends every scheduled request with
- * `Authorization: Bearer ${CRON_SECRET}`. We reject anything else with
- * 401 so nobody can trigger a sweep by hitting the URL directly.
+ * Cron authentication. The configured cron service (cronjobs.org) is
+ * set up to send `Authorization: Bearer ${CRON_SECRET}` on every hit.
+ * We reject anything else with 401 so nobody can trigger a sweep by
+ * hitting the URL directly.
  *
  * In dev, a request with no header from localhost is also accepted so
  * operators can curl the endpoint while debugging.

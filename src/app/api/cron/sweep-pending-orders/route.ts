@@ -11,7 +11,7 @@ import { releaseIfReserved } from '@/lib/products/inventory'
  * webhook: if Stripe delivery ever lags or the webhook endpoint was
  * down during the expiry moment, this sweep cleans up the orphan.
  *
- * Runs hourly via Vercel Cron.
+ * Scheduled hourly via cronjobs.org.
  */
 
 export const dynamic = 'force-dynamic'

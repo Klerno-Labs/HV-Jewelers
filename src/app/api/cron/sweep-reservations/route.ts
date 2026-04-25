@@ -5,8 +5,8 @@ import { sweepExpiredReservations } from '@/lib/products/inventory'
 /**
  * Sweep expired RESERVED inventory items back to AVAILABLE.
  *
- * Runs every 5 minutes (Vercel Cron config in vercel.json). The Phase 3
- * helper handles the per-row ledger entries and conditional UPDATEs.
+ * Scheduled every 5 minutes via cronjobs.org. The Phase 3 helper
+ * handles the per-row ledger entries and conditional UPDATEs.
  */
 
 export const dynamic = 'force-dynamic'

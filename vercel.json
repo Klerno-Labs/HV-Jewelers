@@ -1,19 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cron/sweep-reservations",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/sweep-pending-orders",
-      "schedule": "15 * * * *"
-    },
-    {
-      "path": "/api/cron/prune-audit",
-      "schedule": "0 4 * * *"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

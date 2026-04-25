@@ -19,7 +19,7 @@ once end-to-end when joining; keep it to hand for incidents.
 | Images      | Cloudinary                                    |
 | Hosting     | Vercel                                        |
 | Rate limit  | Upstash Redis                                 |
-| Crons       | Vercel Cron (`vercel.json`)                   |
+| Crons       | cronjobs.org (Bearer-authed GET hits)         |
 
 Source of truth for state:
 
@@ -89,8 +89,8 @@ always works as long as the **Required** group is present.
    ```bash
    vercel --prod
    ```
-   Vercel reads `vercel.json` and registers the three cron jobs
-   automatically.
+   Then go to cronjobs.org and register the three jobs from §7 against
+   the production host (Bearer-authed with `CRON_SECRET`).
 6. **Smoke test.**
    - `curl https://<YOUR_HOST>/api/healthz` → `{ ok: true, db: true }`
    - `/admin` → redirects to `/login`
@@ -148,14 +148,20 @@ entry under the same card.
 
 ## 7. Cron jobs
 
-Configured in `vercel.json`. Vercel sends each with
-`Authorization: Bearer ${CRON_SECRET}`.
+Configured in [cronjobs.org](https://cronjobs.org). Each job is set up
+as a GET against the URL below with a custom header
+`Authorization: Bearer ${CRON_SECRET}` so `isCronAuthorized` accepts it.
 
 | Schedule     | Path                               | Purpose                                              |
 | ------------ | ---------------------------------- | ---------------------------------------------------- |
 | `*/5 * * * *` | `/api/cron/sweep-reservations`     | Release RESERVED items whose 30-min TTL expired.     |
 | `15 * * * *`  | `/api/cron/sweep-pending-orders`   | Cancel PENDING orders older than 2 h, release stock. |
 | `0 4 * * *`   | `/api/cron/prune-audit`            | Delete audit rows older than 365 d (730 d for auth). |
+
+In cronjobs.org's UI: **Create cronjob → URL** is `https://<YOUR_HOST>/api/cron/<name>`,
+**Schedule** uses the cron expression above, **Advanced → Custom HTTP
+headers** holds the `Authorization: Bearer …` line. Enable
+notifications on failure so a quiet sweep doesn't go unnoticed.
 
 To manually invoke a cron in production:
 

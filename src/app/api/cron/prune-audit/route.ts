@@ -11,7 +11,7 @@ import { prisma } from '@/lib/prisma'
  * we still have forensic records of sign-in activity at the usual
  * security-review interval.
  *
- * Runs daily at 04:00 UTC via Vercel Cron.
+ * Scheduled daily at 04:00 UTC via cronjobs.org.
  */
 
 export const dynamic = 'force-dynamic'
