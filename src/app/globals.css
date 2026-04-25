@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HV Jewelers — Design Tokens
+   Earthy luxury palette. Editorial restraint. Greek-inspired quiet.
+   Tokens are declared in @theme so Tailwind generates matching utilities
+   (bg-olive, text-parchment, text-display-lg, font-serif, etc.).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ─── Color · Grounds ──────────────────────────────────────────────── */
+  --color-parchment: #f2ebd7;
+  --color-parchment-warm: #efe4c7;
+  --color-parchment-deep: #e8dfc4;
+  --color-limestone: #e8e2d1;
+  --color-limestone-deep: #d9d1bc;
+
+  /* ─── Color · Core brand ───────────────────────────────────────────── */
+  --color-olive: #4d5a31;
+  --color-olive-deep: #3a4526;
+  --color-olive-soft: #6b7850;
+  --color-cedar: #5e4026;
+  --color-cedar-deep: #3e2a18;
+  --color-cedar-soft: #7d5b3e;
+
+  /* ─── Color · Accent metals ────────────────────────────────────────── */
+  --color-bronze: #8b6a3c;
+  --color-bronze-deep: #6d5330;
+  --color-antique-gold: #b08d57;
+  --color-antique-gold-soft: #c4a46f;
+
+  /* ─── Color · Ink (text) ───────────────────────────────────────────── */
+  --color-ink: #1a1a17;
+  --color-ink-soft: #3a3a35;
+  --color-ink-muted: #6b6a62;
+
+  /* ─── Greek palette · subtle infusion ──────────────────────────────── */
+  /* Aegean teal — used as the primary interaction accent (links, focus). */
+  --color-greek-teal: #007ba7;
+  --color-greek-teal-soft: #4f9bb8;
+  --color-greek-teal-deep: #005f82;
+  /* Terracotta — primary CTA ground; warm clay reading on parchment. */
+  --color-greek-terracotta: #c6934b;
+  --color-greek-terracotta-deep: #a8783a;
+  /* Murex purple — mythic depth for premium signals (signature, refunds). */
+  --color-murex-purple: #703529;
+  --color-murex-purple-soft: #8c4a3d;
+  /* Sun gold — heritage glow on revenue + email headings. Distinct from
+     antique-gold (more saturated, slightly warmer). */
+  --color-sun-gold: #c8a55f;
+  --color-sun-gold-soft: #d6b87a;
+  /* Temple stone — cooler companion to limestone, for secondary surfaces. */
+  --color-temple-stone: #e0ddd5;
+
+  /* ─── Fonts ─── */
+  --font-serif: var(--font-serif-display), ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-sans-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ─── Typography scale ─────────────────────────────────────────────── */
+  --text-display-lg: clamp(3rem, 6vw + 1rem, 5.5rem);
+  --text-display-lg--line-height: 1.02;
+  --text-display-lg--letter-spacing: -0.02em;
+
+  --text-display: clamp(2.25rem, 3.5vw + 1rem, 3.75rem);
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.012em;
+
+  --text-heading: clamp(1.75rem, 1.2vw + 1.25rem, 2.375rem);
+  --text-heading--line-height: 1.14;
+  --text-heading--letter-spacing: -0.005em;
+
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.25;
+
+  --text-subtitle: 1.125rem;
+  --text-subtitle--line-height: 1.55;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.3;
+  --text-eyebrow--letter-spacing: 0.22em;
+
+  /* ─── Radii ─── */
+  --radius-none: 0;
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-pill: 999px;
+
+  /* ─── Shadows — soft, editorial ───────────────────────────────────── */
+  --shadow-sheet: 0 1px 2px rgb(26 26 23 / 0.04), 0 2px 8px rgb(26 26 23 / 0.04);
+  --shadow-float: 0 6px 24px rgb(26 26 23 / 0.08);
+
+  /* ─── Motion ─── */
+  --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-quiet: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Base layer — resets, page chrome, reduced-motion.
+   ══════════════════════════════════════════════════════════════════════════ */
+@layer base {
+  :root {
+    color-scheme: light;
+    --focus-ring: 0 0 0 2px var(--color-parchment), 0 0 0 4px var(--color-bronze);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--color-parchment);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+
+  p, li {
+    hanging-punctuation: first last;
+  }
+
+  ::selection {
+    background: var(--color-olive);
+    color: var(--color-parchment);
+  }
+
+  a, button, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-bronze);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Custom utilities
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@utility text-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  line-height: var(--text-eyebrow--line-height);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@utility hv-hairline {
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
+@utility hv-gold-rule {
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-antique-gold) 20%,
+    var(--color-antique-gold) 80%,
+    transparent
+  );
+  height: 1px;
+}

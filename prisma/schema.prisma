@@ -1,0 +1,852 @@
+// HV Jewelers — Prisma schema.
+//
+// Design goals:
+//   • Per-unit inventory (one row per physical piece) so one-of-one vintage
+//     items cannot double-sell. A status enum + atomic UPDATEs make the
+//     reservation→sale transition concurrency-safe.
+//   • Policy snapshotting: every OrderLine carries its own copy of the
+//     return / final-sale / resize rules at purchase time so changing a
+//     product's policy later cannot retroactively change an old order.
+//   • Address snapshotting: shipping fields live on the Order itself, not as
+//     a foreign key, so deleting a saved address never alters order history.
+//   • Money in integer cents — never floats.
+//   • Editorial first: products carry rich storytelling fields, and the
+//     homepage is composable from typed sections.
+//   • Auditability: AuditLog for admin mutations + OrderEvent for the
+//     customer-facing order timeline.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase: runtime traffic goes through the Transaction pooler
+  // (DATABASE_URL); migrations need real prepared statements, so
+  // Prisma uses DIRECT_URL (the Session pooler) for `prisma migrate`.
+  directUrl = env("DIRECT_URL")
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Auth — Users, Roles, Auth.js tables
+// ════════════════════════════════════════════════════════════════════════
+
+enum UserRole {
+  CUSTOMER
+  STAFF
+  ADMIN
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  emailVerified  DateTime?
+  name           String?
+  image          String?
+  role           UserRole  @default(CUSTOMER)
+  /// Argon2id or bcrypt — chosen in Phase 4. Nullable so passwordless
+  /// magic-link accounts are supported without a password record.
+  passwordHash   String?
+  marketingOptIn Boolean   @default(false)
+  /// Soft-disable. Disabled users keep their order history but cannot
+  /// authenticate; never hard-delete a user with orders attached.
+  isDisabled     Boolean   @default(false)
+  /// Last successful sign-in. Used by the admin user list and as a
+  /// lightweight signal for forensic review.
+  lastSignInAt   DateTime?
+  /// SHA-256 hex of a one-time staff-invite token. Raw token only ever
+  /// lives in the invite email; verification hashes the incoming value.
+  /// Cleared when the user completes password set.
+  inviteTokenHash  String?
+  inviteExpiresAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+  addresses       Address[]
+  carts           Cart[]
+  orders          Order[]
+  auditLogs       AuditLog[]
+  editorialPosts  EditorialPost[]
+  inventoryEvents InventoryLedger[] @relation("LedgerActor")
+  orderEvents     OrderEvent[]      @relation("OrderEventActor")
+
+  @@index([role])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Address book — saved addresses; orders snapshot, never reference.
+// ════════════════════════════════════════════════════════════════════════
+
+model Address {
+  id         String  @id @default(cuid())
+  userId     String
+  fullName   String
+  line1      String
+  line2      String?
+  city       String
+  region     String
+  postalCode String
+  country    String  @db.Char(2)
+  phone      String?
+  isDefault  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isDefault])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Catalog — Products, Images, Materials, Stones
+// ════════════════════════════════════════════════════════════════════════
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+/// The merchandising era — shapes default policy and storefront placement.
+enum ProductEra {
+  VINTAGE_ERA
+  NEAR_VINTAGE
+  MODERN_FINE
+  JADE
+}
+
+enum ProductCondition {
+  NEW
+  /// Older inventory that was never previously owned. Use this for the
+  /// "older but never worn" Asian-dealer stock.
+  NEW_OLD_STOCK
+  EXCELLENT
+  VERY_GOOD
+  GOOD
+  FAIR
+}
+
+enum GoldKarat {
+  NONE
+  K8
+  K9
+  K10
+  K14
+  K18
+  K22
+  K24
+}
+
+/// Stocking strategy — drives whether per-unit InventoryItem rows are
+/// required and how the storefront can present availability.
+enum StockMode {
+  /// One physical piece. Most vintage, most jade trinkets.
+  ONE_OF_ONE
+  /// A finite number of identical pieces; cannot be reordered once gone.
+  LIMITED_STOCK
+  /// No inventory units; produced after order. Long lead time.
+  MADE_TO_ORDER
+  /// Counter-based; admin can replenish by adding new InventoryItems.
+  REORDERABLE
+}
+
+model Product {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+
+  /// Editorial standfirst — short, customer-facing description.
+  shortDescription String? @db.Text
+  /// Long-form editorial body. Markdown-friendly text; rendered safely.
+  longDescription  String? @db.Text
+
+  era      ProductEra
+  status   ProductStatus @default(DRAFT)
+  /// Soft-hide without archiving. ACTIVE+isHidden products are still
+  /// purchasable via direct link but excluded from listings.
+  isHidden Boolean       @default(false)
+
+  // ── Pricing — cents only ────────────────────────────────────────────
+  priceCents     Int
+  compareAtCents Int?
+  currency       String @default("USD") @db.Char(3)
+
+  // ── Material & stone descriptive copy (editorial) ───────────────────
+  /// Free-form editorial text describing materials. Structured records
+  /// for filtering live in ProductMaterial.
+  materialsText  String? @db.Text
+  /// Free-form editorial text describing stones. Structured records for
+  /// filtering live in ProductStone.
+  stonesText     String? @db.Text
+  dimensionsText String?
+
+  // ── Gold specifics ──────────────────────────────────────────────────
+  goldKarat         GoldKarat @default(NONE)
+  /// Decimal grams. Visible to customers only when gramWeightVisible is
+  /// true (admin-controlled; useful for gold-heavy pieces).
+  gramWeight        Decimal?  @db.Decimal(8, 3)
+  gramWeightVisible Boolean   @default(false)
+
+  // ── Sizing ──────────────────────────────────────────────────────────
+  ringSize          String?
+  isResizable       Boolean @default(false)
+  resizeNotes       String?
+  /// If true, requesting a resize voids the return window for this piece.
+  resizeVoidsReturn Boolean @default(true)
+
+  // ── Stock + policy defaults (snapshotted onto OrderLine) ────────────
+  stockMode        StockMode @default(ONE_OF_ONE)
+  isReorderable    Boolean   @default(false)
+  isFinalSale      Boolean   @default(true)
+  /// 0 means final sale. 15 is the default for eligible modern pieces.
+  returnWindowDays Int       @default(0)
+
+  // ── Provenance + condition ──────────────────────────────────────────
+  signed         Boolean          @default(false)
+  signedNotes    String?
+  provenance     String?          @db.Text
+  condition      ProductCondition @default(EXCELLENT)
+  conditionNotes String?          @db.Text
+
+  // ── Merchandising flags ─────────────────────────────────────────────
+  isFeatured   Boolean @default(false)
+  isNewArrival Boolean @default(false)
+
+  // ── Shipping ────────────────────────────────────────────────────────
+  shippingProfileId String?
+  shippingProfile   ShippingProfile? @relation(fields: [shippingProfileId], references: [id])
+
+  // ── SEO ─────────────────────────────────────────────────────────────
+  metaTitle       String?
+  metaDescription String?
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  images         ProductImage[]
+  materials      ProductMaterial[]
+  stones         ProductStone[]
+  collections    ProductCollection[]
+  inventoryItems InventoryItem[]
+  cartItems      CartItem[]
+  orderLines     OrderLine[]
+
+  @@index([status, isHidden])
+  @@index([era])
+  @@index([isFeatured])
+  @@index([isNewArrival])
+  @@index([publishedAt])
+}
+
+enum MaterialKind {
+  GOLD_YELLOW
+  GOLD_WHITE
+  GOLD_ROSE
+  GOLD_GREEN
+  PLATINUM
+  STERLING_SILVER
+  PALLADIUM
+  STAINLESS_STEEL
+  TITANIUM
+  COPPER
+  BRASS
+  OTHER
+}
+
+model ProductMaterial {
+  id        String       @id @default(cuid())
+  productId String
+  kind      MaterialKind
+  notes     String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([kind])
+}
+
+enum StoneKind {
+  DIAMOND
+  SAPPHIRE
+  RUBY
+  EMERALD
+  JADE
+  PEARL
+  OPAL
+  TURQUOISE
+  AMETHYST
+  TOPAZ
+  CITRINE
+  GARNET
+  ONYX
+  CORAL
+  LAPIS
+  OTHER
+}
+
+model ProductStone {
+  id          String    @id @default(cuid())
+  productId   String
+  kind        StoneKind
+  caratWeight Decimal?  @db.Decimal(6, 3)
+  count       Int?
+  notes       String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([kind])
+}
+
+model ProductImage {
+  id                 String  @id @default(cuid())
+  productId          String
+  cloudinaryPublicId String
+  url                String
+  width              Int?
+  height             Int?
+  alt                String?
+  caption            String?
+  /// Lower numbers display first. Hero image is typically position 0.
+  position           Int     @default(0)
+  isHero             Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, position])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Collections — editorial groupings, many-to-many with products
+// ════════════════════════════════════════════════════════════════════════
+
+enum CollectionKind {
+  ARCHIVE_VINTAGE
+  NEAR_VINTAGE
+  FINE_JEWELRY
+  JADE
+  GOLD
+  PEARLS
+  NEW_ARRIVALS
+  /// One-off curatorial groupings, e.g., "Spring Edit" or "By Hand".
+  CURATED
+}
+
+model Collection {
+  id                String         @id @default(cuid())
+  slug              String         @unique
+  title             String
+  kind              CollectionKind
+  description       String?        @db.Text
+  /// Cloudinary public_id for the collection's hero image. Loose pointer
+  /// (not FK) because the same image may not live in ProductImage.
+  heroImagePublicId String?
+  heroImageUrl      String?
+  position          Int            @default(0)
+  isPublished       Boolean        @default(false)
+  isFeatured        Boolean        @default(false)
+
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products ProductCollection[]
+
+  @@index([kind])
+  @@index([isPublished, position])
+}
+
+model ProductCollection {
+  productId    String
+  collectionId String
+  /// Position within the collection — drives ordering on the collection page.
+  position     Int    @default(0)
+
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([productId, collectionId])
+  @@index([collectionId, position])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Inventory — per-unit tracking with status + ledger
+//
+//  Reservation flow (race-safe):
+//    UPDATE InventoryItem
+//      SET status='RESERVED', reservedCartId=<cartId>, ...
+//      WHERE id=<id> AND status='AVAILABLE'
+//  The conditional WHERE is the single point of truth for "only one cart
+//  can hold this piece". Always pair with an InventoryLedger row.
+// ════════════════════════════════════════════════════════════════════════
+
+enum InventoryStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  DAMAGED
+  /// Manual hold by admin (e.g., piece out for photography).
+  HOLD
+  RETURNED
+}
+
+model InventoryItem {
+  id          String          @id @default(cuid())
+  productId   String
+  /// Optional admin-facing SKU. Not exposed to customers.
+  sku         String?         @unique
+  /// Internal tag, dealer reference, drawer location, etc.
+  internalRef String?
+  status      InventoryStatus @default(AVAILABLE)
+  /// Acquisition cost in cents. Admin-only — never expose to clients.
+  costCents   Int?
+
+  // ── Reservation pointers ────────────────────────────────────────────
+  /// Set when status=RESERVED. Loose string FK (no constraint) so cart
+  /// deletion does not cascade through to inventory state.
+  reservedCartId    String?
+  reservedAt        DateTime?
+  reservedExpiresAt DateTime?
+
+  // ── Sale pointer ────────────────────────────────────────────────────
+  soldAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItem  CartItem?
+  orderLine OrderLine?
+  ledger    InventoryLedger[]
+
+  @@index([productId, status])
+  @@index([status])
+  @@index([reservedCartId])
+  @@index([reservedExpiresAt])
+}
+
+enum InventoryEvent {
+  RECEIVED
+  RESERVED
+  RESERVATION_RELEASED
+  RESERVATION_EXPIRED
+  SOLD
+  RETURNED
+  HELD
+  HELD_RELEASED
+  DAMAGED
+  ADJUSTED
+}
+
+model InventoryLedger {
+  id              String           @id @default(cuid())
+  inventoryItemId String
+  event           InventoryEvent
+  fromStatus      InventoryStatus?
+  toStatus        InventoryStatus?
+  /// User who caused the event; null for system-driven events (cron sweeps).
+  actorId         String?
+  reason          String?
+  context         Json?
+
+  createdAt DateTime @default(now())
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  actor         User?         @relation("LedgerActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([inventoryItemId])
+  @@index([createdAt])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Carts
+// ════════════════════════════════════════════════════════════════════════
+
+enum CartStatus {
+  OPEN
+  CONVERTED
+  ABANDONED
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?
+  /// Opaque token stored in an httpOnly cookie. Never expose internal id.
+  token     String     @unique
+  status    CartStatus @default(OPEN)
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items CartItem[]
+
+  @@index([userId])
+  @@index([status, expiresAt])
+}
+
+model CartItem {
+  id              String  @id @default(cuid())
+  cartId          String
+  productId       String
+  /// 1:1 with InventoryItem when a piece is reserved to this cart.
+  /// Null while browsing; set during reservation step.
+  inventoryItemId String? @unique
+
+  quantity       Int @default(1)
+  unitPriceCents Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart          Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product       Product        @relation(fields: [productId], references: [id])
+  inventoryItem InventoryItem? @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+
+  @@index([cartId])
+  @@index([productId])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Orders — snapshotted shipping address, snapshotted policy on each line
+// ════════════════════════════════════════════════════════════════════════
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
+  PROCESSING
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+  RETURN_REQUESTED
+  RETURNED
+  CANCELLED
+}
+
+model Order {
+  id          String  @id @default(cuid())
+  /// Human-readable, e.g., HV-26-001234. Generated server-side; safe to
+  /// share with the customer.
+  orderNumber String  @unique
+  userId      String?
+  /// Always captured (guest checkout supported). Snapshot — do not rely
+  /// on the User.email which may change.
+  email       String
+
+  status            OrderStatus       @default(PENDING)
+  paymentStatus     PaymentStatus     @default(PENDING)
+  fulfillmentStatus FulfillmentStatus @default(UNFULFILLED)
+
+  // ── Money — cents only ──────────────────────────────────────────────
+  currency           String @default("USD") @db.Char(3)
+  subtotalCents      Int
+  shippingCents      Int    @default(0)
+  taxCents           Int    @default(0)
+  discountCents      Int    @default(0)
+  totalCents         Int
+  /// Cumulative refunded amount across every refund issued on this
+  /// order. Stays ≤ totalCents. When equal to totalCents, the order's
+  /// `status` is REFUNDED; while positive but less, PARTIALLY_REFUNDED.
+  totalRefundedCents Int    @default(0)
+
+  // ── Shipping address (snapshot, never FK to mutable Address) ────────
+  shipName       String
+  shipLine1      String
+  shipLine2      String?
+  shipCity       String
+  shipRegion     String
+  shipPostalCode String
+  shipCountry    String  @db.Char(2)
+  shipPhone      String?
+
+  // ── Payment refs (Stripe; never store raw card data) ────────────────
+  stripePaymentIntentId   String? @unique
+  stripeCheckoutSessionId String? @unique
+
+  // ── Shipping execution ──────────────────────────────────────────────
+  /// Snapshot of ShippingProfile at purchase time — preserves rules even
+  /// if the profile is later edited.
+  shippingProfileSnapshot Json?
+  carrier                 String?
+  trackingNumber          String?
+  signatureRequired       Boolean @default(true)
+  /// Shippo transaction id — ties our order to the purchased label so
+  /// we can refund/void the label later if fulfillment changes.
+  shippoTransactionId     String?
+  /// Direct URL to the Shippo-generated label PDF. Stored on the order
+  /// so staff can re-download without round-tripping the Shippo API.
+  shippoLabelUrl          String?
+
+  // ── Notes ───────────────────────────────────────────────────────────
+  customerNote String? @db.Text
+  internalNote String? @db.Text
+
+  // ── Timeline timestamps ─────────────────────────────────────────────
+  paidAt      DateTime?
+  shippedAt   DateTime?
+  deliveredAt DateTime?
+  cancelledAt DateTime?
+  refundedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  lines  OrderLine[]
+  events OrderEvent[]
+
+  @@index([userId])
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderLine {
+  id              String  @id @default(cuid())
+  orderId         String
+  /// Nullable so a deleted product does not break order history.
+  productId       String?
+  /// 1:1 with the InventoryItem that was sold. Null for MADE_TO_ORDER lines.
+  inventoryItemId String? @unique
+
+  // ── Product snapshot (immutable after creation) ─────────────────────
+  productTitle String
+  productSlug  String
+  productEra   ProductEra
+  productImage String?
+
+  quantity       Int @default(1)
+  unitPriceCents Int
+  totalCents     Int
+
+  // ── Policy snapshot (the rules the customer agreed to at purchase) ──
+  policyFinalSale         Boolean
+  policyReturnWindowDays  Int
+  policyResizable         Boolean
+  policyResizeVoidsReturn Boolean
+
+  // ── Resizing handling ───────────────────────────────────────────────
+  resizingRequested Boolean @default(false)
+  resizingNotes     String?
+
+  createdAt DateTime @default(now())
+
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product       Product?       @relation(fields: [productId], references: [id], onDelete: SetNull)
+  inventoryItem InventoryItem? @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+/// Customer-facing order timeline. Use AuditLog for staff-only audit.
+model OrderEvent {
+  id                String  @id @default(cuid())
+  orderId           String
+  /// e.g., "PAID", "SHIPPED", "TRACKING_ADDED", "REFUND_ISSUED".
+  type              String
+  description       String? @db.Text
+  /// Whether this event is visible to the customer.
+  isCustomerVisible Boolean @default(true)
+  actorId           String?
+  context           Json?
+
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor User? @relation("OrderEventActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Shipping profiles — minimal at launch, extensible later
+// ════════════════════════════════════════════════════════════════════════
+
+enum SignatureRequirement {
+  NONE
+  STANDARD
+  ADULT
+}
+
+model ShippingProfile {
+  id                String               @id @default(cuid())
+  name              String               @unique
+  description       String?
+  baseRateCents     Int                  @default(0)
+  isDefault         Boolean              @default(false)
+  signature         SignatureRequirement @default(STANDARD)
+  /// Free-form for now (e.g., "Up to $5,000", "ParcelPro >$10k"). Phase 8
+  /// may formalize this once carrier integrations exist.
+  insuranceLevel    String?
+  carrierPreference String?
+  notes             String?              @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@index([isDefault])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Editorial — posts and homepage sections
+// ════════════════════════════════════════════════════════════════════════
+
+enum EditorialStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model EditorialPost {
+  id                String          @id @default(cuid())
+  slug              String          @unique
+  title             String
+  excerpt           String?
+  /// MDX/Markdown text. Always sanitize before render — never feed to
+  /// dangerouslySetInnerHTML directly.
+  body              String          @db.Text
+  heroImagePublicId String?
+  heroImageUrl      String?
+  authorId          String?
+  status            EditorialStatus @default(DRAFT)
+  publishedAt       DateTime?
+
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+}
+
+enum HomepageSectionType {
+  HERO
+  EDITORIAL_HIGHLIGHT
+  FEATURED_COLLECTION
+  NEW_ARRIVALS_GRID
+  JADE_FEATURE
+  TWO_UP
+  PRESS_QUOTE
+  CTA_BAND
+}
+
+/// Composable homepage. Each section's `data` field is validated by a
+/// type-specific Zod schema in src/lib/validation/homepage.ts at write time.
+model HomepageSection {
+  id          String              @id @default(cuid())
+  type        HomepageSectionType
+  title       String?
+  subtitle    String?
+  position    Int
+  isPublished Boolean             @default(false)
+  data        Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isPublished, position])
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  Audit log — staff-only record of admin mutations
+// ════════════════════════════════════════════════════════════════════════
+
+model AuditLog {
+  id           String  @id @default(cuid())
+  actorId      String?
+  /// Dot-namespaced action, e.g., "product.update", "order.refund",
+  /// "user.role.change". Free-form string; document conventions in code.
+  action       String
+  resourceType String
+  resourceId   String?
+  before       Json?
+  after        Json?
+  /// Request IP at time of action (for forensic review).
+  ip           String?
+  userAgent    String?
+  context      Json?
+
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([resourceType, resourceId])
+  @@index([action])
+  @@index([createdAt])
+}

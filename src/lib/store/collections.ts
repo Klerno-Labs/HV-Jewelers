@@ -1,0 +1,92 @@
+/**
+ * Display metadata for the public collection routes. The DB Collection
+ * row carries title and description; this map adds the editorial framing
+ * (eyebrow, intro paragraph, accent tone) used on the collection hero.
+ *
+ * Slugs here are the canonical *public* URLs and must match the seeded
+ * collection slugs.
+ */
+
+export interface CollectionMeta {
+  slug: string
+  title: string
+  /// Short label above the title.
+  eyebrow: string
+  /// Editorial intro shown on the collection page hero.
+  intro: string
+  /// Optional secondary line for breathing room.
+  notes?: string
+}
+
+const META: Record<string, CollectionMeta> = {
+  'vintage-era': {
+    slug: 'vintage-era',
+    title: 'Vintage Era',
+    eyebrow: 'Pre-1980, unworn',
+    intro:
+      'Older pieces that were made decades ago and never sold. We source them through estate dealers and small workshops, verify each one in person, and describe what we see. Vintage Era pieces are final sale, so the writeup has to do the work.',
+    notes: 'Sized as made. Resizing available on select pieces.',
+  },
+  'near-vintage': {
+    slug: 'near-vintage',
+    title: 'Near Vintage',
+    eyebrow: 'Late twentieth century',
+    intro:
+      'Pieces from the late twentieth century: late deco, mid-century, the cleaner lines of the seventies and eighties. All unworn. Often unsigned. Final sale.',
+  },
+  'modern-fine-jewelry': {
+    slug: 'modern-fine-jewelry',
+    title: 'Modern Fine Jewelry',
+    eyebrow: 'Made now',
+    intro:
+      'New pieces made on the bench today. Bands, solitaires, everyday gold. Most are eligible for a 15-day return on unworn returns. Resizing voids that window.',
+  },
+  jade: {
+    slug: 'jade',
+    title: 'Jade',
+    eyebrow: 'Bangles, trinkets, pendants',
+    intro:
+      'Jadeite and nephrite, bangles to small pendants, all unworn. We tell you the type, whether it has been treated, and what we know about where it came from. Most jade is final sale. That is noted on every piece.',
+  },
+  gold: {
+    slug: 'gold',
+    title: 'Gold',
+    eyebrow: 'By karat and weight',
+    intro:
+      'Gold-forward pieces from across the catalog: signets, modern bands, jade with gold settings. Gram weight is shown when it matters.',
+  },
+  pearls: {
+    slug: 'pearls',
+    title: 'Pearls',
+    eyebrow: 'Strung and set',
+    intro:
+      'Strands, drops, and pearl detail. All unworn, on original silk where applicable, with original clasps when they were part of the piece.',
+  },
+  'new-arrivals': {
+    slug: 'new-arrivals',
+    title: 'New Arrivals',
+    eyebrow: 'Most recent',
+    intro:
+      'Pieces newly added to the catalog. We add a small set every few weeks; we would rather be slow than wrong.',
+  },
+}
+
+export function getCollectionMeta(slug: string): CollectionMeta | null {
+  return META[slug] ?? null
+}
+
+export const PUBLIC_COLLECTION_SLUGS = Object.keys(META) as readonly string[]
+
+/**
+ * Display order for the collection-worlds grid on the homepage and the
+ * primary site nav. Jade is intentionally elevated.
+ */
+export const NAV_COLLECTION_ORDER: readonly string[] = [
+  'vintage-era',
+  'near-vintage',
+  'modern-fine-jewelry',
+  'jade',
+  'gold',
+  'pearls',
+  'new-arrivals',
+]
