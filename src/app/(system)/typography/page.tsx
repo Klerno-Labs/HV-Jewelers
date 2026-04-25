@@ -78,7 +78,7 @@ export default function TypographyPage() {
           <p className="text-eyebrow text-ink-muted">Sans · tracked caps</p>
         </div>
         <div className="space-y-6">
-          <p className="text-eyebrow text-bronze">Archive · Jade · Fine · Pearls</p>
+          <p className="text-eyebrow text-bronze">Archive · Fine · Gold · Pearls</p>
           <p className="text-eyebrow text-ink-muted">Sourcing · Craft · Provenance</p>
           <p className="text-caption text-ink-soft">
             Use the eyebrow for category, section, or editorial labeling. Never
@@ -96,8 +96,8 @@ export default function TypographyPage() {
           <p>
             The archive began quietly, from a small table in a back room.
             A handful of pieces chosen because they held their own
-            language. Jade kept thin and untouched. Gold in its original
-            weight. Settings older than the hands that made them.
+            language. Gold in its original weight. Settings older than
+            the hands that made them.
           </p>
           <p>
             <em className="font-serif text-ink">Hong Vi</em>, the house

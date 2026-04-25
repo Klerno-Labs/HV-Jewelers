@@ -41,19 +41,12 @@ const META: Record<string, CollectionMeta> = {
     intro:
       'New pieces made on the bench today. Bands, solitaires, everyday gold. Most are eligible for a 15-day return on unworn returns. Resizing voids that window.',
   },
-  jade: {
-    slug: 'jade',
-    title: 'Jade',
-    eyebrow: 'Bangles, trinkets, pendants',
-    intro:
-      'Jadeite and nephrite, bangles to small pendants, all unworn. We tell you the type, whether it has been treated, and what we know about where it came from. Most jade is final sale. That is noted on every piece.',
-  },
   gold: {
     slug: 'gold',
     title: 'Gold',
     eyebrow: 'By karat and weight',
     intro:
-      'Gold-forward pieces from across the catalog: signets, modern bands, jade with gold settings. Gram weight is shown when it matters.',
+      'Gold-forward pieces from across the catalog: signets, bands, chains, and modern settings. Gram weight is shown when it matters.',
   },
   pearls: {
     slug: 'pearls',
@@ -79,13 +72,12 @@ export const PUBLIC_COLLECTION_SLUGS = Object.keys(META) as readonly string[]
 
 /**
  * Display order for the collection-worlds grid on the homepage and the
- * primary site nav. Jade is intentionally elevated.
+ * primary site nav.
  */
 export const NAV_COLLECTION_ORDER: readonly string[] = [
   'vintage-era',
   'near-vintage',
   'modern-fine-jewelry',
-  'jade',
   'gold',
   'pearls',
   'new-arrivals',

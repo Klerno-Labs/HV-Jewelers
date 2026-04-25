@@ -10,7 +10,6 @@ const KIND_OPTIONS = [
   { value: 'ARCHIVE_VINTAGE', label: 'Vintage Era · Archive' },
   { value: 'NEAR_VINTAGE', label: 'Near Vintage' },
   { value: 'FINE_JEWELRY', label: 'Modern Fine Jewelry' },
-  { value: 'JADE', label: 'Jade' },
   { value: 'GOLD', label: 'Gold' },
   { value: 'PEARLS', label: 'Pearls' },
   { value: 'NEW_ARRIVALS', label: 'New Arrivals' },

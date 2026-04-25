@@ -210,10 +210,10 @@ function EmptyBag() {
           See New Arrivals
         </Link>
         <Link
-          href="/collections/jade"
+          href="/collections/vintage-era"
           className="text-caption text-ink-soft underline underline-offset-4 decoration-bronze/40 hover:text-olive hover:decoration-olive"
         >
-          Browse Jade
+          Browse Vintage Era
         </Link>
       </div>
     </div>

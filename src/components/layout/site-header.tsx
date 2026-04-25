@@ -7,7 +7,6 @@ const primaryNav = [
   { label: 'Vintage Era', href: '/collections/vintage-era' },
   { label: 'Near Vintage', href: '/collections/near-vintage' },
   { label: 'Modern Fine', href: '/collections/modern-fine-jewelry' },
-  { label: 'Jade', href: '/collections/jade' },
   { label: 'Gold', href: '/collections/gold' },
   { label: 'Pearls', href: '/collections/pearls' },
   { label: 'New Arrivals', href: '/collections/new-arrivals' },

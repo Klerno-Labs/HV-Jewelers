@@ -31,7 +31,6 @@ export const homepageSectionType = z.enum([
   'EDITORIAL_HIGHLIGHT',
   'FEATURED_COLLECTION',
   'NEW_ARRIVALS_GRID',
-  'JADE_FEATURE',
   'TWO_UP',
   'PRESS_QUOTE',
   'CTA_BAND',
@@ -72,13 +71,6 @@ const newArrivalsGridData = z.object({
   count: z.number().int().min(2).max(12).default(6),
 })
 
-const jadeFeatureData = z.object({
-  headline: safeName,
-  body: z.string().max(800).optional().nullable(),
-  productSlugs: z.array(slugSchema).min(1).max(6),
-  cta: linkSchema.optional().nullable(),
-})
-
 const twoUpData = z.object({
   left: z.object({
     eyebrow: safeShortText.optional().nullable(),
@@ -116,7 +108,6 @@ export const homepageSectionInput = z.discriminatedUnion('type', [
   z.object({ type: z.literal('EDITORIAL_HIGHLIGHT'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: editorialHighlightData }),
   z.object({ type: z.literal('FEATURED_COLLECTION'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: featuredCollectionData }),
   z.object({ type: z.literal('NEW_ARRIVALS_GRID'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: newArrivalsGridData }),
-  z.object({ type: z.literal('JADE_FEATURE'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: jadeFeatureData }),
   z.object({ type: z.literal('TWO_UP'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: twoUpData }),
   z.object({ type: z.literal('PRESS_QUOTE'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: pressQuoteData }),
   z.object({ type: z.literal('CTA_BAND'), title: safeName.optional().nullable(), subtitle: safeShortText.optional().nullable(), position: z.number().int().min(0), isPublished: z.boolean().default(false), data: ctaBandData }),

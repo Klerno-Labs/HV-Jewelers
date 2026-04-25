@@ -7,7 +7,7 @@ import { ConciergeClose } from '@/components/store/concierge-close'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'HV Jewelers (Hong Vi). A small archive of unworn Vintage Era, Near Vintage, jade, and modern fine jewelry.',
+    'HV Jewelers (Hong Vi). A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
 }
 
 export default function AboutPage() {
@@ -29,9 +29,9 @@ export default function AboutPage() {
             </h1>
             <p className="mt-10 max-w-2xl text-subtitle leading-relaxed text-ink-soft">
               HV Jewelers (Hong Vi) is a small archive of unworn jewelry:
-              vintage, near-vintage, jade, and modern fine pieces. Some
-              were made decades ago and stored, never sold. Others are
-              made on the bench today. Either way, they come to you new.
+              vintage, near-vintage, and modern fine pieces. Some were
+              made decades ago and stored, never sold. Others are made
+              on the bench today. Either way, they come to you new.
             </p>
           </FadeIn>
         </Container>
@@ -49,10 +49,10 @@ export default function AboutPage() {
               <p>
                 Hong Vi started collecting from estate dealers and small
                 workshops across Asia: signets from the Vintage Era that
-                had sat in drawers for decades, jade from suppliers who
-                had been passing pieces through families for years, fine
-                chain that had been made and never sold. None of it had
-                been worn.
+                had sat in drawers for decades, fine chain that had been
+                made and never sold, and pieces from suppliers who had
+                been holding inventory through families for years. None
+                of it had been worn.
               </p>
               <p>
                 <em className="font-serif text-ink">HV Jewelers</em> grew
@@ -88,7 +88,7 @@ export default function AboutPage() {
             <Principle
               number="03"
               title="Plain about the rules."
-              body="Vintage Era, Near Vintage, and most jade are final sale. Modern Fine pieces have a 15-day return window for unworn returns. We say it on the product page so there are no surprises."
+              body="Vintage Era and Near Vintage pieces are final sale. Modern Fine pieces have a 15-day return window for unworn returns. We say it on the product page so there are no surprises."
             />
           </FadeIn>
         </Container>
@@ -100,7 +100,7 @@ export default function AboutPage() {
           <FadeIn>
             <p className="text-eyebrow text-ink-muted">The collections</p>
             <h2 className="mt-6 max-w-2xl font-serif text-display text-ink">
-              Four sections of the catalog.
+              Three sections of the catalog.
             </h2>
           </FadeIn>
           <FadeIn delay={150} className="mt-16 grid gap-10 md:grid-cols-2">
@@ -121,13 +121,6 @@ export default function AboutPage() {
               title="Modern Fine Jewelry"
               body="New pieces made on the bench. Bands, solitaires, everyday gold. Most are eligible for a 15-day return on unworn returns. Resizing voids that window."
               href="/collections/modern-fine-jewelry"
-            />
-            <WorldRow
-              eyebrow="04"
-              title="Jade"
-              body="Jadeite and nephrite, bangles to small pendants, all unworn. We tell you the type and any treatment. Most jade is final sale; we note it on each piece."
-              href="/collections/jade"
-              accent="olive"
             />
           </FadeIn>
         </Container>

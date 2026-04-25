@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma'
 export const metadata: Metadata = {
   title: 'Journal',
   description:
-    'Notes from us on jade, sourcing older pieces, materials, and how we work.',
+    'Notes from us on sourcing older pieces, materials, and how we work.',
 }
 
 const TONE_CLASSES = [
@@ -56,8 +56,8 @@ export default async function JournalPage() {
               Notes from us.
             </h1>
             <p className="mt-8 max-w-2xl text-subtitle leading-relaxed text-ink-soft">
-              Pieces about jade, sourcing older pieces, materials, and
-              how we work. New entries every few weeks. No newsletter.
+              Pieces about sourcing older jewelry, materials, and how
+              we work. New entries every few weeks. No newsletter.
             </p>
           </FadeIn>
         </Container>
@@ -73,8 +73,8 @@ export default async function JournalPage() {
                 The journal is being written.
               </h2>
               <p className="mt-4 max-w-xl text-body leading-relaxed text-ink-soft">
-                We&apos;re preparing the first set of entries: on jade,
-                on signets, and on what we choose to keep.
+                We&apos;re preparing the first set of entries: on
+                signets, on materials, and on what we choose to keep.
               </p>
             </div>
           ) : (

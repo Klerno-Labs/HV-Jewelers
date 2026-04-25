@@ -56,7 +56,6 @@ interface ProductSeed {
       | 'SAPPHIRE'
       | 'RUBY'
       | 'EMERALD'
-      | 'JADE'
       | 'PEARL'
       | 'OTHER'
     caratWeight?: number
@@ -69,7 +68,6 @@ const COLLECTIONS = [
   { slug: 'vintage-era', title: 'Vintage Era', kind: 'ARCHIVE_VINTAGE' as const },
   { slug: 'near-vintage', title: 'Near Vintage', kind: 'NEAR_VINTAGE' as const },
   { slug: 'modern-fine-jewelry', title: 'Modern Fine Jewelry', kind: 'FINE_JEWELRY' as const },
-  { slug: 'jade', title: 'Jade', kind: 'JADE' as const },
   { slug: 'gold', title: 'Gold', kind: 'GOLD' as const },
   { slug: 'pearls', title: 'Pearls', kind: 'PEARLS' as const },
   { slug: 'new-arrivals', title: 'New Arrivals', kind: 'NEW_ARRIVALS' as const },
@@ -98,42 +96,6 @@ const PRODUCTS: ProductSeed[] = [
     isFeatured: true,
     collections: ['vintage-era', 'gold'],
     materials: [{ kind: 'GOLD_YELLOW', notes: '14K' }],
-  },
-  {
-    slug: 'jade-bangle-imperial-green',
-    title: 'Imperial Green Jade Bangle',
-    era: 'JADE',
-    shortDescription: 'Translucent green jadeite, type A, never worn.',
-    longDescription:
-      'Type A jadeite, untreated. The color shifts a little in daylight and runs deeper at the rim. Sourced from a Burmese dealer we work with regularly. Unworn.',
-    priceCents: 165000,
-    isFinalSale: true,
-    returnWindowDays: 0,
-    condition: 'NEW_OLD_STOCK',
-    conditionNotes: 'Unworn estate stock. Hand-finished interior.',
-    isFeatured: true,
-    isNewArrival: true,
-    collections: ['jade', 'new-arrivals'],
-    stones: [{ kind: 'JADE', notes: 'Type A jadeite' }],
-  },
-  {
-    slug: 'jade-pendant-trinket-fish',
-    title: 'Jade Trinket, Carved Fish',
-    era: 'JADE',
-    shortDescription: 'A small carved fish on a 14K bail. Unworn.',
-    longDescription:
-      'Hand-carved nephrite, never strung or worn. The bail is set in 14K yellow gold so you can wear it on a chain you already own. Sourced from a workshop in southern China.',
-    priceCents: 32000,
-    goldKarat: 'K14',
-    gramWeight: 2.6,
-    gramWeightVisible: false,
-    isFinalSale: true,
-    returnWindowDays: 0,
-    condition: 'NEW_OLD_STOCK',
-    isNewArrival: true,
-    collections: ['jade', 'new-arrivals'],
-    stones: [{ kind: 'JADE' }],
-    materials: [{ kind: 'GOLD_YELLOW', notes: '14K bail' }],
   },
   {
     slug: 'modern-fine-solitaire-old-european',
@@ -402,36 +364,6 @@ async function main() {
   // ─── Editorial posts ────────────────────────────────────────────────
   const editorial = [
     {
-      slug: 'on-jade',
-      title: 'On Jade',
-      excerpt:
-        'A note on what makes jade quiet, and why the right piece warms with the wearer.',
-      publishedAt: new Date('2026-03-01T10:00:00Z'),
-      body: `Jade is quiet. It doesn't sparkle the way diamonds do, and that's the point. It warms with skin contact and softens slowly over years of being worn.
-
-The pieces we carry are bangles, small carved trinkets, and the occasional pendant. All of them are unworn. Some are jadeite, sourced through a small group of dealers we've worked with for years. Some are nephrite, which has a gentler tone and is more durable. We label each piece with its type.
-
-## On treatment
-
-Jadeite has a long history with treatment. **Type A** is untreated; just the natural mineral, polished. **Type B** has been bleached and resin-impregnated. **Type C** has also been dyed.
-
-We don't stock B or C. When a piece is type A, we say so. When we can't verify the type, we describe what we can observe and price accordingly. That's not a marketing line; it's the only way an archive like this can work.
-
-## On wearing it
-
-Once you start wearing jade, it changes. The oils of skin warm the stone and, over decades, soften its surface. A piece kept in a drawer stays a piece in a drawer. A piece worn for years becomes yours.
-
-> The right jade is the one you forget you're wearing.
-
-A few practical notes: jade doesn't love ultrasonic cleaners or sudden heat. A soft cloth, warm water, and mild soap is the whole care kit.
-
-## On price
-
-Jade isn't always rare, and we're not going to pretend it is. We pick pieces for their carve, color, and weight in the hand. A small, well-cut piece that gets worn for fifty years beats an inflated provenance claim every time.
-
-If a piece interests you, [send a note](/contact). We'll tell you what we know.`,
-    },
-    {
       slug: 'on-vintage-era',
       title: 'On the Vintage Era',
       excerpt:
@@ -482,7 +414,7 @@ Gold reads on the touch. A carve reads in the light. A setting either holds a st
 
 When a piece arrives, we check it in this order:
 
-1. **Material.** Acid test where appropriate, specific gravity for jadeite, a loupe for the stone, a magnet on the chain. The piece is whatever it actually is, not whatever the seller called it.
+1. **Material.** Acid test where appropriate, a loupe for the stone, a magnet on the chain. The piece is whatever it actually is, not whatever the seller called it.
 2. **Craft.** Are the prongs even? Is the bezel rolled clean? Does the engraving show the same hand on both sides of a signet? Careful makers leave careful details.
 3. **Story.** *Then* we look at the hallmark, the provenance, whatever paperwork came with it. Story comes last because story is the easiest part to fake.
 
@@ -492,7 +424,7 @@ We've turned down pieces with confident-sounding provenance because the math did
 
 ## What we won't do
 
-The reverse is also true. We won't invent a story to make a piece sound rarer. If a jade bangle is type A, well-cut, and a nice color, we'll say that. We won't call it "imperial" or "museum-grade" unless those words actually fit.
+The reverse is also true. We won't invent a story to make a piece sound rarer. If a signet is 14K, well-cut, and an honest weight, we'll say that. We won't call it "imperial" or "museum-grade" unless those words actually fit.
 
 We trust the piece. We trust you. We try not to get in the way.`,
     },
@@ -535,16 +467,6 @@ We trust the piece. We trust you. We try not to get in the way.`,
     },
     {
       position: 1,
-      type: 'JADE_FEATURE',
-      data: {
-        headline: 'Jade, unworn and quiet.',
-        body: 'Bangles and small trinkets, sourced from dealers we know.',
-        productSlugs: ['jade-bangle-imperial-green', 'jade-pendant-trinket-fish'],
-        cta: { label: 'See the Jade', href: '/collections/jade' },
-      },
-    },
-    {
-      position: 2,
       type: 'NEW_ARRIVALS_GRID',
       data: { count: 6 },
     },

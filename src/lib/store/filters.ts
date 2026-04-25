@@ -21,7 +21,6 @@ export const FILTERABLE_STONES = [
   'SAPPHIRE',
   'RUBY',
   'EMERALD',
-  'JADE',
   'PEARL',
   'OPAL',
 ] as const satisfies readonly StoneKind[]

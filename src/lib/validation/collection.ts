@@ -5,7 +5,6 @@ export const collectionKind = z.enum([
   'ARCHIVE_VINTAGE',
   'NEAR_VINTAGE',
   'FINE_JEWELRY',
-  'JADE',
   'GOLD',
   'PEARLS',
   'NEW_ARRIVALS',

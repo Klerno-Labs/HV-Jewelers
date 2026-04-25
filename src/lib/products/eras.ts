@@ -54,9 +54,9 @@ export const STOCK_MODE_LABELS: Record<StockMode, string> = {
 }
 
 /**
- * Default return policy by era. Vintage/Near-Vintage/Jade default to final
- * sale; Modern Fine pieces default to a 15-day window. Admin can override
- * per product before publishing.
+ * Default return policy by era. Vintage Era and Near Vintage default to
+ * final sale; Modern Fine pieces default to a 15-day window. Admin can
+ * override per product before publishing.
  */
 export interface EraPolicyDefaults {
   isFinalSale: boolean

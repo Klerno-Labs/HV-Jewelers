@@ -42,8 +42,8 @@ export default async function AdminPoliciesPage() {
           </table>
         </div>
         <p className="mt-6 max-w-2xl text-caption leading-relaxed text-ink-muted">
-          Vintage Era, Near Vintage, and Jade default to final sale. Modern
-          Fine pieces default to a 15-day window for unworn returns. Resizing
+          Vintage Era and Near Vintage default to final sale. Modern Fine
+          pieces default to a 15-day window for unworn returns. Resizing
           a piece voids the return window per the resize-voids-return flag on
           the product. Damage and not-as-described claims follow a separate
           remedy path defined in policy copy.

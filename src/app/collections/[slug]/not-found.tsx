@@ -23,14 +23,6 @@ export default function CollectionNotFound() {
         </li>
         <li>
           <Link
-            href="/collections/jade"
-            className="text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
-          >
-            Jade
-          </Link>
-        </li>
-        <li>
-          <Link
             href="/collections/modern-fine-jewelry"
             className="text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
           >

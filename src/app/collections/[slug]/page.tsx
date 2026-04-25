@@ -6,7 +6,6 @@ import { CollectionHero } from '@/components/store/collection-hero'
 import { ProductGrid } from '@/components/store/product-grid'
 import { FilterBar } from '@/components/store/filter-bar'
 import { EmptyState } from '@/components/store/empty-state'
-import { JadeShowpiece } from '@/components/store/jade-showpiece'
 import { prisma } from '@/lib/prisma'
 import { getCollectionMeta, PUBLIC_COLLECTION_SLUGS } from '@/lib/store/collections'
 import {
@@ -60,7 +59,6 @@ export default async function CollectionPage({ params, searchParams }: PageProps
           />
           <CollectionHero meta={meta} count={0} className="mt-10" />
         </Container>
-        {slug === 'jade' ? <JadeShowpiece /> : null}
         <Container>
           <EmptyState
             eyebrow="Quiet for now"
@@ -141,8 +139,6 @@ export default async function CollectionPage({ params, searchParams }: PageProps
         />
         <CollectionHero meta={meta} count={totalUnfiltered} className="mt-10" />
       </Container>
-
-      {slug === 'jade' ? <JadeShowpiece /> : null}
 
       <Container>
         <FilterBar basePath={`/collections/${slug}`} filters={filters} />

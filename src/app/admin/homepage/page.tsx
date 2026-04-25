@@ -22,7 +22,6 @@ const TYPE_LABELS: Record<string, string> = {
   EDITORIAL_HIGHLIGHT: 'Editorial highlight',
   FEATURED_COLLECTION: 'Featured collection',
   NEW_ARRIVALS_GRID: 'New arrivals grid',
-  JADE_FEATURE: 'Jade feature',
   TWO_UP: 'Two-up',
   PRESS_QUOTE: 'Press quote',
   CTA_BAND: 'CTA band',

@@ -12,7 +12,7 @@ export default async function AdminEditorialPage() {
       <AdminPageHeader
         eyebrow="Editorial"
         title="Posts"
-        description="Long-form pieces: sourcing notes, jade craft, archive stories."
+        description="Long-form pieces: sourcing notes, material guides, archive stories."
       />
       <AdminPageBody>
         <PlaceholderPanel

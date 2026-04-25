@@ -22,7 +22,6 @@ const STONE_LABELS: Record<(typeof FILTERABLE_STONES)[number], string> = {
   SAPPHIRE: 'Sapphire',
   RUBY: 'Ruby',
   EMERALD: 'Emerald',
-  JADE: 'Jade',
   PEARL: 'Pearl',
   OPAL: 'Opal',
 }

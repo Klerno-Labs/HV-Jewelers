@@ -12,7 +12,7 @@ export default async function AdminProductsPage() {
       <AdminPageHeader
         eyebrow="Catalog"
         title="Products"
-        description="The catalog. Vintage Era, Near Vintage, Modern Fine, and Jade pieces, with policy and inventory state."
+        description="The catalog. Vintage Era, Near Vintage, and Modern Fine pieces, with policy and inventory state."
       />
       <AdminPageBody>
         <PlaceholderPanel

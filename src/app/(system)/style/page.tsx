@@ -40,7 +40,6 @@ export default function StylePage() {
           <li>· Quiet before loud. Restraint is the brand.</li>
           <li>· Serif for voice. Sans for information.</li>
           <li>· Metals as ornament, not as ink.</li>
-          <li>· Jade is a world, not a category tag.</li>
           <li>· Craft and material speak before provenance.</li>
           <li>· Never a cliché. Greek by restraint, not by column.</li>
         </ul>

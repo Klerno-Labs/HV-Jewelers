@@ -3,7 +3,6 @@ import { Container } from '@/components/layout/container'
 import { buttonVariants } from '@/components/ui/button'
 import { Manifesto } from '@/components/store/manifesto'
 import { WorldFeature } from '@/components/store/world-feature'
-import { JadeStory } from '@/components/store/jade-story'
 import { JournalPreview } from '@/components/store/journal-preview'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { FadeIn } from '@/components/store/fade-in'
@@ -37,7 +36,7 @@ const PRODUCT_SELECT = {
 
 async function loadHomeData() {
   try {
-    const [vintageProducts, jadeProducts, modernProducts, newArrivals, posts] =
+    const [vintageProducts, modernProducts, newArrivals, posts] =
       await Promise.all([
         prisma.product.findMany({
           where: {
@@ -47,16 +46,6 @@ async function loadHomeData() {
           },
           orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }],
           take: 4,
-          select: PRODUCT_SELECT,
-        }),
-        prisma.product.findMany({
-          where: {
-            status: 'ACTIVE',
-            isHidden: false,
-            era: 'JADE',
-          },
-          orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }],
-          take: 3,
           select: PRODUCT_SELECT,
         }),
         prisma.product.findMany({
@@ -92,11 +81,10 @@ async function loadHomeData() {
           },
         }),
       ])
-    return { vintageProducts, jadeProducts, modernProducts, newArrivals, posts }
+    return { vintageProducts, modernProducts, newArrivals, posts }
   } catch {
     return {
       vintageProducts: [],
-      jadeProducts: [],
       modernProducts: [],
       newArrivals: [],
       posts: [],
@@ -132,11 +120,8 @@ export default async function Home() {
   const data = await loadHomeData()
 
   const vintage = data.vintageProducts.map(toCard)
-  const jade = data.jadeProducts.map(toCard)
   const modern = data.modernProducts.map(toCard)
   const arrivals = data.newArrivals.map(toCard)
-  const jadeEssaySlug =
-    data.posts.find((p) => p.slug.includes('jade'))?.slug ?? null
 
   return (
     <>
@@ -161,9 +146,9 @@ export default async function Home() {
               Vintage Era and modern fine jewelry. Every piece unworn.
             </h1>
             <p className="mt-10 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-              Older-era pieces that were made but never sold, jade we
-              source and verify, and modern fine jewelry made fresh on
-              the bench. None of it has been worn before.
+              Older-era pieces that were made but never sold, alongside
+              modern fine jewelry made fresh on the bench. None of it
+              has been worn before.
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-4">
               <Link
@@ -218,10 +203,7 @@ export default async function Home() {
         preview={vintage}
       />
 
-      {/* ─── World 02 — Jade ─── */}
-      <JadeStory pieces={jade} essaySlug={jadeEssaySlug} />
-
-      {/* ─── World 03 — Modern Fine ─── */}
+      {/* ─── World 02 — Modern Fine ─── */}
       <WorldFeature
         eyebrow="Modern Fine Jewelry"
         title="New pieces, made to wear daily."
@@ -287,7 +269,7 @@ export default async function Home() {
             />
             <Pillar
               title="Plain about returns"
-              body="Vintage Era, Near Vintage, and most jade are final sale. Modern Fine pieces have a 15-day return window on unworn returns. Resizing a piece voids that window."
+              body="Vintage Era and Near Vintage pieces are final sale. Modern Fine pieces have a 15-day return window on unworn returns. Resizing a piece voids that window."
               cta={{ href: '/returns', label: 'Read the return policy' }}
             />
           </FadeIn>

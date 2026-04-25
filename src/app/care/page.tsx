@@ -5,7 +5,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Care & Resizing',
   description:
-    'How to care for gold, jade, pearls, and modern fine jewelry, and how resizing works at HV Jewelers.',
+    'How to care for gold, pearls, and modern fine jewelry, and how resizing works at HV Jewelers.',
 }
 
 export default function CarePage() {
@@ -32,16 +32,6 @@ export default function CarePage() {
             in 7 to 10 days. Vintage Era pieces are sized as made; where
             a resize is possible, the range is narrower. Resizing voids
             the return window.
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-eyebrow text-ink-muted">Jade</dt>
-          <dd className="mt-3">
-            Jade does well with regular wear. Skip ultrasonic cleaners,
-            harsh detergents, and sudden temperature changes. A soft cloth
-            and warm water is plenty. Type A jadeite doesn&apos;t need
-            chemical care; never test it with acid.
           </dd>
         </div>
 

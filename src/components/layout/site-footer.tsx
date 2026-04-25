@@ -6,7 +6,6 @@ const footerNav: Record<string, { label: string; href: string }[]> = {
     { label: 'Vintage Era', href: '/collections/vintage-era' },
     { label: 'Near Vintage', href: '/collections/near-vintage' },
     { label: 'Modern Fine Jewelry', href: '/collections/modern-fine-jewelry' },
-    { label: 'Jade', href: '/collections/jade' },
     { label: 'Gold', href: '/collections/gold' },
     { label: 'Pearls', href: '/collections/pearls' },
     { label: 'New Arrivals', href: '/collections/new-arrivals' },
@@ -37,8 +36,8 @@ export function SiteFooter() {
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
               Quietly sourced pieces across Vintage Era, Near Vintage,
-              Jade, and Modern Fine Jewelry. All unworn. Verified in
-              person before they go on the site.
+              and Modern Fine Jewelry. All unworn. Verified in person
+              before they go on the site.
             </p>
           </div>
           {Object.entries(footerNav).map(([heading, items]) => (

@@ -32,7 +32,7 @@ export default async function AdminCollectionsPage({
       <AdminPageHeader
         eyebrow="Catalog"
         title="Collections"
-        description="Editorial worlds: Archive, Near Vintage, Fine, Jade, Gold, Pearls, New Arrivals, plus curated edits."
+        description="Editorial worlds: Archive, Near Vintage, Fine, Gold, Pearls, New Arrivals, plus curated edits."
         actions={
           <Link
             href="/admin/collections/new"

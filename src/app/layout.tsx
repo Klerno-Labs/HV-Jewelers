@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s · HV Jewelers',
   },
   description:
-    'Hong Vi Jewelers. A small archive of unworn jewelry: Vintage Era, Near Vintage, jade, and modern fine pieces.',
+    'Hong Vi Jewelers. A small archive of unworn jewelry: Vintage Era, Near Vintage, and modern fine pieces.',
   applicationName: 'HV Jewelers',
   authors: [{ name: 'Hong Vi Jewelers' }],
   // Public pages inherit indexable defaults from Next's built-in policy.
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: 'HV Jewelers',
     title: 'HV Jewelers · Hong Vi',
     description:
-      'A small archive of unworn Vintage Era, Near Vintage, jade, and modern fine jewelry.',
+      'A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
     locale: 'en_US',
   },
   icons: {

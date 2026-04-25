@@ -359,7 +359,7 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
               title={product.isFinalSale ? 'Final sale' : `${product.returnWindowDays}-day return`}
               body={
                 product.isFinalSale
-                  ? 'Vintage Era, Near Vintage, and most jade pieces are final sale.'
+                  ? 'Vintage Era and Near Vintage pieces are final sale.'
                   : 'Eligible for unworn returns within the listed window.'
               }
               href="/returns"
@@ -367,7 +367,7 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
             <CareLink
               eyebrow="Care notes"
               title="Worn slowly, kept softly."
-              body="Notes on jade, gold, pearls, and modern fine jewelry."
+              body="Notes on gold, pearls, and modern fine jewelry."
               href="/care"
             />
           </div>

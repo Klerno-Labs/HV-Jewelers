@@ -55,14 +55,6 @@ export default function ReturnsPage() {
         </div>
 
         <div>
-          <dt className="text-eyebrow text-ink-muted">Jade</dt>
-          <dd className="mt-3">
-            Most jade is final sale. The exact policy is on each product
-            page, so read it before you buy.
-          </dd>
-        </div>
-
-        <div>
           <dt className="text-eyebrow text-ink-muted">Damaged or not as described</dt>
           <dd className="mt-3">
             <span className="font-serif text-ink">We&apos;ll make it right.</span>{' '}
