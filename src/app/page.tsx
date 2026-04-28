@@ -196,7 +196,7 @@ export default async function Home() {
       <WorldFeature
         eyebrow="Vintage Era"
         title="Older pieces, never worn."
-        body="Signets, bands, brooches, and fine chain from earlier eras. Made decades ago, kept in jewelry store inventory, never sold to a customer. We verify each piece in person and describe exactly what we see: stamps, finish, and the small marks long storage leaves. We don't polish or restore. Vintage Era pieces are final sale, so the description has to do the work."
+        body="Signets, bands, brooches, and fine chain from the 1980s and 1990s. Made then, kept in jewelry store inventory, never sold to a customer. We verify each piece in person and describe exactly what we see: stamps, finish, and the small marks long storage leaves. We don't polish or restore. Vintage Era pieces are final sale, so the description has to do the work."
         href="/collections/vintage-era"
         ctaLabel="See the archive"
         tone="cedar"

@@ -22,17 +22,17 @@ const META: Record<string, CollectionMeta> = {
   'vintage-era': {
     slug: 'vintage-era',
     title: 'Vintage Era',
-    eyebrow: 'Pre-1980, unworn',
+    eyebrow: '1980s and 1990s, unworn',
     intro:
-      'Older pieces that were made decades ago and never sold. They came directly from jewelry stores that kept them in inventory for years without ever ringing one up. We verify each piece in person and describe what we see. Vintage Era pieces are final sale, so the writeup has to do the work.',
+      'Pieces from the 1980s and 1990s that came directly from jewelry stores. They were made for retail, kept in inventory, and never sold to a customer. We verify each piece in person and describe what we see. Vintage Era pieces are final sale, so the writeup has to do the work.',
     notes: 'Sized as made. Resizing available on select pieces.',
   },
   'near-vintage': {
     slug: 'near-vintage',
     title: 'Near Vintage',
-    eyebrow: 'Late twentieth century',
+    eyebrow: 'Roughly the last fifteen years',
     intro:
-      'Pieces from the late twentieth century: late deco, mid-century, the cleaner lines of the seventies and eighties. All unworn. Often unsigned. Final sale.',
+      'Pieces from the late 2000s and 2010s. Newer than Vintage Era but still kept aside in store inventory long enough that we can list them as unworn. Often unsigned. Final sale.',
   },
   'modern-fine-jewelry': {
     slug: 'modern-fine-jewelry',

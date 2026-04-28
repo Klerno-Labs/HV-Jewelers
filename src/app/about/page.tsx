@@ -83,7 +83,7 @@ export default function AboutPage() {
             <Principle
               number="02"
               title="Unworn, every piece."
-              body="Whether it was made in 1952 or last month, nothing in the catalog has been worn. Older pieces come from jewelry stores that held them in inventory for years, sometimes decades, without ever ringing one up. That's harder to find than 'vintage' usually delivers, and it's the part we're most proud of."
+              body="Whether it was made in 1985 or last month, nothing in the catalog has been worn. Older pieces come from jewelry stores that held them in inventory for years, sometimes decades, without ever ringing one up. That's harder to find than 'vintage' usually delivers, and it's the part we're most proud of."
             />
             <Principle
               number="03"
@@ -107,13 +107,13 @@ export default function AboutPage() {
             <WorldRow
               eyebrow="01"
               title="Vintage Era"
-              body="Older-era pieces that were made decades ago and never sold. Verified in person before we list them. Final sale; described plainly."
+              body="Pieces from the 1980s and 1990s that were made for retail and never sold. Verified in person before we list them. Final sale; described plainly."
               href="/collections/vintage-era"
             />
             <WorldRow
               eyebrow="02"
               title="Near Vintage"
-              body="Pieces from the late twentieth century. Often unsigned, all unworn. Final sale."
+              body="Pieces from the last fifteen-or-so years — late 2000s and 2010s. Often unsigned, all unworn. Final sale."
               href="/collections/near-vintage"
             />
             <WorldRow

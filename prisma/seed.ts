@@ -75,12 +75,12 @@ const COLLECTIONS = [
 
 const PRODUCTS: ProductSeed[] = [
   {
-    slug: 'vintage-art-deco-signet-1928',
-    title: 'Art Deco Signet, c. 1928',
+    slug: 'vintage-signet-1986',
+    title: 'Engraved Signet, c. 1986',
     era: 'VINTAGE_ERA',
-    shortDescription: 'A 14K signet from the late 1920s. Made then, kept since, never worn.',
+    shortDescription: 'A 14K signet from the mid-1980s. Made then, kept in store inventory since, never worn.',
     longDescription:
-      'Hand-engraved into 14K yellow gold with the restrained geometry of late Art Deco. Made in the late 1920s and held in retail inventory ever since; the engraving is crisp and the shoulders are unworn. Sourced directly from a jewelry store that kept it in stock without ever ringing one up.',
+      'Hand-engraved into 14K yellow gold with clean, restrained geometry. Made in the mid-1980s and held in retail inventory ever since; the engraving is crisp and the shoulders are unworn. Sourced directly from a jewelry store that kept it in stock without ever ringing one up.',
     priceCents: 285000,
     goldKarat: 'K14',
     gramWeight: 11.4,
@@ -123,9 +123,9 @@ const PRODUCTS: ProductSeed[] = [
     slug: 'near-vintage-pearl-strand',
     title: 'Near-Vintage Akoya Strand',
     era: 'NEAR_VINTAGE',
-    shortDescription: 'Mid-century Akoya pearls on original silk. Unworn.',
+    shortDescription: 'Akoya pearls on original silk, ordered around 2010. Unworn.',
     longDescription:
-      "A clean strand of Akoya pearls from the mid-twentieth century, on the original silk with the original 14K clasp. Never sold, never worn. Soft, even luster across the strand. The silk is in good condition for its age; we'd recommend a visual inspection after the first stretch of regular wear, as is standard for any older strand.",
+      "A clean strand of Akoya pearls strung in the late 2000s, on the original silk with the original 14K clasp. Never sold, never worn. Soft, even luster across the strand. The silk is in good condition for its age; we'd recommend a visual inspection after the first stretch of regular wear, as is standard for any strand more than a few years old.",
     priceCents: 92000,
     goldKarat: 'K14',
     isFinalSale: true,
@@ -371,7 +371,7 @@ async function main() {
       publishedAt: new Date('2026-03-15T10:00:00Z'),
       body: `The word "vintage" gets used loosely. We use **Vintage Era** for a reason.
 
-Most places say "vintage" and mean previously owned, often well-worn. We don't carry that. **Vintage Era** at HV means a piece that was made before 1980 *and* has never been worn or sold. Not "in the style of," not "vintage-inspired." Actually old, but unused. These came directly from jewelry stores that kept them in stock — sometimes for decades — without ever finding a buyer.
+Most places say "vintage" and mean previously owned, often well-worn. We don't carry that. **Vintage Era** at HV means a piece made in the 1980s or 1990s that has never been worn or sold. Not "in the style of," not "vintage-inspired." Actually that old, but unused. These came directly from jewelry stores that kept them in stock — sometimes for decades — without ever finding a buyer.
 
 ## How that works
 
