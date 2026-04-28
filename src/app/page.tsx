@@ -3,7 +3,6 @@ import { Container } from '@/components/layout/container'
 import { buttonVariants } from '@/components/ui/button'
 import { Manifesto } from '@/components/store/manifesto'
 import { WorldFeature } from '@/components/store/world-feature'
-import { JournalPreview } from '@/components/store/journal-preview'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { FadeIn } from '@/components/store/fade-in'
 import { cn } from '@/lib/cn'
@@ -11,9 +10,8 @@ import { prisma } from '@/lib/prisma'
 import { ProductCard, type ProductCardData } from '@/components/store/product-card'
 
 /**
- * The editorial home. Reads a small set of products and journal posts;
- * gracefully falls back to typography-only treatment when data is
- * missing so the page is always coherent.
+ * The editorial home. Reads a small set of products; gracefully falls
+ * back to typography-only treatment when data is missing.
  */
 
 const PRODUCT_SELECT = {
@@ -36,7 +34,7 @@ const PRODUCT_SELECT = {
 
 async function loadHomeData() {
   try {
-    const [vintageProducts, modernProducts, newArrivals, posts] =
+    const [vintageProducts, modernProducts, newArrivals] =
       await Promise.all([
         prisma.product.findMany({
           where: {
@@ -68,26 +66,13 @@ async function loadHomeData() {
           take: 4,
           select: PRODUCT_SELECT,
         }),
-        prisma.editorialPost.findMany({
-          where: { status: 'PUBLISHED' },
-          orderBy: { publishedAt: 'desc' },
-          take: 2,
-          select: {
-            slug: true,
-            title: true,
-            excerpt: true,
-            publishedAt: true,
-            heroImageUrl: true,
-          },
-        }),
       ])
-    return { vintageProducts, modernProducts, newArrivals, posts }
+    return { vintageProducts, modernProducts, newArrivals }
   } catch {
     return {
       vintageProducts: [],
       modernProducts: [],
       newArrivals: [],
-      posts: [],
     }
   }
 }
@@ -245,9 +230,6 @@ export default async function Home() {
           </Container>
         </section>
       ) : null}
-
-      {/* ─── Journal preview ─── */}
-      <JournalPreview posts={data.posts} />
 
       {/* ─── Care band ─── */}
       <section className="border-t border-limestone-deep/60 bg-limestone/40">

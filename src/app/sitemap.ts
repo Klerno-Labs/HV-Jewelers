@@ -6,9 +6,8 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000'
 
 /**
- * Sitemap. Static pages + live collection pages + live product pages +
- * published journal entries. Fails soft when the DB is unreachable —
- * we return just the static pages so crawlers never see a blank site.
+ * Sitemap. Static pages + live collection pages + live product pages.
+ * Fails soft when the DB is unreachable.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
@@ -20,7 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/shipping`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${SITE_URL}/returns`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${SITE_URL}/care`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${SITE_URL}/journal`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
   ]
 
   const collectionEntries: MetadataRoute.Sitemap = PUBLIC_COLLECTION_SLUGS.map(
@@ -33,18 +31,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   try {
-    const [products, posts] = await Promise.all([
-      prisma.product.findMany({
-        where: { status: 'ACTIVE', isHidden: false },
-        select: { slug: true, updatedAt: true },
-        take: 5000,
-      }),
-      prisma.editorialPost.findMany({
-        where: { status: 'PUBLISHED' },
-        select: { slug: true, updatedAt: true },
-        take: 1000,
-      }),
-    ])
+    const products = await prisma.product.findMany({
+      where: { status: 'ACTIVE', isHidden: false },
+      select: { slug: true, updatedAt: true },
+      take: 5000,
+    })
 
     const productEntries: MetadataRoute.Sitemap = products.map((p) => ({
       url: `${SITE_URL}/products/${p.slug}`,
@@ -53,19 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
 
-    const postEntries: MetadataRoute.Sitemap = posts.map((p) => ({
-      url: `${SITE_URL}/journal/${p.slug}`,
-      lastModified: p.updatedAt,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    }))
-
-    return [
-      ...staticEntries,
-      ...collectionEntries,
-      ...productEntries,
-      ...postEntries,
-    ]
+    return [...staticEntries, ...collectionEntries, ...productEntries]
   } catch {
     return [...staticEntries, ...collectionEntries]
   }

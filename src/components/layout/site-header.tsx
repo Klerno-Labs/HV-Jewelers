@@ -13,7 +13,6 @@ const primaryNav = [
 ]
 
 const secondaryNav = [
-  { label: 'Journal', href: '/journal' },
   { label: 'About', href: '/about' },
   { label: 'Concierge', href: '/contact' },
   { label: 'Shipping', href: '/shipping' },
@@ -66,12 +65,6 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-5">
-          <Link
-            href="/journal"
-            className="hidden text-caption text-ink-soft transition-colors duration-300 hover:text-olive xl:inline"
-          >
-            Journal
-          </Link>
           <Link
             href="/account"
             className="hidden text-caption text-ink-soft transition-colors duration-300 hover:text-olive sm:inline"

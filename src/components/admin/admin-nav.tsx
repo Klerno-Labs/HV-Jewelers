@@ -37,7 +37,6 @@ const NAV_GROUPS: NavGroup[] = [
   {
     heading: 'Editorial',
     items: [
-      { label: 'Posts', href: '/admin/editorial' },
       { label: 'Homepage', href: '/admin/homepage' },
     ],
   },

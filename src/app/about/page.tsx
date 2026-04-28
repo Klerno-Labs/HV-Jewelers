@@ -154,12 +154,6 @@ export default function AboutPage() {
           </FadeIn>
           <FadeIn delay={200} className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-limestone-deep/60 pt-8">
             <Link
-              href="/journal"
-              className="text-caption tracking-wide text-ink underline underline-offset-4 decoration-bronze/60 transition-colors hover:text-olive hover:decoration-olive"
-            >
-              Read the Journal →
-            </Link>
-            <Link
               href="/care"
               className="text-caption tracking-wide text-ink-soft underline underline-offset-4 decoration-bronze/40 transition-colors hover:text-olive hover:decoration-olive"
             >

@@ -63,8 +63,8 @@ export default async function CollectionPage({ params, searchParams }: PageProps
           <EmptyState
             eyebrow="Quiet for now"
             title="This collection is being built."
-            body="We add small, considered sets every few weeks. Check back soon, or read the journal in the meantime."
-            action={{ label: 'Read the Journal', href: '/journal' }}
+            body="We add small, considered sets every few weeks. Check back soon, or browse what is already in the archive."
+            action={{ label: 'See New Arrivals', href: '/collections/new-arrivals' }}
           />
         </Container>
       </>
@@ -161,7 +161,7 @@ export default async function CollectionPage({ params, searchParams }: PageProps
             action={
               isFiltered
                 ? { label: 'Clear filters', href: `/collections/${slug}` }
-                : { label: 'Read the Journal', href: '/journal' }
+                : { label: 'See New Arrivals', href: '/collections/new-arrivals' }
             }
           />
         ) : (

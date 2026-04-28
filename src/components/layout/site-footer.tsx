@@ -12,7 +12,6 @@ const footerNav: Record<string, { label: string; href: string }[]> = {
   ],
   'The House': [
     { label: 'About Hoang Vi', href: '/about' },
-    { label: 'Journal', href: '/journal' },
     { label: 'Concierge', href: '/contact' },
   ],
   Care: [

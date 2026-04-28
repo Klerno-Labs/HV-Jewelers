@@ -40,14 +40,6 @@ export default function NotFound() {
         </li>
         <li>
           <Link
-            href="/journal"
-            className="text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
-          >
-            The Journal →
-          </Link>
-        </li>
-        <li>
-          <Link
             href="/contact"
             className="text-ink-soft underline underline-offset-4 decoration-bronze/40 hover:text-olive hover:decoration-olive"
           >
