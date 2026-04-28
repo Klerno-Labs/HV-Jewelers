@@ -11,7 +11,7 @@ const footerNav: Record<string, { label: string; href: string }[]> = {
     { label: 'New Arrivals', href: '/collections/new-arrivals' },
   ],
   'The House': [
-    { label: 'About Hong Vi', href: '/about' },
+    { label: 'About Hoang Vi', href: '/about' },
     { label: 'Journal', href: '/journal' },
     { label: 'Concierge', href: '/contact' },
   ],
@@ -32,7 +32,7 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <p className="font-serif text-heading text-ink">HV Jewelers</p>
             <p className="mt-3 text-eyebrow text-ink-muted">
-              Hong Vi · A small archive
+              Hoang Vi · A small archive
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
               Quietly sourced pieces across Vintage Era, Near Vintage,

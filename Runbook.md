@@ -50,7 +50,7 @@ commit `.env.local`.**
 | `STRIPE_WEBHOOK_SECRET`                 | Stripe → Developers → Webhooks                | Yes      |
 | `STRIPE_TAX_ENABLED`                    | `"true"` after activating Stripe Tax          | Optional |
 | `RESEND_API_KEY`                        | Resend dashboard                              | Yes      |
-| `EMAIL_FROM_ADDRESS`                    | `Hong Vi <concierge@hvjewelers.com>`          | Yes      |
+| `EMAIL_FROM_ADDRESS`                    | `Hoang Vi <concierge@hvjewelers.com>`          | Yes      |
 | `EMAIL_REPLY_TO`                        | Optional custom reply-to                      | Optional |
 | `SHIPPO_API_KEY`                        | Shippo → API → Tokens                         | Optional |
 | `SELLER_SHIP_FROM_*` (5 fields)         | Your return address                           | For Shippo |

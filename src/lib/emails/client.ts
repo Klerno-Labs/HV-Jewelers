@@ -21,7 +21,7 @@ export function isEmailConfigured(): boolean {
 }
 
 export function fromAddress(): string {
-  return serverEnv.EMAIL_FROM_ADDRESS ?? 'Hong Vi <concierge@hvjewelers.com>'
+  return serverEnv.EMAIL_FROM_ADDRESS ?? 'Hoang Vi <concierge@hvjewelers.com>'
 }
 
 export function replyTo(): string | undefined {

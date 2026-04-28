@@ -80,7 +80,7 @@ const PRODUCTS: ProductSeed[] = [
     era: 'VINTAGE_ERA',
     shortDescription: 'A 14K signet from the late 1920s. Made then, kept since, never worn.',
     longDescription:
-      'Hand-engraved into 14K yellow gold with the restrained geometry of late Art Deco. Made in the late 1920s and stored since; the engraving is crisp and the shoulders are unworn. Sourced from an estate workshop that kept its trade pieces aside.',
+      'Hand-engraved into 14K yellow gold with the restrained geometry of late Art Deco. Made in the late 1920s and held in retail inventory ever since; the engraving is crisp and the shoulders are unworn. Sourced directly from a jewelry store that kept it in stock without ever ringing one up.',
     priceCents: 285000,
     goldKarat: 'K14',
     gramWeight: 11.4,
@@ -371,17 +371,17 @@ async function main() {
       publishedAt: new Date('2026-03-15T10:00:00Z'),
       body: `The word "vintage" gets used loosely. We use **Vintage Era** for a reason.
 
-Most places say "vintage" and mean previously owned, often well-worn. We don't carry that. **Vintage Era** at HV means a piece that was made before 1980 *and* has never been worn or sold. Not "in the style of," not "vintage-inspired." Actually old, but unused. We source these through estate dealers and small workshops that kept inventory aside, sometimes for decades.
+Most places say "vintage" and mean previously owned, often well-worn. We don't carry that. **Vintage Era** at HV means a piece that was made before 1980 *and* has never been worn or sold. Not "in the style of," not "vintage-inspired." Actually old, but unused. These came directly from jewelry stores that kept them in stock — sometimes for decades — without ever finding a buyer.
 
 ## How that works
 
-Workshops produce more than they sell. Estates sit on inventory that never moved. Family-run dealers in Asia and Europe have been holding pieces for years. We work with a short list of those sources, look at every piece in person, and only list what we can verify.
+Jewelry stores order more than they sell. Display pieces stay in cases for years. When a store closes, downsizes, or clears old inventory, those unsold pieces have to go somewhere. We work with a short list of store owners and trade dealers, look at every piece in person, and only list what we can verify.
 
-So it's a narrower set than the Vintage Era usually delivers: old enough to count, but new in the sense that nobody's worn it.
+So it's a narrower set than "vintage" usually delivers: old enough to count, but new in the sense that nobody's worn it.
 
 ## On condition
 
-These pieces have been sitting on shelves and in drawers for decades. They haven't been worn, but storage leaves its own small marks. We describe what we see in plain words:
+These pieces have been sitting in showcases and inventory drawers for decades. They haven't been worn, but storage leaves its own small marks. We describe what we see in plain words:
 
 - **New, old stock.** Older inventory, never worn or sold. Most of our Vintage Era catalog. Sometimes still in original packaging.
 - **Excellent.** Unworn, with the kind of minor surface marks you'd expect from long storage (a faint scuff on a band's back, a touch of tarnish). No structural issues.
@@ -390,7 +390,7 @@ We don't restore. We don't polish them up. The pieces come to you the way they c
 
 ## On signatures
 
-A lot of what we sell is unsigned. That's normal for the era and for pieces sourced through Asia in the mid-twentieth century. We describe craft and material; we don't invent a maker.
+A lot of what we sell is unsigned. That's normal for the era and for pieces ordered for retail by stores that didn't print their own marks. We describe craft and material; we don't invent a maker.
 
 When a piece is signed, we read the punch and report what we read.
 
@@ -459,7 +459,7 @@ We trust the piece. We trust you. We try not to get in the way.`,
       position: 0,
       type: 'HERO',
       data: {
-        eyebrow: 'Hong Vi Jewelers',
+        eyebrow: 'Hoang Vi Jewelers',
         headline: 'Vintage Era and modern fine jewelry. Every piece unworn.',
         primaryCta: { label: 'See New Arrivals', href: '/collections/new-arrivals' },
         secondaryCta: { label: 'About the house', href: '/about' },

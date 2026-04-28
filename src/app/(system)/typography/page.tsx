@@ -43,7 +43,7 @@ export default function TypographyPage() {
                 <p className="mt-1 text-eyebrow text-ink-muted/80">{s.usage}</p>
               </div>
               <p className={`${s.className} font-serif text-ink`}>
-                Hong Vi Jewelers
+                Hoang Vi Jewelers
               </p>
             </div>
           ))}
@@ -100,7 +100,7 @@ export default function TypographyPage() {
             the hands that made them.
           </p>
           <p>
-            <em className="font-serif text-ink">Hong Vi</em>, the house
+            <em className="font-serif text-ink">Hoang Vi</em>, the house
             behind HV Jewelers, is named for the collector who built it.
             Every piece is considered before it is listed, and cared for
             after it leaves.

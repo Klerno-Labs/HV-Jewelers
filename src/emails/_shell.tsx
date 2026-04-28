@@ -88,7 +88,7 @@ export function EmailShell({
                 margin: '4px 0 0',
               }}
             >
-              Hong Vi Jewelers
+              Hoang Vi Jewelers
             </Text>
           </Section>
 
@@ -111,7 +111,7 @@ export function EmailShell({
               margin: 0,
             }}
           >
-            HV Jewelers (Hong Vi). Real replies from real people. Reach
+            HV Jewelers (Hoang Vi). Real replies from real people. Reach
             us at{' '}
             <a
               href="mailto:concierge@hvjewelers.com"

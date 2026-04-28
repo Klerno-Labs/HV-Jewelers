@@ -26,7 +26,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
             >
               HV Jewelers
             </Link>
-            <p className="mt-2 text-eyebrow text-bronze">Admin · Hong Vi</p>
+            <p className="mt-2 text-eyebrow text-bronze">Admin · Hoang Vi</p>
           </div>
 
           <div className="mt-12 flex-1 overflow-y-auto">

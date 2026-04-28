@@ -23,13 +23,13 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'HV Jewelers · Hong Vi',
+    default: 'HV Jewelers · Hoang Vi',
     template: '%s · HV Jewelers',
   },
   description:
-    'Hong Vi Jewelers. A small archive of unworn jewelry: Vintage Era, Near Vintage, and modern fine pieces.',
+    'Hoang Vi Jewelers. A small archive of unworn jewelry: Vintage Era, Near Vintage, and modern fine pieces.',
   applicationName: 'HV Jewelers',
-  authors: [{ name: 'Hong Vi Jewelers' }],
+  authors: [{ name: 'Hoang Vi Jewelers' }],
   // Public pages inherit indexable defaults from Next's built-in policy.
   // Internal/transactional surfaces (admin, checkout, login, account,
   // bag, design-system specs) override with their own `robots: { index:
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'HV Jewelers',
-    title: 'HV Jewelers · Hong Vi',
+    title: 'HV Jewelers · Hoang Vi',
     description:
       'A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
     locale: 'en_US',

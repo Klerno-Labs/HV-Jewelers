@@ -46,7 +46,7 @@ export async function SiteHeader() {
             HV Jewelers
           </span>
           <span className="hidden text-eyebrow text-ink-muted md:inline">
-            Hong Vi
+            Hoang Vi
           </span>
         </Link>
 

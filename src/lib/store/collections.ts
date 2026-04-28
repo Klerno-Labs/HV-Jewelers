@@ -24,7 +24,7 @@ const META: Record<string, CollectionMeta> = {
     title: 'Vintage Era',
     eyebrow: 'Pre-1980, unworn',
     intro:
-      'Older pieces that were made decades ago and never sold. We source them through estate dealers and small workshops, verify each one in person, and describe what we see. Vintage Era pieces are final sale, so the writeup has to do the work.',
+      'Older pieces that were made decades ago and never sold. They came directly from jewelry stores that kept them in inventory for years without ever ringing one up. We verify each piece in person and describe what we see. Vintage Era pieces are final sale, so the writeup has to do the work.',
     notes: 'Sized as made. Resizing available on select pieces.',
   },
   'near-vintage': {

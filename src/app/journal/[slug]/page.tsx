@@ -157,7 +157,7 @@ export default async function JournalArticlePage({ params }: PageProps) {
           <Container className="py-16" width="reading">
             <p className="text-eyebrow text-ink-muted">Written by</p>
             <p className="mt-3 font-serif text-title text-ink">
-              {post.author?.name ?? 'Hong Vi'}
+              {post.author?.name ?? 'Hoang Vi'}
             </p>
 
             <div className="mt-12 grid gap-6 border-t border-limestone-deep/60 pt-8 md:grid-cols-2">

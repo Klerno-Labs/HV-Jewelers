@@ -7,7 +7,7 @@ import { ConciergeClose } from '@/components/store/concierge-close'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'HV Jewelers (Hong Vi). A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
+    'HV Jewelers (Hoang Vi). A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
 }
 
 export default function AboutPage() {
@@ -23,12 +23,12 @@ export default function AboutPage() {
         </div>
         <Container className="py-24 md:py-32">
           <FadeIn className="max-w-3xl">
-            <p className="text-eyebrow text-bronze">About · Hong Vi</p>
+            <p className="text-eyebrow text-bronze">About · Hoang Vi</p>
             <h1 className="mt-10 font-serif text-display-lg italic font-light leading-[1.05] text-ink">
               A small house, kept on purpose.
             </h1>
             <p className="mt-10 max-w-2xl text-subtitle leading-relaxed text-ink-soft">
-              HV Jewelers (Hong Vi) is a small archive of unworn jewelry:
+              HV Jewelers (Hoang Vi) is a small archive of unworn jewelry:
               vintage, near-vintage, and modern fine pieces. Some were
               made decades ago and stored, never sold. Others are made
               on the bench today. Either way, they come to you new.
@@ -47,12 +47,12 @@ export default function AboutPage() {
             </h2>
             <div className="mt-12 space-y-6 text-body leading-[1.8] text-ink-soft">
               <p>
-                Hong Vi started collecting from estate dealers and small
-                workshops across Asia: signets from the Vintage Era that
-                had sat in drawers for decades, fine chain that had been
-                made and never sold, and pieces from suppliers who had
-                been holding inventory through families for years. None
-                of it had been worn.
+                Hoang Vi started collecting from jewelry stores that
+                were closing, downsizing, or clearing old inventory:
+                signets from the Vintage Era that had sat in showcases
+                for decades, fine chain that had been ordered and never
+                sold, pieces that had been kept in stock without ever
+                ringing one up. None of it had been worn.
               </p>
               <p>
                 <em className="font-serif text-ink">HV Jewelers</em> grew
@@ -83,7 +83,7 @@ export default function AboutPage() {
             <Principle
               number="02"
               title="Unworn, every piece."
-              body="Whether it was made in 1952 or last month, nothing in the catalog has been worn. Older pieces come from estates and workshops where they were stored on a shelf, never sold. That's harder to find than the Vintage Era usually delivers, and it's the part we're most proud of."
+              body="Whether it was made in 1952 or last month, nothing in the catalog has been worn. Older pieces come from jewelry stores that held them in inventory for years, sometimes decades, without ever ringing one up. That's harder to find than 'vintage' usually delivers, and it's the part we're most proud of."
             />
             <Principle
               number="03"
@@ -137,12 +137,12 @@ export default function AboutPage() {
           </FadeIn>
           <FadeIn delay={150} className="mt-12 space-y-6 text-body leading-[1.8] text-ink-soft">
             <p>
-              Our older pieces come from estate sources and small
-              workshops in Asia and Europe that have been holding inventory
-              for years (sometimes decades). We work with a short list of
-              dealers we trust. Each piece is examined and tested where
-              appropriate before it goes on the site. If we can&apos;t
-              verify a claim about a piece, we don&apos;t make it.
+              Our older pieces come from jewelry stores that have been
+              holding inventory for years, sometimes decades. We work
+              with a short list of store owners and trade dealers we
+              trust. Each piece is examined and tested where appropriate
+              before it goes on the site. If we can&apos;t verify a
+              claim about a piece, we don&apos;t make it.
             </p>
             <p>
               Modern Fine pieces are made on a bench we work with directly.

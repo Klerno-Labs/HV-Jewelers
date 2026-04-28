@@ -138,7 +138,7 @@ export default async function Home() {
         </div>
         <Container className="grid gap-12 py-24 md:py-32 lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-16 lg:py-40">
           <FadeIn>
-            <p className="text-eyebrow text-bronze">Hong Vi Jewelers</p>
+            <p className="text-eyebrow text-bronze">Hoang Vi Jewelers</p>
             <h1
               id="intro-heading"
               className="mt-10 max-w-[18ch] font-serif text-display-lg font-light italic leading-[1.02] text-ink"
@@ -196,7 +196,7 @@ export default async function Home() {
       <WorldFeature
         eyebrow="Vintage Era"
         title="Older pieces, never worn."
-        body="Signets, bands, brooches, and fine chain from earlier eras. Made decades ago, kept on a shelf, never worn. We verify each piece in person and describe exactly what we see: stamps, finish, and the small marks long storage leaves. We don't polish or restore. Vintage Era pieces are final sale, so the description has to do the work."
+        body="Signets, bands, brooches, and fine chain from earlier eras. Made decades ago, kept in jewelry store inventory, never sold to a customer. We verify each piece in person and describe exactly what we see: stamps, finish, and the small marks long storage leaves. We don't polish or restore. Vintage Era pieces are final sale, so the description has to do the work."
         href="/collections/vintage-era"
         ctaLabel="See the archive"
         tone="cedar"
