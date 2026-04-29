@@ -2,6 +2,8 @@ import { z } from 'zod'
 import type {
   InventoryStatus,
   OrderStatus,
+  ProductEra,
+  ProductStatus,
   Prisma,
 } from '@prisma/client'
 
@@ -133,4 +135,60 @@ export const INVENTORY_STATUS_OPTIONS: Array<{ value: InventoryStatus; label: st
   { value: 'HOLD', label: 'Held' },
   { value: 'DAMAGED', label: 'Damaged' },
   { value: 'RETURNED', label: 'Returned' },
+]
+
+// ─────────────────────────────────────────────────────────────────────
+//  Product filters
+// ─────────────────────────────────────────────────────────────────────
+
+export const PRODUCT_PAGE_SIZE = 30
+
+const productStatusFilterSchema = z.enum(['DRAFT', 'ACTIVE', 'ARCHIVED'])
+const productEraFilterSchema = z.enum(['VINTAGE_ERA', 'NEAR_VINTAGE', 'MODERN_FINE'])
+
+const productsFiltersSchema = z.object({
+  status: productStatusFilterSchema.optional(),
+  era: productEraFilterSchema.optional(),
+  q: z.string().trim().max(120).optional(),
+  page: z.coerce.number().int().min(1).max(10_000).default(1),
+})
+
+export type ProductsFilters = z.infer<typeof productsFiltersSchema>
+
+export function parseProductsFilters(
+  searchParams: Record<string, string | string[] | undefined>,
+): ProductsFilters {
+  const flat: Record<string, string | undefined> = {}
+  for (const [k, v] of Object.entries(searchParams)) {
+    flat[k] = Array.isArray(v) ? v[0] : v
+  }
+  const result = productsFiltersSchema.safeParse(flat)
+  return result.success ? result.data : { page: 1 }
+}
+
+export function productsWhereFromFilters(
+  f: ProductsFilters,
+): Prisma.ProductWhereInput {
+  const where: Prisma.ProductWhereInput = {}
+  if (f.status) where.status = f.status
+  if (f.era) where.era = f.era
+  if (f.q) {
+    where.OR = [
+      { title: { contains: f.q, mode: 'insensitive' } },
+      { slug: { contains: f.q, mode: 'insensitive' } },
+    ]
+  }
+  return where
+}
+
+export const PRODUCT_STATUS_OPTIONS: Array<{ value: ProductStatus; label: string }> = [
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'ARCHIVED', label: 'Archived' },
+]
+
+export const PRODUCT_ERA_OPTIONS: Array<{ value: ProductEra; label: string }> = [
+  { value: 'VINTAGE_ERA', label: 'Vintage Era' },
+  { value: 'NEAR_VINTAGE', label: 'Near Vintage' },
+  { value: 'MODERN_FINE', label: 'Modern Fine Jewelry' },
 ]
