@@ -32,6 +32,7 @@ import {
   bulkMarkDamagedAction,
   bulkReleaseAction,
   bulkUnholdAction,
+  createInventoryUnitAction,
 } from './actions'
 
 interface PageProps {
@@ -51,7 +52,7 @@ export default async function AdminInventoryPage({ searchParams }: PageProps) {
   const filters = parseInventoryFilters(sp)
   const where = inventoryWhereFromFilters(filters)
 
-  const [items, total, statusCounts] = await Promise.all([
+  const [items, total, statusCounts, productsForCreate] = await Promise.all([
     prisma.inventoryItem.findMany({
       where,
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
@@ -74,6 +75,11 @@ export default async function AdminInventoryPage({ searchParams }: PageProps) {
       by: ['status'],
       _count: { _all: true },
     }),
+    prisma.product.findMany({
+      where: { status: { in: ['ACTIVE', 'DRAFT'] } },
+      orderBy: [{ era: 'asc' }, { title: 'asc' }],
+      select: { id: true, title: true, era: true, slug: true },
+    }),
   ])
 
   const totalPages = Math.max(1, Math.ceil(total / INVENTORY_PAGE_SIZE))
@@ -92,7 +98,11 @@ export default async function AdminInventoryPage({ searchParams }: PageProps) {
   const flashBanner = Object.entries(BULK_BANNERS).find(
     ([k]) => sp[k] && Number(sp[k]) > 0,
   )
-  const errorMsg = sp.error === 'no_selection' ? 'Select at least one row.' : null
+  const errorMsg =
+    sp.error === 'no_selection' ? 'Select at least one row.' :
+    sp.error === 'product' ? 'Select a product before creating the unit.' :
+    sp.error === 'sku' ? 'That SKU already exists. Choose a different SKU or leave blank.' :
+    null
 
   return (
     <>
@@ -126,6 +136,50 @@ export default async function AdminInventoryPage({ searchParams }: PageProps) {
             {errorMsg}
           </p>
         ) : null}
+
+        <details className="mb-8 border border-limestone-deep/60 bg-parchment">
+          <summary className="cursor-pointer list-none border-b border-transparent px-4 py-3 text-eyebrow text-bronze hover:text-olive open:border-b-limestone-deep/60">
+            + New unit
+          </summary>
+          <form
+            action={createInventoryUnitAction}
+            className="grid gap-4 px-4 py-4 lg:grid-cols-[2fr_1fr_1fr_1fr_auto]"
+          >
+            <div className="space-y-2">
+              <label htmlFor="new-product" className="block text-eyebrow text-ink-muted">Product</label>
+              <select
+                id="new-product"
+                name="productId"
+                required
+                className="block h-10 w-full border border-limestone-deep bg-parchment-warm/40 px-2 text-body text-ink focus-visible:border-olive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bronze"
+              >
+                <option value="">— Select a product —</option>
+                {productsForCreate.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.title} ({p.era.replace('_', ' ').toLowerCase()})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="new-sku" className="block text-eyebrow text-ink-muted">SKU (optional)</label>
+              <input id="new-sku" name="sku" type="text" maxLength={64} className="block h-10 w-full border border-limestone-deep bg-parchment-warm/40 px-3 text-body text-ink focus-visible:border-olive focus-visible:outline-none" />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="new-ref" className="block text-eyebrow text-ink-muted">Internal ref</label>
+              <input id="new-ref" name="internalRef" type="text" maxLength={140} className="block h-10 w-full border border-limestone-deep bg-parchment-warm/40 px-3 text-body text-ink focus-visible:border-olive focus-visible:outline-none" />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="new-cost" className="block text-eyebrow text-ink-muted">Cost (USD)</label>
+              <input id="new-cost" name="cost" type="number" min="0" step="0.01" placeholder="0.00" className="block h-10 w-full border border-limestone-deep bg-parchment-warm/40 px-3 text-body text-ink focus-visible:border-olive focus-visible:outline-none" />
+            </div>
+            <div className="flex items-end">
+              <button type="submit" className="inline-flex h-10 items-center bg-ink px-4 text-eyebrow text-parchment hover:bg-olive">
+                Add unit
+              </button>
+            </div>
+          </form>
+        </details>
 
         <section className="mb-8 grid gap-3 sm:grid-cols-3 md:grid-cols-6">
           {INVENTORY_STATUS_OPTIONS.map((opt) => (
@@ -216,7 +270,12 @@ export default async function AdminInventoryPage({ searchParams }: PageProps) {
                         />
                       </Td>
                       <Td>
-                        <span className="font-mono text-ink">{i.sku ?? '-'}</span>
+                        <Link
+                          href={`/admin/inventory/${i.id}`}
+                          className="font-mono text-ink underline underline-offset-4 decoration-bronze/40 hover:text-olive hover:decoration-olive"
+                        >
+                          {i.sku ?? `unit ${i.id.slice(-6)}`}
+                        </Link>
                         {i.internalRef ? (
                           <div className="mt-1 text-caption text-ink-muted">
                             ref {i.internalRef}
