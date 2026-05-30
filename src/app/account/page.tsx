@@ -46,16 +46,10 @@ function SignedIn({ email, name }: { email: string; name: string | null }) {
       </dl>
       <div className="mt-12 flex flex-wrap gap-6">
         <Link
-          href="/bag"
+          href="/shop"
           className="text-caption text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
         >
-          View your bag →
-        </Link>
-        <Link
-          href="/collections/new-arrivals"
-          className="text-caption text-ink-soft underline underline-offset-4 decoration-bronze/40 hover:text-olive hover:decoration-olive"
-        >
-          Browse New Arrivals
+          Browse the shop →
         </Link>
       </div>
     </>

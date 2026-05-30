@@ -8,6 +8,7 @@ import { cn } from '@/lib/cn'
 interface NavItem {
   label: string
   href: string
+  external?: boolean
   /// Roles that can see this item. ADMIN sees everything by default.
   roles?: UserRole[]
 }
@@ -19,25 +20,9 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    heading: 'Catalog',
+    heading: 'Content',
     items: [
-      { label: 'Products', href: '/admin/products' },
-      { label: 'Collections', href: '/admin/collections' },
-    ],
-  },
-  {
-    heading: 'Operations',
-    items: [
-      { label: 'Orders', href: '/admin/orders' },
-      { label: 'Inventory', href: '/admin/inventory' },
-      { label: 'Shipping', href: '/admin/shipping' },
       { label: 'Policies', href: '/admin/policies' },
-    ],
-  },
-  {
-    heading: 'Editorial',
-    items: [
-      { label: 'Homepage', href: '/admin/homepage' },
     ],
   },
   {
@@ -45,6 +30,17 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Users & Staff', href: '/admin/users', roles: ['ADMIN'] },
       { label: 'Audit Log', href: '/admin/audit' },
+    ],
+  },
+  {
+    heading: 'Shopify',
+    items: [
+      { label: 'Products ↗', href: 'https://zvf91s-qy.myshopify.com/admin/products', external: true },
+      { label: 'Inventory ↗', href: 'https://zvf91s-qy.myshopify.com/admin/products/inventory', external: true },
+      { label: 'Orders ↗', href: 'https://zvf91s-qy.myshopify.com/admin/orders', external: true },
+      { label: 'Customers ↗', href: 'https://zvf91s-qy.myshopify.com/admin/customers', external: true },
+      { label: 'Discounts ↗', href: 'https://zvf91s-qy.myshopify.com/admin/discounts', external: true },
+      { label: 'Shipping ↗', href: 'https://zvf91s-qy.myshopify.com/admin/settings/shipping', external: true },
     ],
   },
 ]
@@ -77,7 +73,22 @@ export function AdminNav({ role }: { role: UserRole }) {
             <ul className="space-y-2">
               {items.map((item) => {
                 const active =
-                  pathname === item.href || pathname?.startsWith(`${item.href}/`)
+                  !item.external &&
+                  (pathname === item.href || pathname?.startsWith(`${item.href}/`))
+                if (item.external) {
+                  return (
+                    <li key={item.href}>
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-caption text-ink-soft transition-colors duration-200 hover:text-olive"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  )
+                }
                 return (
                   <li key={item.href}>
                     <Link

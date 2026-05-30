@@ -32,7 +32,7 @@ export default function NotFound() {
         </li>
         <li>
           <Link
-            href="/collections/new-arrivals"
+            href="/shop"
             className="text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
           >
             New Arrivals →

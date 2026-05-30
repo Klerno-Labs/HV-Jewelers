@@ -108,19 +108,19 @@ export default function AboutPage() {
               eyebrow="01"
               title="Vintage Era"
               body="Pieces from the 1980s and 1990s that were made for retail and never sold. Verified in person before we list them. Final sale; described plainly."
-              href="/collections/vintage-era"
+              href="/shop"
             />
             <WorldRow
               eyebrow="02"
               title="Near Vintage"
               body="Pieces from the last fifteen-or-so years — late 2000s and 2010s. Often unsigned, all unworn. Final sale."
-              href="/collections/near-vintage"
+              href="/shop"
             />
             <WorldRow
               eyebrow="03"
               title="Modern Fine Jewelry"
               body="New pieces made on the bench. Bands, solitaires, everyday gold. Most are eligible for a 15-day return on unworn returns. Resizing voids that window."
-              href="/collections/modern-fine-jewelry"
+              href="/shop"
             />
           </FadeIn>
         </Container>

@@ -5,108 +5,25 @@ import { Manifesto } from '@/components/store/manifesto'
 import { WorldFeature } from '@/components/store/world-feature'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { FadeIn } from '@/components/store/fade-in'
+import { ShopProductCard } from '@/components/shop/shop-product-card'
 import { cn } from '@/lib/cn'
-import { prisma } from '@/lib/prisma'
-import { ProductCard, type ProductCardData } from '@/components/store/product-card'
+import { listProducts } from '@/lib/shopify/products'
 
 /**
- * The editorial home. Reads a small set of products; gracefully falls
- * back to typography-only treatment when data is missing.
+ * The editorial home. Reads up to 12 Shopify products and slices them
+ * across the two World features and the New Arrivals grid. Falls back
+ * to typography-only treatment when no products are configured yet,
+ * so the page is always coherent.
+ *
+ * TODO once Shopify products carry `tag:vintage-era`, `tag:modern-fine`,
+ * and `tag:new-arrival`, replace the slice() with three tag-filtered
+ * `listProducts` calls so each section pulls its own set.
  */
-
-const PRODUCT_SELECT = {
-  slug: true,
-  title: true,
-  era: true,
-  priceCents: true,
-  compareAtCents: true,
-  currency: true,
-  isFinalSale: true,
-  images: {
-    orderBy: { position: 'asc' },
-    take: 1,
-    select: { url: true, alt: true, width: true, height: true },
-  },
-  _count: {
-    select: { inventoryItems: { where: { status: 'AVAILABLE' } } },
-  },
-} as const
-
-async function loadHomeData() {
-  try {
-    const [vintageProducts, modernProducts, newArrivals] =
-      await Promise.all([
-        prisma.product.findMany({
-          where: {
-            status: 'ACTIVE',
-            isHidden: false,
-            era: 'VINTAGE_ERA',
-          },
-          orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }],
-          take: 4,
-          select: PRODUCT_SELECT,
-        }),
-        prisma.product.findMany({
-          where: {
-            status: 'ACTIVE',
-            isHidden: false,
-            era: 'MODERN_FINE',
-          },
-          orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }],
-          take: 4,
-          select: PRODUCT_SELECT,
-        }),
-        prisma.product.findMany({
-          where: {
-            status: 'ACTIVE',
-            isHidden: false,
-            isNewArrival: true,
-          },
-          orderBy: [{ publishedAt: 'desc' }],
-          take: 4,
-          select: PRODUCT_SELECT,
-        }),
-      ])
-    return { vintageProducts, modernProducts, newArrivals }
-  } catch {
-    return {
-      vintageProducts: [],
-      modernProducts: [],
-      newArrivals: [],
-    }
-  }
-}
-
-function toCard(p: {
-  slug: string
-  title: string
-  era: ProductCardData['era']
-  priceCents: number
-  compareAtCents: number | null
-  currency: string
-  isFinalSale: boolean
-  images: { url: string; alt: string | null; width: number | null; height: number | null }[]
-  _count: { inventoryItems: number }
-}): ProductCardData {
-  return {
-    slug: p.slug,
-    title: p.title,
-    era: p.era,
-    priceCents: p.priceCents,
-    compareAtCents: p.compareAtCents,
-    currency: p.currency,
-    isFinalSale: p.isFinalSale,
-    image: p.images[0] ?? null,
-    availableCount: p._count.inventoryItems,
-  }
-}
-
 export default async function Home() {
-  const data = await loadHomeData()
-
-  const vintage = data.vintageProducts.map(toCard)
-  const modern = data.modernProducts.map(toCard)
-  const arrivals = data.newArrivals.map(toCard)
+  const { products } = await listProducts(12)
+  const vintage = products.slice(0, 4)
+  const modern = products.slice(4, 8)
+  const arrivals = products.slice(8, 12)
 
   return (
     <>
@@ -137,10 +54,10 @@ export default async function Home() {
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-4">
               <Link
-                href="/collections/new-arrivals"
+                href="/shop"
                 className={cn(buttonVariants({ variant: 'primary', size: 'lg' }))}
               >
-                See New Arrivals
+                Enter the shop
               </Link>
               <Link
                 href="/about"
@@ -164,10 +81,10 @@ export default async function Home() {
                 Currently in the case
               </p>
               <Link
-                href="/collections/vintage-era"
+                href="/shop"
                 className="text-eyebrow text-bronze underline underline-offset-4 decoration-bronze/60 hover:text-olive"
               >
-                Enter the archive →
+                Browse the shop →
               </Link>
             </div>
           </FadeIn>
@@ -182,23 +99,51 @@ export default async function Home() {
         eyebrow="Vintage Era"
         title="Older pieces, never worn."
         body="Signets, bands, brooches, and fine chain from the 1980s and 1990s. Made then, kept in jewelry store inventory, never sold to a customer. We verify each piece in person and describe exactly what we see: stamps, finish, and the small marks long storage leaves. We don't polish or restore. Vintage Era pieces are final sale, so the description has to do the work."
-        href="/collections/vintage-era"
+        href="/shop"
         ctaLabel="See the archive"
         tone="cedar"
-        preview={vintage}
       />
+      {vintage.length > 0 ? (
+        <section className="border-t border-limestone-deep/60">
+          <Container className="py-16 md:py-20">
+            <FadeIn>
+              <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
+                {vintage.map((p) => (
+                  <li key={p.id}>
+                    <ShopProductCard product={p} />
+                  </li>
+                ))}
+              </ul>
+            </FadeIn>
+          </Container>
+        </section>
+      ) : null}
 
       {/* ─── World 02 — Modern Fine ─── */}
       <WorldFeature
         eyebrow="Modern Fine Jewelry"
         title="New pieces, made to wear daily."
         body="Bands, solitaires, and everyday gold made fresh on the bench. Most pieces are eligible for a 15-day return on unworn returns. Resizing voids that window, so size before you buy."
-        href="/collections/modern-fine-jewelry"
+        href="/shop"
         ctaLabel="See the modern bench"
         imageReversed
         tone="bronze"
-        preview={modern}
       />
+      {modern.length > 0 ? (
+        <section className="border-t border-limestone-deep/60">
+          <Container className="py-16 md:py-20">
+            <FadeIn>
+              <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
+                {modern.map((p) => (
+                  <li key={p.id}>
+                    <ShopProductCard product={p} />
+                  </li>
+                ))}
+              </ul>
+            </FadeIn>
+          </Container>
+        </section>
+      ) : null}
 
       {/* ─── New Arrivals ─── */}
       {arrivals.length > 0 ? (
@@ -212,7 +157,7 @@ export default async function Home() {
                 </h2>
               </div>
               <Link
-                href="/collections/new-arrivals"
+                href="/shop"
                 className="hidden text-caption tracking-wide text-ink-soft underline underline-offset-4 decoration-bronze/60 transition-colors duration-300 hover:text-olive md:inline"
               >
                 See all →
@@ -221,8 +166,8 @@ export default async function Home() {
             <FadeIn delay={150} className="mt-14">
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
                 {arrivals.map((p) => (
-                  <li key={p.slug}>
-                    <ProductCard product={p} />
+                  <li key={p.id}>
+                    <ShopProductCard product={p} />
                   </li>
                 ))}
               </ul>

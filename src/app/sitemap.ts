@@ -1,19 +1,20 @@
 import type { MetadataRoute } from 'next'
-import { prisma } from '@/lib/prisma'
-import { PUBLIC_COLLECTION_SLUGS } from '@/lib/store/collections'
+import { listProductHandles } from '@/lib/shopify/products'
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000'
 
 /**
- * Sitemap. Static pages + live collection pages + live product pages.
- * Fails soft when the DB is unreachable.
+ * Sitemap. Static pages + the /shop catalog + every published Shopify
+ * product. `listProductHandles` fails soft (returns []) when Shopify is
+ * unreachable, so crawlers never see a blank site.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const staticEntries: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: `${SITE_URL}/shop`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/shipping`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
@@ -21,31 +22,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/care`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ]
 
-  const collectionEntries: MetadataRoute.Sitemap = PUBLIC_COLLECTION_SLUGS.map(
-    (slug) => ({
-      url: `${SITE_URL}/collections/${slug}`,
-      lastModified: now,
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }),
-  )
+  const handles = await listProductHandles(250)
+  const productEntries: MetadataRoute.Sitemap = handles.map((p) => ({
+    url: `${SITE_URL}/shop/${p.handle}`,
+    lastModified: new Date(p.updatedAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
 
-  try {
-    const products = await prisma.product.findMany({
-      where: { status: 'ACTIVE', isHidden: false },
-      select: { slug: true, updatedAt: true },
-      take: 5000,
-    })
-
-    const productEntries: MetadataRoute.Sitemap = products.map((p) => ({
-      url: `${SITE_URL}/products/${p.slug}`,
-      lastModified: p.updatedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    }))
-
-    return [...staticEntries, ...collectionEntries, ...productEntries]
-  } catch {
-    return [...staticEntries, ...collectionEntries]
-  }
+  return [...staticEntries, ...productEntries]
 }

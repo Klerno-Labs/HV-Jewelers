@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/cn'
 import { Container } from '@/components/layout/container'
-import { ProductCard, type ProductCardData } from './product-card'
 import { FadeIn } from './fade-in'
 
 const TONE_CLASSES = {
@@ -29,10 +28,15 @@ export interface WorldFeatureProps {
   tone?: keyof typeof TONE_CLASSES
   /// Optional editorial image (Cloudinary URL).
   image?: { url: string; alt: string; width: number; height: number } | null
-  /// Optional product preview row beneath the lead.
-  preview?: ProductCardData[]
 }
 
+/**
+ * Editorial section — left/right split of image and copy with an
+ * optional gradient placeholder when no image is supplied. Preview
+ * rows of product cards now live in the parent page (so the home can
+ * pass Shopify-shaped products without coupling this component to a
+ * catalog data type).
+ */
 export function WorldFeature({
   eyebrow,
   title,
@@ -42,7 +46,6 @@ export function WorldFeature({
   imageReversed = false,
   tone = 'parchment',
   image = null,
-  preview = [],
 }: WorldFeatureProps) {
   return (
     <section className="border-t border-limestone-deep/60">
@@ -85,18 +88,6 @@ export function WorldFeature({
             </Link>
           </FadeIn>
         </div>
-
-        {preview.length > 0 ? (
-          <FadeIn className="mt-20 border-t border-limestone-deep/60 pt-12">
-            <ul className="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-3 xl:grid-cols-4">
-              {preview.map((p) => (
-                <li key={p.slug}>
-                  <ProductCard product={p} />
-                </li>
-              ))}
-            </ul>
-          </FadeIn>
-        ) : null}
       </Container>
     </section>
   )

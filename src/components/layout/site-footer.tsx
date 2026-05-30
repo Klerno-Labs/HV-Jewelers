@@ -5,12 +5,6 @@ import { Brand } from './brand'
 const footerNav: Record<string, { label: string; href: string }[]> = {
   Shop: [
     { label: 'The Shop', href: '/shop' },
-    { label: 'Vintage Era', href: '/collections/vintage-era' },
-    { label: 'Near Vintage', href: '/collections/near-vintage' },
-    { label: 'Modern Fine Jewelry', href: '/collections/modern-fine-jewelry' },
-    { label: 'Gold', href: '/collections/gold' },
-    { label: 'Pearls', href: '/collections/pearls' },
-    { label: 'New Arrivals', href: '/collections/new-arrivals' },
   ],
   'The House': [
     { label: 'About Hoang Vi', href: '/about' },

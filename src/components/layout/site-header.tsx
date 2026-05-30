@@ -7,12 +7,8 @@ import { getCart } from '@/lib/shopify/cart'
 
 const primaryNav = [
   { label: 'Shop', href: '/shop' },
-  { label: 'Vintage Era', href: '/collections/vintage-era' },
-  { label: 'Near Vintage', href: '/collections/near-vintage' },
-  { label: 'Modern Fine', href: '/collections/modern-fine-jewelry' },
-  { label: 'Gold', href: '/collections/gold' },
-  { label: 'Pearls', href: '/collections/pearls' },
-  { label: 'New Arrivals', href: '/collections/new-arrivals' },
+  { label: 'About', href: '/about' },
+  { label: 'Concierge', href: '/contact' },
 ]
 
 const secondaryNav = [
