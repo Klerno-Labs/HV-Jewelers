@@ -49,11 +49,16 @@ const serverEnvSchema = z.object({
 
   // Sentry (optional)
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+
+  // Shopify Storefront API (headless)
+  SHOPIFY_STOREFRONT_TOKEN: z.string().min(1).optional(),
+  SHOPIFY_STOREFRONT_API_VERSION: z.string().min(1).default('2024-10'),
 })
 
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().min(1).optional(),
+  NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: z.string().min(1).optional(),
 })
 
 function parse<T extends z.ZodTypeAny>(schema: T, raw: Record<string, unknown>, label: string): z.infer<T> {
@@ -74,6 +79,7 @@ export const clientEnv = parse(
   {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN,
   },
   'client',
 )

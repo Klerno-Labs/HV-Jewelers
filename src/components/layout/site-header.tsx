@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { Container } from './container'
+import { Brand } from './brand'
 import { MobileMenu } from './mobile-menu'
-import { getCartItemCount } from '@/lib/cart/cart'
+import { ShopCartLauncher } from '@/components/shop/shop-cart-drawer'
+import { getCart } from '@/lib/shopify/cart'
 
 const primaryNav = [
+  { label: 'Shop', href: '/shop' },
   { label: 'Vintage Era', href: '/collections/vintage-era' },
   { label: 'Near Vintage', href: '/collections/near-vintage' },
   { label: 'Modern Fine', href: '/collections/modern-fine-jewelry' },
@@ -13,6 +16,7 @@ const primaryNav = [
 ]
 
 const secondaryNav = [
+  { label: 'Shop', href: '/shop' },
   { label: 'About', href: '/about' },
   { label: 'Concierge', href: '/contact' },
   { label: 'Shipping', href: '/shipping' },
@@ -22,7 +26,7 @@ const secondaryNav = [
 ]
 
 export async function SiteHeader() {
-  const bagCount = await getCartItemCount()
+  const initialCart = await getCart()
 
   return (
     <header
@@ -38,15 +42,10 @@ export async function SiteHeader() {
       <Container className="flex h-16 items-center justify-between gap-6 md:h-20">
         <Link
           href="/"
-          className="group inline-flex items-baseline gap-3 transition-opacity duration-300 hover:opacity-80"
+          className="group inline-flex items-baseline transition-opacity duration-300 hover:opacity-80"
           aria-label="HV Jewelers, home"
         >
-          <span className="font-serif text-title leading-none tracking-tight text-ink">
-            HV Jewelers
-          </span>
-          <span className="hidden text-eyebrow text-ink-muted md:inline">
-            Hoang Vi
-          </span>
+          <Brand size="md" showSubtitle />
         </Link>
 
         <nav aria-label="Primary" className="hidden lg:block">
@@ -71,13 +70,7 @@ export async function SiteHeader() {
           >
             Account
           </Link>
-          <Link
-            href="/bag"
-            className="text-caption text-ink-soft transition-colors duration-300 hover:text-olive"
-            aria-label={`Shopping bag, ${bagCount} ${bagCount === 1 ? 'piece' : 'pieces'}`}
-          >
-            Bag <span className="tabular-nums">({bagCount})</span>
-          </Link>
+          <ShopCartLauncher initialCart={initialCart} />
           <MobileMenu primary={primaryNav} secondary={secondaryNav} />
         </div>
       </Container>

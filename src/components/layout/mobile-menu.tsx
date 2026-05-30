@@ -1,13 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Brand } from './brand'
 
 interface NavItem {
   label: string
   href: string
 }
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export function MobileMenu({
   primary,
@@ -19,34 +23,92 @@ export function MobileMenu({
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
-  // Auto-close on route change.
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const closeRef = useRef<HTMLButtonElement | null>(null)
+  const dialogRef = useRef<HTMLDivElement | null>(null)
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+
+  // Auto-close on route change (covers programmatic navigations).
   useEffect(() => {
     setOpen(false)
   }, [pathname])
 
-  // Lock body scroll while the menu is open.
+  // iOS-safe body scroll lock.
   useEffect(() => {
     if (!open) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    const scrollY = window.scrollY
+    const body = document.body
+    const prevPosition = body.style.position
+    const prevTop = body.style.top
+    const prevWidth = body.style.width
+    const prevOverflow = body.style.overflow
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.width = '100%'
+    body.style.overflow = 'hidden'
     return () => {
-      document.body.style.overflow = prev
+      body.style.position = prevPosition
+      body.style.top = prevTop
+      body.style.width = prevWidth
+      body.style.overflow = prevOverflow
+      window.scrollTo(0, scrollY)
     }
   }, [open])
 
-  // ESC closes.
+  const trapTab = useCallback((e: KeyboardEvent) => {
+    const root = dialogRef.current
+    if (!root) return
+    const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+      (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1,
+    )
+    if (items.length === 0) return
+    const first = items[0]!
+    const last = items[items.length - 1]!
+    const active = document.activeElement as HTMLElement | null
+    if (e.shiftKey) {
+      if (active === first || !root.contains(active)) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else if (active === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [])
+
+  // ESC closes + focus trap while open.
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Tab') trapTab(e)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  }, [open, trapTab])
+
+  // Move focus into the dialog on open; restore on close.
+  useEffect(() => {
+    if (open) {
+      returnFocusRef.current =
+        (document.activeElement as HTMLElement | null) ?? triggerRef.current
+      const id = requestAnimationFrame(() => {
+        closeRef.current?.focus()
+      })
+      return () => cancelAnimationFrame(id)
+    }
+    if (returnFocusRef.current) {
+      returnFocusRef.current.focus()
+      returnFocusRef.current = null
+    } else {
+      triggerRef.current?.focus()
+    }
   }, [open])
 
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         aria-label={open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
@@ -59,6 +121,7 @@ export function MobileMenu({
 
       {open ? (
         <div
+          ref={dialogRef}
           id="mobile-menu"
           role="dialog"
           aria-modal="true"
@@ -66,9 +129,11 @@ export function MobileMenu({
           className="fixed inset-0 z-50 flex flex-col bg-parchment lg:hidden"
         >
           <div className="flex h-16 items-center justify-between border-b border-limestone-deep/60 px-6 md:h-20 md:px-10">
-            <span className="font-serif text-title text-ink">HV Jewelers</span>
+            <Brand size="md" />
             <button
+              ref={closeRef}
               type="button"
+              aria-label="Close menu"
               onClick={() => setOpen(false)}
               className="text-caption tracking-wide text-ink-soft transition-colors duration-300 hover:text-olive"
             >
@@ -85,6 +150,7 @@ export function MobileMenu({
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={() => setOpen(false)}
                     className="font-serif text-heading text-ink transition-colors duration-300 hover:text-olive"
                   >
                     {item.label}
@@ -98,6 +164,7 @@ export function MobileMenu({
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={() => setOpen(false)}
                     className="text-body text-ink-soft transition-colors duration-300 hover:text-olive"
                   >
                     {item.label}

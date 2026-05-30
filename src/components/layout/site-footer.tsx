@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { Container } from './container'
+import { Brand } from './brand'
 
 const footerNav: Record<string, { label: string; href: string }[]> = {
   Shop: [
+    { label: 'The Shop', href: '/shop' },
     { label: 'Vintage Era', href: '/collections/vintage-era' },
     { label: 'Near Vintage', href: '/collections/near-vintage' },
     { label: 'Modern Fine Jewelry', href: '/collections/modern-fine-jewelry' },
@@ -29,7 +31,7 @@ export function SiteFooter() {
       <Container className="py-16">
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="max-w-xs">
-            <p className="font-serif text-heading text-ink">HV Jewelers</p>
+            <Brand size="lg" />
             <p className="mt-3 text-eyebrow text-ink-muted">
               Hoang Vi · A small archive
             </p>
