@@ -1,13 +1,16 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import {
   addLineToCart,
   clearCartIdCookie,
   getCart,
+  readCartIdCookie,
   removeCartLine,
   updateCartLineQuantity,
 } from '@/lib/shopify/cart'
+import { apiLimiter, cartCreateLimiter, getClientKey } from '@/lib/rate-limit'
 import type { ShopifyCart, UserError } from '@/lib/shopify/types'
 
 /**
@@ -17,6 +20,11 @@ import type { ShopifyCart, UserError } from '@/lib/shopify/types'
  * Cache invalidation is handled inside the cart helpers via
  * `revalidateTag(SHOPIFY_TAGS.cart(cartId))` so SiteHeader picks up
  * fresh totals on the next render.
+ *
+ * Rate limits (per IP):
+ *  - addToCartAction when no cart exists yet: 10/min (cartCreate is
+ *    the most expensive Storefront path — mints a Shopify cart)
+ *  - other cart actions: 30/min (apiLimiter)
  */
 
 export interface CartActionResult {
@@ -25,7 +33,22 @@ export interface CartActionResult {
   ok: boolean
 }
 
+const RATE_LIMIT_ERROR: CartActionResult = {
+  cart: null,
+  userErrors: [
+    { field: null, message: 'Too many requests. Try again in a moment.', code: 'RATE_LIMITED' },
+  ],
+  ok: false,
+}
+
+async function clientKey(): Promise<string> {
+  const h = await headers()
+  return getClientKey(h)
+}
+
 export async function fetchCartAction(): Promise<CartActionResult> {
+  const { success } = await apiLimiter.limit(await clientKey())
+  if (!success) return RATE_LIMIT_ERROR
   const cart = await getCart()
   return { cart, userErrors: [], ok: true }
 }
@@ -41,6 +64,15 @@ export async function addToCartAction(
       ok: false,
     }
   }
+  const key = await clientKey()
+  // The no-cookie branch will mint a new Shopify cart — gate that
+  // path on the tighter cart-create limiter; the cookie-present
+  // branch is just a line add, so the general api limiter is enough.
+  const existingCartId = await readCartIdCookie()
+  const limiter = existingCartId ? apiLimiter : cartCreateLimiter
+  const { success } = await limiter.limit(key)
+  if (!success) return RATE_LIMIT_ERROR
+
   const result = await addLineToCart(merchandiseId, quantity)
   return {
     cart: result.cart,
@@ -60,6 +92,9 @@ export async function updateCartLineAction(
       ok: false,
     }
   }
+  const { success } = await apiLimiter.limit(await clientKey())
+  if (!success) return RATE_LIMIT_ERROR
+
   const result =
     quantity === 0
       ? await removeCartLine(lineId)
@@ -81,6 +116,9 @@ export async function removeCartLineAction(
       ok: false,
     }
   }
+  const { success } = await apiLimiter.limit(await clientKey())
+  if (!success) return RATE_LIMIT_ERROR
+
   const result = await removeCartLine(lineId)
   return {
     cart: result.cart,

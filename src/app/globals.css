@@ -160,6 +160,15 @@
     border-radius: var(--radius-xs);
   }
 
+  /* Sticky header sits at h-16 / md:h-20 (64–80px). Ensure anchor
+     targets, skip-to-content jumps, and focused inputs land below it
+     instead of being clipped. */
+  :target,
+  [id],
+  main {
+    scroll-margin-top: 5rem;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

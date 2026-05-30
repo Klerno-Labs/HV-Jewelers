@@ -81,6 +81,18 @@ export const apiLimiter = buildLimiter({
 })
 
 /**
+ * 10 cart creates per minute — applied to the first `addToCartAction`
+ * call from an IP without a cart cookie. Each create mints a new
+ * Shopify cart against the per-shop Storefront API bucket, so this is
+ * the most expensive path to keep tight.
+ */
+export const cartCreateLimiter = buildLimiter({
+  requests: 10,
+  window: '1 m',
+  prefix: 'hv:ratelimit:cart-create',
+})
+
+/**
  * Extract a stable client identifier from a request. Prefer the userId when
  * authenticated (so one malicious user cannot drain their own quota by rotating
  * IPs); otherwise fall back to the first forwarded-for IP.

@@ -27,7 +27,10 @@ import type {
  * changes immediately.
  */
 
-const COOKIE_NAME = isProd ? '__Secure-hv.shop.cart' : 'hv.shop.cart'
+// __Host- prefix in prod: requires Secure, Path=/, no Domain attribute,
+// which we already meet. Adds subdomain-clobber protection over plain
+// __Secure-. Dev uses an unprefixed name so http://localhost works.
+const COOKIE_NAME = isProd ? '__Host-hv.shop.cart' : 'hv.shop.cart'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30 // 30 days
 
 export async function readCartIdCookie(): Promise<string | null> {

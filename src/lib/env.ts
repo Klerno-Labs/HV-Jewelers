@@ -52,7 +52,10 @@ const serverEnvSchema = z.object({
 
   // Shopify Storefront API (headless)
   SHOPIFY_STOREFRONT_TOKEN: z.string().min(1).optional(),
-  SHOPIFY_STOREFRONT_API_VERSION: z.string().min(1).default('2024-10'),
+  SHOPIFY_STOREFRONT_API_VERSION: z.string().min(1).default('2025-10'),
+  /// Shared secret Shopify uses to sign webhook bodies. Required for
+  /// /api/shopify/webhook to verify and act on cache-invalidation events.
+  SHOPIFY_WEBHOOK_SECRET: z.string().min(1).optional(),
 })
 
 const clientEnvSchema = z.object({

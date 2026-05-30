@@ -78,32 +78,12 @@ export function AddToShopCartForm({
       {showOptionPicker && (
         <div className="space-y-5">
           {options.map((group) => (
-            <fieldset key={group.name}>
-              <legend className="text-eyebrow text-ink-muted">
-                {group.name}
-              </legend>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {group.values.map((value) => {
-                  const isActive = selected[group.name] === value
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => pick(group.name, value)}
-                      aria-pressed={isActive}
-                      className={cn(
-                        'inline-flex h-10 items-center border px-4 text-caption transition-colors',
-                        isActive
-                          ? 'border-ink bg-ink text-parchment'
-                          : 'border-limestone-deep bg-parchment text-ink-soft hover:border-olive hover:text-olive',
-                      )}
-                    >
-                      {value}
-                    </button>
-                  )
-                })}
-              </div>
-            </fieldset>
+            <OptionRadioGroup
+              key={group.name}
+              group={group}
+              selected={selected[group.name]}
+              onPick={(v) => pick(group.name, v)}
+            />
           ))}
         </div>
       )}
@@ -142,5 +122,87 @@ export function AddToShopCartForm({
         </p>
       )}
     </div>
+  )
+}
+
+/**
+ * Single variant option group rendered as a true ARIA radiogroup.
+ * Click selects; ArrowLeft/Right/Up/Down move selection and focus
+ * with wraparound. Tab moves between groups, not within them — the
+ * checked radio is the only tab stop, matching the standard pattern.
+ */
+function OptionRadioGroup({
+  group,
+  selected,
+  onPick,
+}: {
+  group: OptionGroup
+  selected: string | undefined
+  onPick: (value: string) => void
+}) {
+  function handleKey(e: React.KeyboardEvent<HTMLDivElement>) {
+    const key = e.key
+    if (
+      key !== 'ArrowRight' &&
+      key !== 'ArrowLeft' &&
+      key !== 'ArrowDown' &&
+      key !== 'ArrowUp'
+    ) {
+      return
+    }
+    e.preventDefault()
+    const idx = group.values.findIndex((v) => v === selected)
+    const len = group.values.length
+    if (len === 0) return
+    const delta = key === 'ArrowRight' || key === 'ArrowDown' ? 1 : -1
+    const nextIdx = idx === -1 ? 0 : (idx + delta + len) % len
+    const next = group.values[nextIdx]
+    if (next === undefined) return
+    onPick(next)
+    // Defer focus to the newly-checked button.
+    requestAnimationFrame(() => {
+      const root = e.currentTarget
+      if (!root) return
+      const btn = root.querySelector<HTMLButtonElement>(
+        `button[data-value="${CSS.escape(next)}"]`,
+      )
+      btn?.focus()
+    })
+  }
+
+  return (
+    <fieldset>
+      <legend className="text-eyebrow text-ink-muted">{group.name}</legend>
+      <div
+        role="radiogroup"
+        aria-label={group.name}
+        onKeyDown={handleKey}
+        className="mt-3 flex flex-wrap gap-2"
+      >
+        {group.values.map((value) => {
+          const isActive = selected === value
+          return (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              data-value={value}
+              aria-checked={isActive}
+              tabIndex={isActive ? 0 : -1}
+              onClick={() => onPick(value)}
+              className={cn(
+                'inline-flex h-10 items-center border px-4 text-caption transition-colors',
+                isActive
+                  ? 'border-ink bg-ink text-parchment'
+                  : 'border-limestone-deep bg-parchment text-ink-soft hover:border-olive hover:text-olive',
+                'focus-visible:outline-2 focus-visible:outline-bronze',
+              )}
+            >
+              {value}
+            </button>
+          )
+        })}
+      </div>
+    </fieldset>
   )
 }
