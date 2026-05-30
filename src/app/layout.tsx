@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   applicationName: 'HV Jewelers',
   authors: [{ name: 'Hoang Vi Jewelers' }],
   // Public pages inherit indexable defaults from Next's built-in policy.
-  // Internal/transactional surfaces (admin, checkout, login, account,
-  // bag, design-system specs) override with their own `robots: { index:
-  // false }` metadata. robots.txt is the belt-and-suspenders gate.
+  // Internal/transactional surfaces (admin, login, account, design-system
+  // specs) override with their own `robots: { index: false }` metadata.
+  // robots.txt is the belt-and-suspenders gate.
   openGraph: {
     type: 'website',
     siteName: 'HV Jewelers',
@@ -41,9 +41,21 @@ export const metadata: Metadata = {
     description:
       'A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
     locale: 'en_US',
+    images: [
+      {
+        url: '/brand/wordmark.png',
+        width: 1024,
+        height: 1024,
+        alt: 'HV Jewelers',
+      },
+    ],
   },
-  icons: {
-    icon: '/favicon.ico',
+  twitter: {
+    card: 'summary',
+    title: 'HV Jewelers · Hoang Vi',
+    description:
+      'A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
+    images: ['/brand/wordmark.png'],
   },
 }
 

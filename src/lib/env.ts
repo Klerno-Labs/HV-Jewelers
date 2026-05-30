@@ -9,48 +9,30 @@ import { z } from 'zod'
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
-  // Auth (Phase 4)
+  // Auth — NextAuth credentials provider + staff invites
   AUTH_SECRET: z.string().min(32).optional(),
   AUTH_URL: z.string().url().optional(),
 
-  // Database (Phase 3)
+  // Database — User, AuditLog, Invite
   DATABASE_URL: z.string().url().optional(),
 
-  // Cloudinary
-  CLOUDINARY_CLOUD_NAME: z.string().min(1).optional(),
-  CLOUDINARY_API_KEY: z.string().min(1).optional(),
-  CLOUDINARY_API_SECRET: z.string().min(1).optional(),
-
-  // Upstash rate limiter
+  // Upstash — rate limiter backing cart actions + auth/contact forms
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
 
-  // Stripe — payments
-  STRIPE_SECRET_KEY: z.string().min(1).optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-  STRIPE_TAX_ENABLED: z.enum(['true', 'false']).default('false'),
-
-  // Resend — transactional email
+  // Resend — transactional email (staff invites)
   RESEND_API_KEY: z.string().min(1).optional(),
   EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
   EMAIL_REPLY_TO: z.string().email().optional(),
 
-  // Shippo — shipping labels
-  SHIPPO_API_KEY: z.string().min(1).optional(),
-  SELLER_SHIP_FROM_NAME: z.string().min(1).optional(),
-  SELLER_SHIP_FROM_STREET1: z.string().min(1).optional(),
-  SELLER_SHIP_FROM_CITY: z.string().min(1).optional(),
-  SELLER_SHIP_FROM_STATE: z.string().length(2).optional(),
-  SELLER_SHIP_FROM_POSTAL: z.string().min(3).optional(),
-  SELLER_SHIP_FROM_PHONE: z.string().min(1).optional(),
-
   // Shared secret sent by cronjobs.org as `Authorization: Bearer …`
+  // Currently used by /api/cron/prune-audit only.
   CRON_SECRET: z.string().min(16).optional(),
 
   // Sentry (optional)
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 
-  // Shopify Storefront API (headless)
+  // Shopify Storefront API (headless catalog)
   SHOPIFY_STOREFRONT_TOKEN: z.string().min(1).optional(),
   SHOPIFY_STOREFRONT_API_VERSION: z.string().min(1).default('2025-10'),
   /// Shared secret Shopify uses to sign webhook bodies. Required for
@@ -60,7 +42,6 @@ const serverEnvSchema = z.object({
 
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
-  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().min(1).optional(),
   NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: z.string().min(1).optional(),
 })
 
@@ -81,7 +62,6 @@ export const clientEnv = parse(
   clientEnvSchema,
   {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN,
   },
   'client',
