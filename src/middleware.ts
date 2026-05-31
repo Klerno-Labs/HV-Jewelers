@@ -41,14 +41,34 @@ function buildCsp(nonce: string, isDev: boolean) {
         "'unsafe-inline'",
       ],
     ],
-    ["img-src", ["'self'", "data:", "blob:", "https://res.cloudinary.com"]],
+    [
+      "img-src",
+      [
+        "'self'",
+        "data:",
+        "blob:",
+        "https://cdn.shopify.com",
+        "https://res.cloudinary.com",
+      ],
+    ],
     ["font-src", ["'self'", "data:"]],
     [
       "connect-src",
-      ["'self'", ...(isDev ? ["ws:", "http://localhost:*"] : [])],
+      [
+        "'self'",
+        // Reserved for future client-side Storefront API calls; today
+        // every Shopify call is server-side, but allowing the storefront
+        // domain costs nothing and avoids a silent breakage if a client
+        // GraphQL fetch is added later.
+        "https://zvf91s-qy.myshopify.com",
+        ...(isDev ? ["ws:", "http://localhost:*"] : []),
+      ],
     ],
     ["frame-src", ["'self'"]],
     ["frame-ancestors", ["'none'"]],
+    // Cart checkout redirects to a Shopify-hosted page via Server Action +
+    // `redirect()`; that's a 302 response, not a <form action> target, so
+    // we don't need to allowlist Shopify here.
     ["form-action", ["'self'"]],
     ["base-uri", ["'self'"]],
     ["object-src", ["'none'"]],
