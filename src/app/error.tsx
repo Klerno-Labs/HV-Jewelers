@@ -27,8 +27,8 @@ export default function Error({
         Hold on, we&apos;re fixing it.
       </h1>
       <p className="mt-8 max-w-xl text-body leading-relaxed text-ink-soft">
-        The page couldn&apos;t load. Try again, or head back to the
-        archive. Our team has been notified.
+        The page couldn&apos;t load. Try again, or head back home. Our
+        team has been notified.
       </p>
 
       <div className="mt-10 flex flex-wrap gap-4">

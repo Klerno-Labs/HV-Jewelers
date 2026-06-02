@@ -7,7 +7,7 @@ import { ConciergeClose } from '@/components/store/concierge-close'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'HV Jewelers (Hoang Vi). A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
+    'HV Jewelers (Hoang Vi) — a small collection of fine jewelry, chosen and verified in person.',
 }
 
 export default function AboutPage() {
@@ -28,10 +28,9 @@ export default function AboutPage() {
               A small house, kept on purpose.
             </h1>
             <p className="mt-10 max-w-2xl text-subtitle leading-relaxed text-ink-soft">
-              HV Jewelers (Hoang Vi) is a small archive of unworn jewelry:
-              vintage, near-vintage, and modern fine pieces. Some were
-              made decades ago and stored, never sold. Others are made
-              on the bench today. Either way, they come to you new.
+              HV Jewelers (Hoang Vi) is a small collection of fine
+              jewelry — chosen, examined, and described in person by a
+              working jeweler. We keep it small on purpose.
             </p>
           </FadeIn>
         </Container>
@@ -46,19 +45,20 @@ export default function AboutPage() {
               How the house started.
             </h2>
             <div className="mt-12 space-y-6 text-body leading-[1.8] text-ink-soft">
+              {/* TODO [Hoang Vi's real story] — this is the $1k+ trust anchor.
+                  Replace this placeholder with her actual origin: who she is
+                  as a jeweler, how HV began, why fine jewelry. No invented
+                  backstory ships. */}
               <p>
-                Hoang Vi started collecting from jewelry stores that
-                were closing, downsizing, or clearing old inventory:
-                signets from the Vintage Era that had sat in showcases
-                for decades, fine chain that had been ordered and never
-                sold, pieces that had been kept in stock without ever
-                ringing one up. None of it had been worn.
+                Hoang Vi is a jeweler. HV Jewelers brings a small, edited
+                part of that work online — fine jewelry chosen one piece at
+                a time, examined in person, and described plainly.
               </p>
               <p>
-                <em className="font-serif text-ink">HV Jewelers</em> grew
-                from that. We&apos;re not trying to be a department store. We
-                keep the catalog small, we describe each piece honestly,
-                and we&apos;d rather lose a sale than oversell something.
+                <em className="font-serif text-ink">HV Jewelers</em> is not
+                trying to be a department store. We keep the catalog small,
+                we describe each piece honestly, and we&apos;d rather lose a
+                sale than oversell something.
               </p>
             </div>
           </FadeIn>
@@ -78,48 +78,51 @@ export default function AboutPage() {
             <Principle
               number="01"
               title="Material first."
-              body="A lot of what we sell is unsigned. We tell you what the metal is, what the stone is, and how the piece was put together. Plain words, not invented provenance."
+              body="We tell you what the metal is, what the stone is, and how the piece is made. Plain words, no inflation."
             />
             <Principle
               number="02"
-              title="Unworn, every piece."
-              body="Whether it was made in 1985 or last month, nothing in the catalog has been worn. Older pieces come from jewelry stores that held them in inventory for years, sometimes decades, without ever ringing one up. That's harder to find than 'vintage' usually delivers, and it's the part we're most proud of."
+              title="Verified in person."
+              body="Every piece is examined in person before it goes on the site — the metal, the stone, the finish. We describe what we actually see, not invented provenance."
             />
             <Principle
               number="03"
               title="Plain about the rules."
-              body="Vintage Era and Near Vintage pieces are final sale. Modern Fine pieces have a 15-day return window for unworn returns. We say it on the product page so there are no surprises."
+              body="Most pieces are eligible for a 15-day return in original, unused condition. Custom, engraved, and resized pieces are final sale. We say it on the product page so there are no surprises."
             />
           </FadeIn>
         </Container>
       </section>
 
-      {/* ─── Four worlds ─── */}
+      {/* ─── What we carry ─── */}
       <section className="border-t border-limestone-deep/60 bg-limestone/40">
         <Container className="py-24 md:py-32">
           <FadeIn>
-            <p className="text-eyebrow text-ink-muted">The collections</p>
+            <p className="text-eyebrow text-ink-muted">What we carry</p>
             <h2 className="mt-6 max-w-2xl font-serif text-display text-ink">
-              Three sections of the catalog.
+              A small, fine-jewelry collection.
             </h2>
           </FadeIn>
+          {/* TODO [merch] — the final section taxonomy is a Shopify-tag
+              decision (vision §8). These are placeholder fine-jewelry
+              categories; confirm against the real catalog. */}
           <FadeIn delay={150} className="mt-16 grid gap-10 md:grid-cols-2">
             <WorldRow
               eyebrow="01"
-              title="Vintage Era"
-              body="Pieces from the 1980s and 1990s that were made for retail and never sold. Verified in person before we list them. Final sale; described plainly."
+              title="Rings & Bands"
+              body="Signets, bands, solitaires, and everyday gold. Verified in person before we list them."
               href="/shop"
             />
             <WorldRow
               eyebrow="02"
-              title="Near Vintage"
-              body="Pieces from the last fifteen-or-so years — late 2000s and 2010s. Often unsigned, all unworn. Final sale."
+              title="Necklaces & Chain"
+              body="Fine chain and pendants, described plainly — the metal, the weight, the clasp."
               href="/shop"
             />
             <WorldRow
               eyebrow="03"
-              title="Modern Fine Jewelry"
-              body="New pieces made on the bench. Bands, solitaires, everyday gold. Most are eligible for a 15-day return on unworn returns. Resizing voids that window."
+              title="Stones"
+              body="Loose and set stones, with what we can verify about each one stated plainly."
               href="/shop"
             />
           </FadeIn>
@@ -135,21 +138,19 @@ export default function AboutPage() {
               Where it comes from.
             </h2>
           </FadeIn>
+          {/* TODO [Hoang Vi's real story] — the real sourcing/craft substance
+              (where pieces come from, how they are made or selected) is the
+              $1k+ trust anchor. This is a truthful-minimal placeholder; no
+              invented sourcing ships. */}
           <FadeIn delay={150} className="mt-12 space-y-6 text-body leading-[1.8] text-ink-soft">
             <p>
-              Our older pieces come from jewelry stores that have been
-              holding inventory for years, sometimes decades. We work
-              with a short list of store owners and trade dealers we
-              trust. Each piece is examined and tested where appropriate
-              before it goes on the site. If we can&apos;t verify a
-              claim about a piece, we don&apos;t make it.
+              Every piece is chosen one at a time and examined before it
+              goes on the site. If we can&apos;t verify a claim about a
+              piece, we don&apos;t make it.
             </p>
             <p>
-              Modern Fine pieces are made on a bench we work with directly.
-              Resizing is offered on pieces where the geometry allows.
-              Vintage Era and Near Vintage pieces are typically sized as
-              made; we&apos;ll quote resizing only when it can be done
-              without damaging the piece.
+              Resizing is offered where the geometry allows; we&apos;ll
+              quote it per piece.
             </p>
           </FadeIn>
           <FadeIn delay={200} className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-limestone-deep/60 pt-8">

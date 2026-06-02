@@ -15,12 +15,10 @@ export function Manifesto() {
             We&apos;re small, and we&apos;d rather stay that way.
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
-            Hoang Vi Jewelers is a small archive of unworn jewelry. Most
-            of what we carry came directly from jewelry stores: pieces
-            that were made for retail, sat in cases or back-room
-            inventory for years, and never went home with a customer.
-            Others are made on the bench today. We look at every piece
-            in person before we list it.
+            Hoang Vi Jewelers is a small collection of fine jewelry. We
+            keep it small on purpose — signets, bands, fine chain, and
+            stones, each one chosen and looked at in person before we
+            list it. We&apos;d rather carry less and know it well.
           </p>
         </FadeIn>
       </Container>

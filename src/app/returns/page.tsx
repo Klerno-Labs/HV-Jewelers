@@ -5,7 +5,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Returns',
   description:
-    'How returns work at HV Jewelers. Vintage Era and Near Vintage are final sale; Modern Fine pieces have a 15-day window for unworn returns.',
+    'How returns work at HV Jewelers. Most fine-jewelry pieces have a 15-day return window in original, unused condition; custom and resized pieces are final sale.',
 }
 
 export default function ReturnsPage() {
@@ -23,25 +23,17 @@ export default function ReturnsPage() {
         on your receipt. Here&apos;s the full picture in one place.
       </p>
 
+      {/* TODO [confirm] — these terms (15-day window, conditions) must match
+          Hoang Vi's actual return policy before launch. */}
       <dl className="mt-12 space-y-12 text-body leading-relaxed text-ink-soft">
         <div>
-          <dt className="text-eyebrow text-ink-muted">Vintage Era and Near Vintage</dt>
-          <dd className="mt-3">
-            <span className="font-serif text-ink">Final sale.</span> These
-            are older pieces, often one of a kind. We describe condition
-            honestly so you can decide before you buy. Returns are accepted
-            only if we made an error in the description.
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-eyebrow text-ink-muted">Modern Fine Jewelry</dt>
+          <dt className="text-eyebrow text-ink-muted">Fine jewelry</dt>
           <dd className="mt-3">
             Most pieces are eligible for a{' '}
             <span className="font-serif text-ink">15-day return</span>{' '}
-            on unworn returns in original condition. The window starts the
-            day you receive the piece. Send back the original packaging,
-            tags, and any certificates that came with it.
+            in original, unused condition. The window starts the day you
+            receive the piece. Send back the original packaging, tags, and
+            any certificates that came with it.
           </dd>
         </div>
 

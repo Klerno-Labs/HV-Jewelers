@@ -27,12 +27,11 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <Brand size="lg" />
             <p className="mt-3 text-eyebrow text-ink-muted">
-              Hoang Vi · A small archive
+              Hoang Vi · Fine jewelry
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
-              Quietly sourced pieces across Vintage Era, Near Vintage,
-              and Modern Fine Jewelry. All unworn. Verified in person
-              before they go on the site.
+              A small, considered collection of fine jewelry — verified
+              in person before it goes on the site.
             </p>
           </div>
           {Object.entries(footerNav).map(([heading, items]) => (

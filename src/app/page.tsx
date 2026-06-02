@@ -15,14 +15,15 @@ import { listProducts } from '@/lib/shopify/products'
  * to typography-only treatment when no products are configured yet,
  * so the page is always coherent.
  *
- * TODO once Shopify products carry `tag:vintage-era`, `tag:modern-fine`,
- * and `tag:new-arrival`, replace the slice() with three tag-filtered
- * `listProducts` calls so each section pulls its own set.
+ * TODO once Shopify products carry section tags, replace the slice()
+ * with tag-filtered `listProducts` calls so each section pulls its own
+ * set. The final section taxonomy is a merchandising decision — see the
+ * vision doc.
  */
 export default async function Home() {
   const { products } = await listProducts(12)
-  const vintage = products.slice(0, 4)
-  const modern = products.slice(4, 8)
+  const collection = products.slice(0, 4)
+  const bench = products.slice(4, 8)
   const arrivals = products.slice(8, 12)
 
   return (
@@ -45,12 +46,12 @@ export default async function Home() {
               id="intro-heading"
               className="mt-10 max-w-[18ch] font-serif text-display-lg font-light italic leading-[1.02] text-ink"
             >
-              Vintage Era and modern fine jewelry. Every piece unworn.
+              Fine jewelry, chosen and verified in person.
             </h1>
             <p className="mt-10 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-              Older-era pieces that were made but never sold, alongside
-              modern fine jewelry made fresh on the bench. None of it
-              has been worn before.
+              Bands, solitaires, everyday gold, and stones — a small,
+              considered collection, each piece looked at in person before
+              it goes on the site.
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-4">
               <Link
@@ -94,21 +95,21 @@ export default async function Home() {
       {/* ─── Manifesto ─── */}
       <Manifesto />
 
-      {/* ─── World 01 — Vintage Era ─── */}
+      {/* ─── World 01 — The Collection ─── */}
       <WorldFeature
-        eyebrow="Vintage Era"
-        title="Older pieces, never worn."
-        body="Signets, bands, brooches, and fine chain from the 1980s and 1990s. Made then, kept in jewelry store inventory, never sold to a customer. We verify each piece in person and describe exactly what we see: stamps, finish, and the small marks long storage leaves. We don't polish or restore. Vintage Era pieces are final sale, so the description has to do the work."
+        eyebrow="The Collection"
+        title="Chosen with restraint."
+        body="A small, edited selection of fine jewelry — signets, bands, fine chain, and stones. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
         href="/shop"
-        ctaLabel="See the archive"
+        ctaLabel="See the collection"
         tone="cedar"
       />
-      {vintage.length > 0 ? (
+      {collection.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-16 md:py-20">
             <FadeIn>
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {vintage.map((p) => (
+                {collection.map((p) => (
                   <li key={p.id}>
                     <ShopProductCard product={p} />
                   </li>
@@ -119,22 +120,22 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {/* ─── World 02 — Modern Fine ─── */}
+      {/* ─── World 02 — On the Bench ─── */}
       <WorldFeature
-        eyebrow="Modern Fine Jewelry"
-        title="New pieces, made to wear daily."
-        body="Bands, solitaires, and everyday gold made fresh on the bench. Most pieces are eligible for a 15-day return on unworn returns. Resizing voids that window, so size before you buy."
+        eyebrow="On the Bench"
+        title="Made to wear, every day."
+        body="Bands, solitaires, and everyday gold. Most pieces are eligible for a 15-day return in original, unused condition. Resizing voids that window, so size before you buy."
         href="/shop"
-        ctaLabel="See the modern bench"
+        ctaLabel="See the bench"
         imageReversed
         tone="bronze"
       />
-      {modern.length > 0 ? (
+      {bench.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-16 md:py-20">
             <FadeIn>
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {modern.map((p) => (
+                {bench.map((p) => (
                   <li key={p.id}>
                     <ShopProductCard product={p} />
                   </li>
@@ -187,7 +188,7 @@ export default async function Home() {
           <FadeIn delay={150} className="mt-12 grid gap-12 md:grid-cols-3">
             <Pillar
               title="Material first"
-              body="A lot of what we sell is unsigned. We talk about the metal, the carve, and the stone before we talk about who made it. If we can't verify a claim about a piece, we don't make it."
+              body="We talk about the metal, the carve, and the stone before anything else. If we can't verify a claim about a piece, we don't make it."
             />
             <Pillar
               title="Insured, signed for"
@@ -196,7 +197,7 @@ export default async function Home() {
             />
             <Pillar
               title="Plain about returns"
-              body="Vintage Era and Near Vintage pieces are final sale. Modern Fine pieces have a 15-day return window on unworn returns. Resizing a piece voids that window."
+              body="Most pieces are eligible for a 15-day return in original, unused condition. Custom, engraved, and resized pieces are final sale."
               cta={{ href: '/returns', label: 'Read the return policy' }}
             />
           </FadeIn>

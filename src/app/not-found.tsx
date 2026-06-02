@@ -3,20 +3,20 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/layout/container'
 
 export const metadata: Metadata = {
-  title: 'Not in the archive',
+  title: 'Not found',
   robots: { index: false, follow: false },
 }
 
 export default function NotFound() {
   return (
     <Container className="py-32 md:py-40" width="reading">
-      <p className="text-eyebrow text-bronze">Not in the archive</p>
+      <p className="text-eyebrow text-bronze">Not found</p>
       <h1 className="mt-8 font-serif text-display-lg italic font-light text-ink">
         That page is not part of the house.
       </h1>
       <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-        The link may be old, or the page may have been retired as the
-        archive evolved. Below are a few good places to begin.
+        The link may be old, or the page may have moved. Below are a few
+        good places to begin.
       </p>
 
       <div className="hv-gold-rule my-12 w-16" />

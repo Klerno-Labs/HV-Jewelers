@@ -5,7 +5,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Care & Resizing',
   description:
-    'How to care for gold, pearls, and modern fine jewelry, and how resizing works at HV Jewelers.',
+    'How to care for gold, pearls, and fine jewelry, and how resizing works at HV Jewelers.',
 }
 
 export default function CarePage() {
@@ -28,10 +28,10 @@ export default function CarePage() {
           <dt className="text-eyebrow text-ink-muted">Resizing</dt>
           <dd className="mt-3">
             Resizing is offered on select pieces and noted on each product
-            page. Modern Fine rings can usually be resized within ±1 size
-            in 7 to 10 days. Vintage Era pieces are sized as made; where
-            a resize is possible, the range is narrower. Resizing voids
-            the return window.
+            page. Most rings can usually be resized within ±1 size in 7 to
+            10 days. Some pieces are sized as made; where a resize is
+            possible, the range is narrower. Resizing voids the return
+            window.
           </dd>
         </div>
 
