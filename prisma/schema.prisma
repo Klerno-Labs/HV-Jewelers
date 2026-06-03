@@ -132,3 +132,28 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
 }
+
+// ════════════════════════════════════════════════════════════════════════
+//  Marketing — pre-launch / newsletter subscribers
+// ════════════════════════════════════════════════════════════════════════
+
+/// Email-capture list for the storefront ("be first to shop the collection")
+/// and the social funnel. Independent of User/Auth.js — a subscriber is not
+/// an account. status: 'subscribed' (default, single opt-in) | 'unsubscribed'.
+/// confirmedAt is reserved for a future double-opt-in step.
+model Subscriber {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  /// Where the signup came from: 'storefront-footer', 'storefront-hero',
+  /// 'pinterest', etc. Lets us attribute the funnel later.
+  source      String    @default("storefront")
+  status      String    @default("subscribed")
+  ip          String?
+  userAgent   String?
+  confirmedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}

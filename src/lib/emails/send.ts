@@ -1,5 +1,6 @@
 import { render } from '@react-email/render'
 import StaffInviteEmail from '@/emails/staff-invite'
+import SubscribeConfirmEmail from '@/emails/subscribe-confirm'
 import { fromAddress, getResend, isEmailConfigured, replyTo } from './client'
 
 /**
@@ -79,5 +80,19 @@ export async function sendStaffInvite(args: {
         timeStyle: 'short',
       }),
     }),
+  })
+}
+
+/**
+ * Welcome a new pre-launch / newsletter subscriber. Fired from
+ * /api/subscribe on a genuinely-new signup. Fails-soft like every sender
+ * here — no RESEND key → it logs and no-ops, so signup never depends on it.
+ */
+export async function sendSubscribeConfirmation(args: { to: string }) {
+  return safeSend({
+    to: args.to,
+    subject: "You're on the list — HV Jewelers",
+    kind: 'subscribe-confirm',
+    react: SubscribeConfirmEmail(),
   })
 }
