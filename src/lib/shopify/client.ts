@@ -29,7 +29,10 @@ function endpoint(): string {
   if (!domain) {
     throw new Error('NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN is not set')
   }
-  return `https://${domain}/api/${API_VERSION}/graphql.json`
+  // Shopify shows the domain as `store.myshopify.com`, but env files often carry
+  // a full `https://…/` — normalize so we never build `https://https://…//api`.
+  const host = domain.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+  return `https://${host}/api/${API_VERSION}/graphql.json`
 }
 
 interface QueryOptions {
