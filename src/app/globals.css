@@ -206,3 +206,53 @@
   );
   height: 1px;
 }
+
+/* ── On-load reveals — pure CSS so no JS, no inline styles, and the
+   global prefers-reduced-motion rule snaps them to their end state.
+   The keyframe owns opacity (element default stays visible), so with
+   animations disabled the content is never stuck hidden. Stagger via
+   arbitrary `[animation-delay:Nms]` utilities, which compile to real
+   classes — not inline styles — keeping style-src tight. ─────────── */
+@keyframes hv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hv-unveil {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hv-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility hv-rise {
+  animation: hv-rise 1s var(--ease-editorial) both;
+}
+
+@utility hv-unveil {
+  animation: hv-unveil 1.5s var(--ease-editorial) both;
+}
+
+@utility hv-draw {
+  transform-origin: left;
+  animation: hv-draw 1.2s var(--ease-editorial) both;
+}

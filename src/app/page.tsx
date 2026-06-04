@@ -1,12 +1,11 @@
 import Link from 'next/link'
 import { Container } from '@/components/layout/container'
-import { buttonVariants } from '@/components/ui/button'
+import { Hero } from '@/components/store/hero'
 import { Manifesto } from '@/components/store/manifesto'
 import { WorldFeature } from '@/components/store/world-feature'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { FadeIn } from '@/components/store/fade-in'
 import { ShopProductCard } from '@/components/shop/shop-product-card'
-import { cn } from '@/lib/cn'
 import { listProducts } from '@/lib/shopify/products'
 
 /**
@@ -22,6 +21,9 @@ import { listProducts } from '@/lib/shopify/products'
  */
 export default async function Home() {
   const { products } = await listProducts(12)
+  // Lead with the first piece that has imagery; the hero falls back to a
+  // gradient when nothing is configured yet.
+  const feature = products.find((p) => p.featuredImage) ?? products[0] ?? null
   const collection = products.slice(0, 4)
   const bench = products.slice(4, 8)
   const arrivals = products.slice(8, 12)
@@ -29,68 +31,7 @@ export default async function Home() {
   return (
     <>
       {/* ─── Editorial hero ─── */}
-      <section
-        aria-labelledby="intro-heading"
-        className="relative overflow-hidden"
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-full md:w-[55%]"
-        >
-          <div className="h-full w-full bg-[radial-gradient(ellipse_at_top_right,color-mix(in_srgb,var(--color-greek-teal)_18%,var(--color-limestone-deep))_0%,var(--color-parchment)_55%,transparent_85%)]" />
-        </div>
-        <Container className="grid gap-12 py-24 md:py-32 lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-16 lg:py-40">
-          <FadeIn>
-            <p className="text-eyebrow text-bronze">Hoang Vi Jewelers</p>
-            <h1
-              id="intro-heading"
-              className="mt-10 max-w-[18ch] font-serif text-display-lg font-light italic leading-[1.02] text-ink"
-            >
-              Fine jewelry, chosen and verified in person.
-            </h1>
-            <p className="mt-10 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-              Bands, solitaires, everyday gold, and stones — a small,
-              considered collection, each piece looked at in person before
-              it goes on the site.
-            </p>
-            <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-4">
-              <Link
-                href="/shop"
-                className={cn(buttonVariants({ variant: 'primary', size: 'lg' }))}
-              >
-                Enter the shop
-              </Link>
-              <Link
-                href="/about"
-                className={cn(buttonVariants({ variant: 'ghost', size: 'lg' }))}
-              >
-                About the House →
-              </Link>
-            </div>
-          </FadeIn>
-
-          <FadeIn
-            delay={200}
-            className="relative aspect-4/5 overflow-hidden lg:aspect-3/4"
-          >
-            <div
-              aria-hidden
-              className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,color-mix(in_srgb,var(--color-greek-terracotta)_55%,var(--color-cedar-soft))_0%,var(--color-temple-stone)_55%,var(--color-parchment-warm)_100%)]"
-            />
-            <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-              <p className="font-serif text-eyebrow text-bronze">
-                Currently in the case
-              </p>
-              <Link
-                href="/shop"
-                className="text-eyebrow text-bronze underline underline-offset-4 decoration-bronze/60 hover:text-olive"
-              >
-                Browse the shop →
-              </Link>
-            </div>
-          </FadeIn>
-        </Container>
-      </section>
+      <Hero feature={feature} />
 
       {/* ─── Manifesto ─── */}
       <Manifesto />
