@@ -46,7 +46,14 @@ const clientEnvSchema = z.object({
 })
 
 function parse<T extends z.ZodTypeAny>(schema: T, raw: Record<string, unknown>, label: string): z.infer<T> {
-  const result = schema.safeParse(raw)
+  // Treat empty-string vars as "not set". .env files and Vercel routinely carry
+  // blank placeholders (e.g. `SHOPIFY_WEBHOOK_SECRET=`), and `.optional()` should
+  // accept those as undefined rather than failing `.min(1)` at build time.
+  const cleaned: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(raw)) {
+    if (v !== '') cleaned[k] = v
+  }
+  const result = schema.safeParse(cleaned)
   if (!result.success) {
     const issues = result.error.issues
       .map((i) => `  • ${i.path.join('.') || '(root)'}: ${i.message}`)
