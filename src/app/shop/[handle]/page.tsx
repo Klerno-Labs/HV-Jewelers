@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Container } from '@/components/layout/container'
 import { Breadcrumbs } from '@/components/store/breadcrumbs'
-import { ProductGallery, type GalleryImage } from '@/components/store/product-gallery'
+import { ProductGallery, type GalleryMedia } from '@/components/store/product-gallery'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { AddToShopCartForm } from '@/components/shop/add-to-shop-cart-form'
 import { getProductByHandle, listProductHandles } from '@/lib/shopify/products'
@@ -43,19 +43,43 @@ export default async function ShopProductPage({ params }: PageProps) {
   const product = await getProductByHandle(handle)
   if (!product) notFound()
 
-  const galleryImages: GalleryImage[] = (
-    product.images.length > 0
-      ? product.images
-      : product.featuredImage
-        ? [product.featuredImage]
-        : []
-  ).map((img) => ({
-    url: img.url,
-    alt: img.altText,
-    width: img.width,
-    height: img.height,
-    caption: null,
-  }))
+  const galleryMedia: GalleryMedia[] =
+    product.media.length > 0
+      ? product.media.map((m) => {
+          if (m.mediaType === 'video') {
+            // Prefer a progressive mp4 source; Shopify also returns HLS
+            // (.m3u8) which a bare <video> can't play without hls.js.
+            const best = m.sources.find((s) => s.mimeType === 'video/mp4') ?? m.sources[0]
+            return {
+              kind: 'video' as const,
+              src: best?.url ?? '',
+              mimeType: best?.mimeType ?? 'video/mp4',
+              poster: m.previewImage?.url ?? null,
+              alt: m.altText,
+              width: best?.width ?? m.previewImage?.width ?? null,
+              height: best?.height ?? m.previewImage?.height ?? null,
+            }
+          }
+          return {
+            kind: 'image' as const,
+            url: m.url,
+            alt: m.altText,
+            width: m.width,
+            height: m.height,
+          }
+        })
+      : (product.images.length > 0
+          ? product.images
+          : product.featuredImage
+            ? [product.featuredImage]
+            : []
+        ).map((img) => ({
+          kind: 'image' as const,
+          url: img.url,
+          alt: img.altText,
+          width: img.width,
+          height: img.height,
+        }))
 
   const priceMin = moneyToCents(product.priceRange.minVariantPrice)
   const compareMin = product.compareAtPriceRange?.minVariantPrice
@@ -79,7 +103,7 @@ export default async function ShopProductPage({ params }: PageProps) {
 
       <Container className="py-10 md:py-16">
         <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-start">
-          <ProductGallery images={galleryImages} productTitle={product.title} />
+          <ProductGallery media={galleryMedia} productTitle={product.title} />
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <p className="text-eyebrow text-bronze">{eyebrow}</p>

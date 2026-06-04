@@ -42,6 +42,27 @@ export interface PriceRange {
   maxVariantPrice: Money
 }
 
+export interface ProductMediaImage {
+  mediaType: 'image'
+  url: string
+  altText: string | null
+  width: number | null
+  height: number | null
+}
+
+export interface ProductMediaVideo {
+  mediaType: 'video'
+  altText: string | null
+  /// Shopify-hosted video renditions (mp4/webm). The UI picks the best
+  /// playable source; ordered as Shopify returns them.
+  sources: Array<{ url: string; mimeType: string; width: number | null; height: number | null }>
+  previewImage: ImageEdge | null
+}
+
+/// Normalized product media. Shopify also exposes ExternalVideo + Model3d;
+/// those are intentionally dropped at the mapper until we need them.
+export type ProductMedia = ProductMediaImage | ProductMediaVideo
+
 export interface ShopifyProduct {
   id: string
   handle: string
@@ -57,6 +78,9 @@ export interface ShopifyProduct {
   compareAtPriceRange: PriceRange | null
   featuredImage: ImageEdge | null
   images: ImageEdge[]
+  /// Ordered media (images + videos) as arranged in Shopify. Drives the
+  /// product gallery; `images` is kept for cards, OG tags, and fallbacks.
+  media: ProductMedia[]
   options: ProductOption[]
   variants: ProductVariant[]
   updatedAt: string

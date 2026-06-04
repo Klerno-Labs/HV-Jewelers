@@ -41,6 +41,36 @@ const PRODUCT_FRAGMENT = /* GraphQL */ `
         }
       }
     }
+    media(first: 20) {
+      edges {
+        node {
+          mediaContentType
+          ... on MediaImage {
+            image {
+              url
+              altText
+              width
+              height
+            }
+          }
+          ... on Video {
+            alt
+            sources {
+              url
+              mimeType
+              width
+              height
+            }
+            previewImage {
+              url
+              altText
+              width
+              height
+            }
+          }
+        }
+      }
+    }
     options {
       name
       values

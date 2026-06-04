@@ -5,16 +5,58 @@ import {
   PRODUCT_BY_HANDLE_QUERY,
   PRODUCT_HANDLES_QUERY,
 } from './queries'
-import type { ShopifyProduct } from './types'
+import type { ImageEdge, ProductMedia, ShopifyProduct } from './types'
 
 /**
  * Storefront product reads. All flatten the Shopify edge-and-node
  * connection format so the UI never sees `edges[].node`.
  */
 
-type RawProduct = Omit<ShopifyProduct, 'images' | 'variants'> & {
+interface RawMediaNode {
+  mediaContentType: string
+  image?: ImageEdge | null
+  alt?: string | null
+  sources?: Array<{ url: string; mimeType: string; width: number | null; height: number | null }>
+  previewImage?: ImageEdge | null
+}
+
+type RawProduct = Omit<ShopifyProduct, 'images' | 'variants' | 'media'> & {
   images: { edges: Array<{ node: ShopifyProduct['images'][number] }> }
   variants: { edges: Array<{ node: ShopifyProduct['variants'][number] }> }
+  media?: { edges: Array<{ node: RawMediaNode }> }
+}
+
+/**
+ * Normalize Shopify's media union to our `ProductMedia[]`. Only IMAGE and
+ * VIDEO are surfaced today; ExternalVideo/Model3d are dropped (a video with
+ * no playable source is skipped rather than rendered empty).
+ */
+function mapMedia(raw: RawProduct['media']): ProductMedia[] {
+  if (!raw) return []
+  const out: ProductMedia[] = []
+  for (const { node } of raw.edges) {
+    if (node.mediaContentType === 'IMAGE' && node.image) {
+      out.push({
+        mediaType: 'image',
+        url: node.image.url,
+        altText: node.image.altText,
+        width: node.image.width,
+        height: node.image.height,
+      })
+    } else if (
+      node.mediaContentType === 'VIDEO' &&
+      node.sources &&
+      node.sources.length > 0
+    ) {
+      out.push({
+        mediaType: 'video',
+        altText: node.alt ?? null,
+        sources: node.sources,
+        previewImage: node.previewImage ?? null,
+      })
+    }
+  }
+  return out
 }
 
 function flattenProduct(raw: RawProduct): ShopifyProduct {
@@ -22,6 +64,7 @@ function flattenProduct(raw: RawProduct): ShopifyProduct {
     ...raw,
     images: raw.images.edges.map((e) => e.node),
     variants: raw.variants.edges.map((e) => e.node),
+    media: mapMedia(raw.media),
   }
 }
 

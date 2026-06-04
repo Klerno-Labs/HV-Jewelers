@@ -4,39 +4,53 @@ import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/cn'
 
-export interface GalleryImage {
-  url: string
-  alt: string | null
-  width: number | null
-  height: number | null
-  caption: string | null
-}
+export type GalleryMedia =
+  | {
+      kind: 'image'
+      url: string
+      alt: string | null
+      width: number | null
+      height: number | null
+    }
+  | {
+      kind: 'video'
+      src: string
+      mimeType: string
+      poster: string | null
+      alt: string | null
+      width: number | null
+      height: number | null
+    }
+
+/** Back-compat alias for callers that only build image lists. */
+export type GalleryImage = Extract<GalleryMedia, { kind: 'image' }>
 
 /**
- * Product gallery — main image, thumbnail strip, and a lightbox for
- * close-up viewing. Keyboard accessible (←/→ to step through, ESC to
- * close lightbox). Falls back to an editorial-safe placeholder when no
- * images are present.
+ * Product gallery — main media (image or Shopify-hosted video), a
+ * thumbnail strip, and a lightbox for close-up viewing. Keyboard
+ * accessible (←/→ to step, ESC to close). Videos play inline with native
+ * controls (and native fullscreen). Falls back to an editorial-safe
+ * placeholder when no media is present.
  */
 export function ProductGallery({
-  images,
+  media,
   productTitle,
 }: {
-  images: GalleryImage[]
+  media: GalleryMedia[]
   productTitle: string
 }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [zoomOpen, setZoomOpen] = useState(false)
 
-  const safeIndex = Math.min(Math.max(activeIdx, 0), Math.max(images.length - 1, 0))
-  const active = images[safeIndex]
+  const safeIndex = Math.min(Math.max(activeIdx, 0), Math.max(media.length - 1, 0))
+  const active = media[safeIndex]
 
   const step = useCallback(
     (delta: number) => {
-      if (images.length === 0) return
-      setActiveIdx((i) => (i + delta + images.length) % images.length)
+      if (media.length === 0) return
+      setActiveIdx((i) => (i + delta + media.length) % media.length)
     },
-    [images.length],
+    [media.length],
   )
 
   // Lightbox keyboard + body-scroll handling.
@@ -56,60 +70,81 @@ export function ProductGallery({
     }
   }, [zoomOpen, step])
 
-  if (images.length === 0 || !active) {
+  if (media.length === 0 || !active) {
     return <PlaceholderImage title={productTitle} />
   }
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => setZoomOpen(true)}
-        className="group relative block aspect-4/5 w-full overflow-hidden bg-limestone focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-parchment"
-        aria-label="Open close-up view"
-      >
-        <Image
-          src={active.url}
-          alt={active.alt ?? productTitle}
-          width={active.width ?? 1600}
-          height={active.height ?? 2000}
-          priority
-          sizes="(min-width: 1024px) 60vw, 100vw"
-          className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.02]"
-        />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute bottom-4 right-4 bg-parchment/90 px-2.5 py-1 text-eyebrow text-ink-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      {active.kind === 'image' ? (
+        <button
+          type="button"
+          onClick={() => setZoomOpen(true)}
+          className="group relative block aspect-4/5 w-full overflow-hidden bg-limestone focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-parchment"
+          aria-label="Open close-up view"
         >
-          Close-up ⤢
-        </span>
-      </button>
+          <Image
+            src={active.url}
+            alt={active.alt ?? productTitle}
+            width={active.width ?? 1600}
+            height={active.height ?? 2000}
+            priority
+            sizes="(min-width: 1024px) 60vw, 100vw"
+            className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.02]"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute bottom-4 right-4 bg-parchment/90 px-2.5 py-1 text-eyebrow text-ink-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          >
+            Close-up ⤢
+          </span>
+        </button>
+      ) : (
+        <video
+          key={active.src}
+          controls
+          playsInline
+          preload="metadata"
+          poster={active.poster ?? undefined}
+          aria-label={active.alt ?? `${productTitle} — video`}
+          className="aspect-4/5 w-full bg-limestone object-cover"
+        >
+          <source src={active.src} type={active.mimeType} />
+        </video>
+      )}
 
-      {images.length > 1 ? (
+      {media.length > 1 ? (
         <ul
           aria-label="Other views of this piece"
           className="mt-4 flex gap-3 overflow-x-auto pb-2"
         >
-          {images.map((img, i) => (
-            <li key={`${img.url}-${i}`}>
+          {media.map((item, i) => (
+            <li key={`${mediaKey(item)}-${i}`}>
               <button
                 type="button"
                 onClick={() => setActiveIdx(i)}
                 aria-current={i === safeIndex ? 'true' : undefined}
-                aria-label={`View ${i + 1} of ${images.length}`}
+                aria-label={
+                  item.kind === 'video'
+                    ? `Play video — view ${i + 1} of ${media.length}`
+                    : `View ${i + 1} of ${media.length}`
+                }
                 className={cn(
                   'relative block h-24 w-20 flex-none overflow-hidden bg-limestone transition-opacity duration-200',
                   i === safeIndex ? 'opacity-100' : 'opacity-65 hover:opacity-90',
                 )}
               >
-                <Image
-                  src={img.url}
-                  alt=""
-                  width={img.width ?? 200}
-                  height={img.height ?? 250}
-                  sizes="80px"
-                  className="h-full w-full object-cover"
-                />
+                <ThumbVisual item={item} />
+                {item.kind === 'video' ? (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink/55 backdrop-blur-sm">
+                      <PlayGlyph />
+                    </span>
+                  </span>
+                ) : null}
                 <span
                   aria-hidden
                   className={cn(
@@ -125,10 +160,10 @@ export function ProductGallery({
 
       {zoomOpen ? (
         <Lightbox
-          image={active}
+          item={active}
           productTitle={productTitle}
           index={safeIndex}
-          total={images.length}
+          total={media.length}
           onClose={() => setZoomOpen(false)}
           onStep={step}
         />
@@ -137,15 +172,37 @@ export function ProductGallery({
   )
 }
 
+function ThumbVisual({ item }: { item: GalleryMedia }) {
+  const poster = item.kind === 'image' ? item.url : item.poster
+  if (!poster) {
+    return (
+      <span
+        aria-hidden
+        className="block h-full w-full bg-[radial-gradient(ellipse_at_center,var(--color-parchment-warm)_0%,var(--color-limestone)_72%)]"
+      />
+    )
+  }
+  return (
+    <Image
+      src={poster}
+      alt=""
+      width={item.width ?? 200}
+      height={item.height ?? 250}
+      sizes="80px"
+      className="h-full w-full object-cover"
+    />
+  )
+}
+
 function Lightbox({
-  image,
+  item,
   productTitle,
   index,
   total,
   onClose,
   onStep,
 }: {
-  image: GalleryImage
+  item: GalleryMedia
   productTitle: string
   index: number
   total: number
@@ -174,14 +231,28 @@ function Lightbox({
       </div>
 
       <div className="flex flex-1 items-center justify-center px-4 pb-8 md:px-12">
-        <Image
-          src={image.url}
-          alt={image.alt ?? productTitle}
-          width={image.width ?? 2000}
-          height={image.height ?? 2500}
-          sizes="(min-width: 1024px) 80vw, 95vw"
-          className="max-h-full max-w-full object-contain"
-        />
+        {item.kind === 'image' ? (
+          <Image
+            src={item.url}
+            alt={item.alt ?? productTitle}
+            width={item.width ?? 2000}
+            height={item.height ?? 2500}
+            sizes="(min-width: 1024px) 80vw, 95vw"
+            className="max-h-full max-w-full object-contain"
+          />
+        ) : (
+          <video
+            key={item.src}
+            controls
+            autoPlay
+            playsInline
+            poster={item.poster ?? undefined}
+            aria-label={item.alt ?? `${productTitle} — video`}
+            className="max-h-full max-w-full object-contain"
+          >
+            <source src={item.src} type={item.mimeType} />
+          </video>
+        )}
       </div>
 
       {total > 1 ? (
@@ -204,6 +275,21 @@ function Lightbox({
       ) : null}
     </div>
   )
+}
+
+function PlayGlyph() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+      <path
+        d="M3 2.2v7.6a.5.5 0 0 0 .77.42l5.7-3.8a.5.5 0 0 0 0-.84l-5.7-3.8A.5.5 0 0 0 3 2.2Z"
+        fill="var(--color-parchment, #f7f3ea)"
+      />
+    </svg>
+  )
+}
+
+function mediaKey(item: GalleryMedia): string {
+  return item.kind === 'image' ? item.url : item.src
 }
 
 function PlaceholderImage({ title }: { title: string }) {
