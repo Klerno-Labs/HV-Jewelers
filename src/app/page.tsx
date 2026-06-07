@@ -40,6 +40,9 @@ export default async function Home() {
         }
       : null
 
+  // Capped stagger for grid reveals (FadeIn accepts 0|100|150|200|300).
+  const STAGGER = [0, 100, 200, 300] as const
+
   return (
     <>
       {/* ─── Editorial hero ─── */}
@@ -61,15 +64,15 @@ export default async function Home() {
       {collection.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-16 md:py-20">
-            <FadeIn>
-              <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {collection.map((p) => (
-                  <li key={p.id}>
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
+              {collection.map((p, i) => (
+                <li key={p.id}>
+                  <FadeIn delay={STAGGER[Math.min(i, 3)]}>
                     <ShopProductCard product={p} />
-                  </li>
-                ))}
-              </ul>
-            </FadeIn>
+                  </FadeIn>
+                </li>
+              ))}
+            </ul>
           </Container>
         </section>
       ) : null}
@@ -88,15 +91,15 @@ export default async function Home() {
       {bench.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-16 md:py-20">
-            <FadeIn>
-              <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {bench.map((p) => (
-                  <li key={p.id}>
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
+              {bench.map((p, i) => (
+                <li key={p.id}>
+                  <FadeIn delay={STAGGER[Math.min(i, 3)]}>
                     <ShopProductCard product={p} />
-                  </li>
-                ))}
-              </ul>
-            </FadeIn>
+                  </FadeIn>
+                </li>
+              ))}
+            </ul>
           </Container>
         </section>
       ) : null}
@@ -119,15 +122,17 @@ export default async function Home() {
                 See all →
               </Link>
             </FadeIn>
-            <FadeIn delay={150} className="mt-14">
+            <div className="mt-14">
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {arrivals.map((p) => (
+                {arrivals.map((p, i) => (
                   <li key={p.id}>
-                    <ShopProductCard product={p} />
+                    <FadeIn delay={STAGGER[Math.min(i, 3)]}>
+                      <ShopProductCard product={p} />
+                    </FadeIn>
                   </li>
                 ))}
               </ul>
-            </FadeIn>
+            </div>
           </Container>
         </section>
       ) : null}

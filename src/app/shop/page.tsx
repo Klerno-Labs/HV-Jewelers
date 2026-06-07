@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 export default async function ShopPage() {
   const { products } = await listProducts(250)
   const configured = shopifyConfigured()
+  const STAGGER = [0, 100, 200, 300] as const
 
   return (
     <>
@@ -76,9 +77,11 @@ export default async function ShopPage() {
           />
         ) : (
           <ul className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((p) => (
+            {products.map((p, i) => (
               <li key={p.id}>
-                <ShopProductCard product={p} />
+                <FadeIn delay={STAGGER[Math.min(i, 3)]}>
+                  <ShopProductCard product={p} />
+                </FadeIn>
               </li>
             ))}
           </ul>

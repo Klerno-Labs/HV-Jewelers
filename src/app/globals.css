@@ -256,3 +256,35 @@
   transform-origin: left;
   animation: hv-draw 1.2s var(--ease-editorial) both;
 }
+
+/* Slow, subtle "Ken-Burns" drift for hero imagery — feels alive without
+   being distracting. Perpetual but reduced-motion snaps it (iteration-count
+   forced to 1 above). Container must be overflow-hidden. */
+@keyframes hv-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+/* Per-navigation page entrance (used by app/template.tsx). */
+@keyframes hv-page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Gentle image reveal — fade pixels in instead of a hard pop. */
+@keyframes hv-img-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@utility hv-kenburns {
+  animation: hv-kenburns 16s var(--ease-quiet) alternate infinite;
+}
+
+@utility hv-page-in {
+  animation: hv-page-in 0.55s var(--ease-editorial) both;
+}
+
+@utility hv-img-in {
+  animation: hv-img-in 0.9s var(--ease-quiet) both;
+}
