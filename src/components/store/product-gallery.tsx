@@ -209,6 +209,7 @@ function Lightbox({
   onClose: () => void
   onStep: (delta: number) => void
 }) {
+  const [zoomed, setZoomed] = useState(false)
   return (
     <div
       role="dialog"
@@ -230,16 +231,30 @@ function Lightbox({
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-center justify-center px-4 pb-8 md:px-12">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-auto px-4 pb-8 md:px-12">
         {item.kind === 'image' ? (
-          <Image
-            src={item.url}
-            alt={item.alt ?? productTitle}
-            width={item.width ?? 2000}
-            height={item.height ?? 2500}
-            sizes="(min-width: 1024px) 80vw, 95vw"
-            className="max-h-[80vh] max-w-full object-contain"
-          />
+          <>
+            {/* Plain <img> for a bulletproof, full-resolution close-up. Click to
+                magnify to native size (scroll/drag to pan), click again to fit. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={item.url}
+              alt={item.alt ?? productTitle}
+              onClick={() => setZoomed((z) => !z)}
+              className={cn(
+                'select-none',
+                zoomed
+                  ? 'max-h-none max-w-none cursor-zoom-out'
+                  : 'max-h-[82vh] max-w-[92vw] object-contain cursor-zoom-in',
+              )}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none fixed bottom-6 left-1/2 -translate-x-1/2 bg-parchment/85 px-3 py-1 text-eyebrow text-ink-soft"
+            >
+              {zoomed ? 'Click image to fit' : 'Click image to magnify'}
+            </span>
+          </>
         ) : (
           <video
             key={item.src}
@@ -248,7 +263,7 @@ function Lightbox({
             playsInline
             poster={item.poster ?? undefined}
             aria-label={item.alt ?? `${productTitle} — video`}
-            className="max-h-[80vh] max-w-full object-contain"
+            className="max-h-[82vh] max-w-[92vw] object-contain"
           >
             <source src={item.src} type={item.mimeType} />
           </video>
