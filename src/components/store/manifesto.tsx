@@ -15,10 +15,10 @@ export function Manifesto() {
             We&apos;re small, and we&apos;d rather stay that way.
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
-            Hoang Vi Jewelers is a small collection of fine jewelry. We
-            keep it small on purpose — signets, bands, fine chain, and
-            stones, each one chosen and looked at in person before we
-            list it. We&apos;d rather carry less and know it well.
+            HV Jewelers is a small collection of fine jewelry. We keep it
+            small on purpose — natural jade and diamond necklaces, pendants,
+            earrings, and bracelets, each one hand-picked before we list it.
+            We&apos;d rather carry less and know it well.
           </p>
         </FadeIn>
       </Container>

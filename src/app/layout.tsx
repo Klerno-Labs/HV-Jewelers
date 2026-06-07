@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: '%s · HV Jewelers',
   },
   description:
-    'Hoang Vi Jewelers — a small collection of fine jewelry: bands, solitaires, chain, and stones, each chosen and verified in person.',
+    'HV Jewelers — a small collection of fine jewelry in natural jade and diamond: necklaces, pendants, earrings, and bracelets, each piece hand-picked.',
   applicationName: 'HV Jewelers',
   authors: [{ name: 'Hoang Vi Jewelers' }],
   // Public pages inherit indexable defaults from Next's built-in policy.
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: 'HV Jewelers',
     title: 'HV Jewelers · Hoang Vi',
     description:
-      'A small collection of fine jewelry — bands, solitaires, chain, and stones, verified in person.',
+      'A small collection of fine jewelry in natural jade and diamond — necklaces, pendants, earrings, and bracelets.',
     locale: 'en_US',
     images: [
       {
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'HV Jewelers · Hoang Vi',
     description:
-      'A small collection of fine jewelry — bands, solitaires, chain, and stones, verified in person.',
+      'A small collection of fine jewelry in natural jade and diamond — necklaces, pendants, earrings, and bracelets.',
     images: ['/brand/wordmark.png'],
   },
 }
