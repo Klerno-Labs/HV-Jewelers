@@ -3,10 +3,11 @@ import { Redis } from '@upstash/redis'
 import { serverEnv, isProd } from './env'
 
 /**
- * Distributed rate limiting via Upstash Redis. Configured lazily: when env vars
- * are absent in development the limiters fail-open so the app is usable. In
- * production, unconfigured limiters throw — we never silently disable a security
- * control on a live deployment.
+ * Distributed rate limiting via Upstash Redis. Configured lazily: when the
+ * Upstash env vars are absent the limiters fail OPEN (and warn in production)
+ * so the storefront stays usable — rate limiting is a hardening layer, not a
+ * purchase-blocker. Set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN to
+ * turn on real distributed limiting.
  */
 
 const isConfigured = Boolean(
@@ -42,16 +43,14 @@ function buildLimiter(config: {
       prefix: config.prefix,
     })
   }
+  // Not configured (no Upstash env). Fail OPEN so the storefront stays usable —
+  // rate limiting must never block a real purchase. Warn in production so the
+  // gap is visible in logs; set the Upstash env vars to enable real limiting.
   if (isProd) {
-    return {
-      async limit() {
-        throw new Error(
-          `Rate limiter "${config.prefix}" is not configured in production. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.`,
-        )
-      },
-    }
+    console.warn(
+      `[rate-limit] "${config.prefix}" not configured — failing open. Set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN to enable.`,
+    )
   }
-  // Dev fallback: fail-open with informational shape.
   return {
     async limit() {
       return { success: true, limit: config.requests, remaining: config.requests, reset: 0 }
