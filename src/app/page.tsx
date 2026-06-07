@@ -28,6 +28,18 @@ export default async function Home() {
   const bench = products.slice(4, 8)
   const arrivals = products.slice(8, 12)
 
+  // Map a product's featured image into the WorldFeature image shape so the
+  // two editorial splits show real pieces instead of gradient placeholders.
+  const toFeatureImage = (p: (typeof products)[number] | undefined) =>
+    p?.featuredImage
+      ? {
+          url: p.featuredImage.url,
+          alt: p.featuredImage.altText ?? p.title,
+          width: p.featuredImage.width ?? 1200,
+          height: p.featuredImage.height ?? 1500,
+        }
+      : null
+
   return (
     <>
       {/* ─── Editorial hero ─── */}
@@ -40,10 +52,11 @@ export default async function Home() {
       <WorldFeature
         eyebrow="The Collection"
         title="Chosen with restraint."
-        body="A small, edited selection of fine jewelry — signets, bands, fine chain, and stones. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
+        body="A small, edited selection of fine jewelry in natural jade and diamond — necklaces, pendants, and earrings, each set in solid gold. Every piece is hand-picked and described plainly: the gold, the stones, the carat weight. We'd rather carry less and know it well."
         href="/shop"
         ctaLabel="See the collection"
         tone="cedar"
+        image={toFeatureImage(collection[1] ?? collection[0])}
       />
       {collection.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
@@ -65,11 +78,12 @@ export default async function Home() {
       <WorldFeature
         eyebrow="On the Bench"
         title="Made to wear, every day."
-        body="Bands, solitaires, and everyday gold. Most pieces are eligible for a 15-day return in original, unused condition. Resizing voids that window, so size before you buy."
+        body="Solid 14- and 18-karat gold set with natural diamonds, jade, and rare stones like tanzanite — made for real life. Most pieces are eligible for a 15-day return in original, unused condition."
         href="/shop"
         ctaLabel="See the bench"
         imageReversed
         tone="bronze"
+        image={toFeatureImage(bench[0] ?? collection[2])}
       />
       {bench.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
