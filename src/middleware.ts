@@ -32,12 +32,12 @@ function buildCsp(nonce: string, isDev: boolean) {
       "style-src",
       [
         "'self'",
-        `'nonce-${nonce}'`,
-        // Inline `style` *attributes* are emitted by next/image and other
-        // framework primitives. Per CSP3, when both a nonce and 'unsafe-inline'
-        // appear in style-src, browsers prefer the nonce for `<style>` tags
-        // (so those remain protected) and only consult 'unsafe-inline' for
-        // attribute-level styles. Net: tags stay strict, attributes pass.
+        // No nonce here on purpose. Per CSP3, a nonce (or hash) in style-src
+        // makes the browser IGNORE 'unsafe-inline' for BOTH <style> tags and
+        // inline `style` attributes — which blocks the attributes emitted by
+        // next/image and other framework primitives. Style-based injection is
+        // low-risk, so we rely on 'unsafe-inline' for styles and keep the real
+        // protection (nonce + strict-dynamic) on script-src above.
         "'unsafe-inline'",
       ],
     ],
