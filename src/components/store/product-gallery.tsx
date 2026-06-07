@@ -230,7 +230,7 @@ function Lightbox({
         </button>
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-4 pb-8 md:px-12">
+      <div className="flex min-h-0 flex-1 items-center justify-center px-4 pb-8 md:px-12">
         {item.kind === 'image' ? (
           <Image
             src={item.url}
@@ -238,7 +238,7 @@ function Lightbox({
             width={item.width ?? 2000}
             height={item.height ?? 2500}
             sizes="(min-width: 1024px) 80vw, 95vw"
-            className="max-h-full max-w-full object-contain"
+            className="max-h-[80vh] max-w-full object-contain"
           />
         ) : (
           <video
@@ -248,7 +248,7 @@ function Lightbox({
             playsInline
             poster={item.poster ?? undefined}
             aria-label={item.alt ?? `${productTitle} — video`}
-            className="max-h-full max-w-full object-contain"
+            className="max-h-[80vh] max-w-full object-contain"
           >
             <source src={item.src} type={item.mimeType} />
           </video>

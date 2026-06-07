@@ -18,13 +18,11 @@ export function ShopProductCard({ product }: { product: ShopifyProduct }) {
   const eyebrow =
     product.productType || product.vendor || 'HV Jewelers'
 
-  const showOneOnly =
-    product.totalInventory != null &&
-    product.totalInventory === 1 &&
-    product.availableForSale
-  const showSold =
-    !product.availableForSale ||
-    (product.totalInventory != null && product.totalInventory <= 0)
+  // Exact inventory counts require the `unauthenticated_read_product_inventory`
+  // Storefront scope, which this token doesn't carry. Derive sold state from
+  // availableForSale (no scope needed); the per-card "one only" badge is omitted.
+  const showOneOnly = false
+  const showSold = !product.availableForSale
 
   // Visually-hidden state prefix folded into the link's text content so
   // screen readers read e.g. "Sold. Gold signet ring. HV Jewelers. $420."

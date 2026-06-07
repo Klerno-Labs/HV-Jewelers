@@ -73,7 +73,7 @@ export interface ShopifyProduct {
   productType: string
   tags: string[]
   availableForSale: boolean
-  totalInventory: number | null
+  totalInventory?: number | null
   priceRange: PriceRange
   compareAtPriceRange: PriceRange | null
   featuredImage: ImageEdge | null
