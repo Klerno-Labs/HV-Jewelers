@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { cn } from '@/lib/cn'
 
@@ -41,6 +42,10 @@ export function ProductGallery({
 }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [zoomOpen, setZoomOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Portal target only exists on the client; gate the lightbox portal on mount.
+  useEffect(() => setMounted(true), [])
 
   const safeIndex = Math.min(Math.max(activeIdx, 0), Math.max(media.length - 1, 0))
   const active = media[safeIndex]
@@ -158,16 +163,19 @@ export function ProductGallery({
         </ul>
       ) : null}
 
-      {zoomOpen ? (
-        <Lightbox
-          item={active}
-          productTitle={productTitle}
-          index={safeIndex}
-          total={media.length}
-          onClose={() => setZoomOpen(false)}
-          onStep={step}
-        />
-      ) : null}
+      {zoomOpen && mounted
+        ? createPortal(
+            <Lightbox
+              item={active}
+              productTitle={productTitle}
+              index={safeIndex}
+              total={media.length}
+              onClose={() => setZoomOpen(false)}
+              onStep={step}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   )
 }

@@ -265,10 +265,13 @@
   to { transform: scale(1.06); }
 }
 
-/* Per-navigation page entrance (used by app/template.tsx). */
+/* Per-navigation page entrance (used by app/template.tsx). Opacity ONLY —
+   a transform here would persist (fill mode) and make the wrapper a containing
+   block for every position:fixed descendant (modals, cart drawer), pinning them
+   to the page instead of the viewport. Fade only keeps fixed positioning intact. */
 @keyframes hv-page-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Gentle image reveal — fade pixels in instead of a hard pop. */
