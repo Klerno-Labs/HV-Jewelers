@@ -4,11 +4,18 @@ import { authConfig } from './auth.config'
 
 const { auth } = NextAuth(authConfig)
 
+// Canonical host for self-referencing rel=canonical. Fixed origin (never the
+// request host) so apex/www variants collapse to one URL.
+const SITE_ORIGIN = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hvjewelers.com'
+).replace(/\/$/, '')
+
 /**
  * Middleware is the first security layer:
  *   1. Generates a per-request nonce and attaches a strict CSP.
  *   2. Applies baseline security headers.
  *   3. Gates `/admin/*` to authenticated STAFF/ADMIN users (redirects otherwise).
+ *   4. Emits a self-referencing canonical Link header on indexable pages.
  *
  * Every privileged Server Component / Action / Route Handler MUST still perform
  * its own server-side role check via `requireAdmin()` or `requireStaffOrAdmin()`.
@@ -136,6 +143,22 @@ export default auth((req) => {
 
   const res = NextResponse.next({ request: { headers: requestHeaders } })
   applySecurityHeaders(res, csp)
+
+  // Self-referencing canonical for indexable pages. Points at the clean apex
+  // URL with no query string and no trailing slash, so apex/www, http/https,
+  // trailing-slash, and ?param variants all consolidate to one canonical —
+  // clearing GSC's "Duplicate without user-selected canonical". Google honors
+  // the HTTP Link header equivalently to <link rel="canonical">. Skip /api and
+  // /admin (non-indexable). `append` preserves any framework Link headers.
+  const { pathname } = req.nextUrl
+  if (!pathname.startsWith('/api') && !pathname.startsWith('/admin')) {
+    const path =
+      pathname !== '/' && pathname.endsWith('/')
+        ? pathname.slice(0, -1)
+        : pathname
+    res.headers.append('Link', `<${SITE_ORIGIN}${path}>; rel="canonical"`)
+  }
+
   return res
 })
 
