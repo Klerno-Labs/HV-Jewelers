@@ -27,12 +27,12 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <Brand size="lg" />
             <p className="mt-3 text-eyebrow text-ink-muted">
-              Hoang Vi · A small archive
+              Hoang Vi · Since 2005
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
-              Quietly sourced pieces across Vintage Era, Near Vintage,
-              and Modern Fine Jewelry. All unworn. Verified in person
-              before they go on the site.
+              Gold and fine jewelry — chains, necklaces, bracelets,
+              earrings, and pendants. One of each piece. A family jeweler
+              since 2005, shipped to your door.
             </p>
           </div>
           {Object.entries(footerNav).map(([heading, items]) => (

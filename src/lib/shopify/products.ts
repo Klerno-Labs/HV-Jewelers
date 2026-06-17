@@ -2,6 +2,7 @@ import 'server-only'
 import { SHOPIFY_TAGS, shopifyConfigured, shopifyFetch } from './client'
 import {
   PRODUCTS_QUERY,
+  PRODUCTS_BY_QUERY_QUERY,
   PRODUCT_BY_HANDLE_QUERY,
   PRODUCT_HANDLES_QUERY,
 } from './queries'
@@ -12,7 +13,10 @@ import type { ShopifyProduct } from './types'
  * connection format so the UI never sees `edges[].node`.
  */
 
-type RawProduct = Omit<ShopifyProduct, 'images' | 'variants'> & {
+type RawProduct = Omit<
+  ShopifyProduct,
+  'images' | 'variants' | 'totalInventory'
+> & {
   images: { edges: Array<{ node: ShopifyProduct['images'][number] }> }
   variants: { edges: Array<{ node: ShopifyProduct['variants'][number] }> }
 }
@@ -20,6 +24,10 @@ type RawProduct = Omit<ShopifyProduct, 'images' | 'variants'> & {
 function flattenProduct(raw: RawProduct): ShopifyProduct {
   return {
     ...raw,
+    // Not queried — the current Storefront token lacks the inventory
+    // read scope (see PRODUCT_FRAGMENT). UI falls back to
+    // availableForSale.
+    totalInventory: null,
     images: raw.images.edges.map((e) => e.node),
     variants: raw.variants.edges.map((e) => e.node),
   }
@@ -52,6 +60,36 @@ export async function listProducts(
   } catch (err) {
     console.error('[shopify] listProducts failed', err)
     return { products: [], endCursor: null, hasNextPage: false }
+  }
+}
+
+interface ProductsByQueryResponse {
+  products: { edges: Array<{ node: RawProduct }> }
+}
+
+/**
+ * Products matching a Storefront search query, newest first.
+ * `listProductsByTag('gold', 4)` → `query: "tag:gold"`.
+ * Returns [] when unconfigured, on error, or when no product carries
+ * the tag — callers treat [] as "fall back or hide the section".
+ */
+export async function listProductsByTag(
+  tag: string,
+  first = 8,
+): Promise<ShopifyProduct[]> {
+  if (!shopifyConfigured()) return []
+  try {
+    const data = await shopifyFetch<ProductsByQueryResponse>(
+      PRODUCTS_BY_QUERY_QUERY,
+      {
+        variables: { first, query: `tag:${tag}` },
+        tags: [SHOPIFY_TAGS.products],
+      },
+    )
+    return data.products.edges.map((e) => flattenProduct(e.node))
+  } catch (err) {
+    console.error('[shopify] listProductsByTag failed', tag, err)
+    return []
   }
 }
 

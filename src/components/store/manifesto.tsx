@@ -15,7 +15,7 @@ export function Manifesto() {
             We&apos;re small, and we&apos;d rather stay that way.
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
-            Hoang Vi Jewelers is a small archive of unworn jewelry. Most
+            Hoang Vi Jewelers is a small archive of jewelry. Most
             of what we carry came directly from jewelry stores: pieces
             that were made for retail, sat in cases or back-room
             inventory for years, and never went home with a customer.

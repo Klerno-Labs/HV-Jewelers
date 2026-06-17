@@ -5,7 +5,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Returns',
   description:
-    'How returns work at HV Jewelers. Vintage Era and Near Vintage are final sale; Modern Fine pieces have a 15-day window for unworn returns.',
+    'How returns work at HV Jewelers — a 15-day return on unworn items in original condition. Earrings are final sale; you cover insured return shipping.',
 }
 
 export default function ReturnsPage() {
@@ -20,36 +20,38 @@ export default function ReturnsPage() {
 
       <p className="text-subtitle leading-relaxed text-ink-soft">
         Every piece has its return rules listed on its product page and
-        on your receipt. Here&apos;s the full picture in one place.
+        on your receipt. Here&apos;s the full picture in one place. Because
+        we only stock one of each piece, returns are refunds rather than
+        exchanges.
       </p>
 
       <dl className="mt-12 space-y-12 text-body leading-relaxed text-ink-soft">
         <div>
-          <dt className="text-eyebrow text-ink-muted">Vintage Era and Near Vintage</dt>
+          <dt className="text-eyebrow text-ink-muted">Most pieces</dt>
           <dd className="mt-3">
-            <span className="font-serif text-ink">Final sale.</span> These
-            are older pieces, often one of a kind. We describe condition
-            honestly so you can decide before you buy. Returns are accepted
-            only if we made an error in the description.
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-eyebrow text-ink-muted">Modern Fine Jewelry</dt>
-          <dd className="mt-3">
-            Most pieces are eligible for a{' '}
+            Eligible for a{' '}
             <span className="font-serif text-ink">15-day return</span>{' '}
-            on unworn returns in original condition. The window starts the
-            day you receive the piece. Send back the original packaging,
-            tags, and any certificates that came with it.
+            on unworn items in original condition. The window starts the
+            day you receive the piece. Send it back in the original
+            packaging with any tags still attached.
           </dd>
         </div>
 
         <div>
-          <dt className="text-eyebrow text-ink-muted">Resized, engraved, custom</dt>
+          <dt className="text-eyebrow text-ink-muted">Earrings</dt>
           <dd className="mt-3">
-            Pieces that were resized, engraved, or made to order are final
-            sale. Asking for a resize voids the return window even if the
+            <span className="font-serif text-ink">Final sale.</span> For
+            hygiene, earrings can&apos;t be returned once they&apos;ve
+            shipped. Please check sizing and details on the product page
+            before you order.
+          </dd>
+        </div>
+
+        <div>
+          <dt className="text-eyebrow text-ink-muted">Resized or engraved pieces</dt>
+          <dd className="mt-3">
+            Pieces that were resized or engraved are final sale. Asking
+            for a resize or engraving voids the return window even if the
             piece would otherwise be eligible.
           </dd>
         </div>
@@ -60,8 +62,7 @@ export default function ReturnsPage() {
             <span className="font-serif text-ink">We&apos;ll make it right.</span>{' '}
             If something arrives damaged or doesn&apos;t match the
             description, send a note within 7 days of receipt with a
-            photo. We&apos;ll cover the return shipping and either refund
-            or replace.
+            photo. We&apos;ll cover the return shipping and refund you.
           </dd>
         </div>
 

@@ -17,9 +17,9 @@ export function ConciergeClose() {
             Questions? We&apos;re here.
           </p>
           <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-            Holds, sizing, sourcing requests, care advice. Write to us
-            directly and we&apos;ll get back, usually within a day or
-            two.
+            Sizing questions, gift notes, care advice — anything about a
+            piece. Write to us directly and we&apos;ll get back, usually
+            within a day or two.
           </p>
           <Link
             href="/contact"

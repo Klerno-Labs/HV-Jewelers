@@ -7,7 +7,7 @@ import { ConciergeClose } from '@/components/store/concierge-close'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'HV Jewelers (Hoang Vi). A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
+    'HV Jewelers (Hoang Vi) — a family jeweler since 2005. Gold and fine jewelry, one of each piece, ready to wear and shipped to your door.',
 }
 
 export default function AboutPage() {
@@ -25,13 +25,14 @@ export default function AboutPage() {
           <FadeIn className="max-w-3xl">
             <p className="text-eyebrow text-bronze">About · Hoang Vi</p>
             <h1 className="mt-10 font-serif text-display-lg italic font-light leading-[1.05] text-ink">
-              A small house, kept on purpose.
+              A family jeweler since 2005.
             </h1>
             <p className="mt-10 max-w-2xl text-subtitle leading-relaxed text-ink-soft">
-              HV Jewelers (Hoang Vi) is a small archive of unworn jewelry:
-              vintage, near-vintage, and modern fine pieces. Some were
-              made decades ago and stored, never sold. Others are made
-              on the bench today. Either way, they come to you new.
+              HV Jewelers (Hoang Vi) has been a family jewelry store since
+              2005. Today we bring that same selection online: gold and
+              fine jewelry — chains, necklaces, bracelets, earrings, and
+              pendants — ready to wear and shipped to your door. We only
+              ever stock one of each piece.
             </p>
           </FadeIn>
         </Container>
@@ -47,18 +48,17 @@ export default function AboutPage() {
             </h2>
             <div className="mt-12 space-y-6 text-body leading-[1.8] text-ink-soft">
               <p>
-                Hoang Vi started collecting from jewelry stores that
-                were closing, downsizing, or clearing old inventory:
-                signets from the Vintage Era that had sat in showcases
-                for decades, fine chain that had been ordered and never
-                sold, pieces that had been kept in stock without ever
-                ringing one up. None of it had been worn.
+                Hoang Vi opened in 2005 as a family jewelry store, and the
+                same family still picks every piece. We know gold, we know
+                the makers we buy from, and we&apos;ve spent a long time
+                learning what wears well and what doesn&apos;t.
               </p>
               <p>
-                <em className="font-serif text-ink">HV Jewelers</em> grew
-                from that. We&apos;re not trying to be a department store. We
-                keep the catalog small, we describe each piece honestly,
-                and we&apos;d rather lose a sale than oversell something.
+                <em className="font-serif text-ink">HV Jewelers</em> is that
+                store, online. We&apos;re not trying to be a department
+                store. We keep the catalog small, we describe each piece
+                honestly, and we&apos;d rather lose a sale than oversell
+                something.
               </p>
             </div>
           </FadeIn>
@@ -77,79 +77,77 @@ export default function AboutPage() {
           <FadeIn delay={150} className="mt-16 grid gap-12 md:grid-cols-3">
             <Principle
               number="01"
-              title="Material first."
-              body="A lot of what we sell is unsigned. We tell you what the metal is, what the stone is, and how the piece was put together. Plain words, not invented provenance."
+              title="One of each."
+              body="We only ever stock one of every piece. When it's gone, it's gone — so what you see is what's actually here, never a stock photo of something we'll reorder."
             />
             <Principle
               number="02"
-              title="Unworn, every piece."
-              body="Whether it was made in 1985 or last month, nothing in the catalog has been worn. Older pieces come from jewelry stores that held them in inventory for years, sometimes decades, without ever ringing one up. That's harder to find than 'vintage' usually delivers, and it's the part we're most proud of."
+              title="Plain about the piece."
+              body="We tell you the metal, the weight, and the measurements first. Real photos that look like the piece in your hand, plain words, no invented stories. If we can't verify a claim, we don't make it."
             />
             <Principle
               number="03"
-              title="Plain about the rules."
-              body="Vintage Era and Near Vintage pieces are final sale. Modern Fine pieces have a 15-day return window for unworn returns. We say it on the product page so there are no surprises."
+              title="Plain about returns."
+              body="Unworn pieces have a 15-day return window in original condition. Earrings are final sale for hygiene. We say it on every product page so there are no surprises."
             />
           </FadeIn>
         </Container>
       </section>
 
-      {/* ─── Four worlds ─── */}
+      {/* ─── Categories ─── */}
       <section className="border-t border-limestone-deep/60 bg-limestone/40">
         <Container className="py-24 md:py-32">
           <FadeIn>
-            <p className="text-eyebrow text-ink-muted">The collections</p>
+            <p className="text-eyebrow text-ink-muted">The collection</p>
             <h2 className="mt-6 max-w-2xl font-serif text-display text-ink">
-              Three sections of the catalog.
+              What we carry.
             </h2>
           </FadeIn>
           <FadeIn delay={150} className="mt-16 grid gap-10 md:grid-cols-2">
             <WorldRow
               eyebrow="01"
-              title="Vintage Era"
-              body="Pieces from the 1980s and 1990s that were made for retail and never sold. Verified in person before we list them. Final sale; described plainly."
+              title="Gold Chains & Necklaces"
+              body="Solid gold chains and necklaces — the pieces you reach for every day. Photographed and checked by hand before they go on the site."
               href="/shop"
             />
             <WorldRow
               eyebrow="02"
-              title="Near Vintage"
-              body="Pieces from the last fifteen-or-so years — late 2000s and 2010s. Often unsigned, all unworn. Final sale."
+              title="Bracelets & Earrings"
+              body="Bracelets, studs, hoops, and drops in gold and fine metals. Finished, ready to wear, ready to ship."
               href="/shop"
             />
             <WorldRow
               eyebrow="03"
-              title="Modern Fine Jewelry"
-              body="New pieces made on the bench. Bands, solitaires, everyday gold. Most are eligible for a 15-day return on unworn returns. Resizing voids that window."
+              title="Pendants & Rings"
+              body="Pendants and finished rings, sized as listed. Simple, well-made pieces you'll keep wearing."
               href="/shop"
             />
           </FadeIn>
         </Container>
       </section>
 
-      {/* ─── Sourcing & craft ─── */}
+      {/* ─── How we work ─── */}
       <section className="border-t border-limestone-deep/60 bg-parchment">
         <Container className="py-24 md:py-32" width="reading">
           <FadeIn>
-            <p className="text-eyebrow text-ink-muted">Sourcing</p>
+            <p className="text-eyebrow text-ink-muted">How it ships</p>
             <h2 className="mt-6 font-serif text-display text-ink">
-              Where it comes from.
+              From our case to your door.
             </h2>
           </FadeIn>
           <FadeIn delay={150} className="mt-12 space-y-6 text-body leading-[1.8] text-ink-soft">
             <p>
-              Our older pieces come from jewelry stores that have been
-              holding inventory for years, sometimes decades. We work
-              with a short list of store owners and trade dealers we
-              trust. Each piece is examined and tested where appropriate
-              before it goes on the site. If we can&apos;t verify a
-              claim about a piece, we don&apos;t make it.
+              We work directly with makers and suppliers we&apos;ve trusted
+              for years. Every piece is inspected before it goes on the
+              site — if we can&apos;t stand behind it, we don&apos;t list
+              it.
             </p>
             <p>
-              Modern Fine pieces are made on a bench we work with directly.
-              Resizing is offered on pieces where the geometry allows.
-              Vintage Era and Near Vintage pieces are typically sized as
-              made; we&apos;ll quote resizing only when it can be done
-              without damaging the piece.
+              Orders ship from our store fully insured, signature required,
+              usually within a day or two. If something isn&apos;t right,
+              you have 15 days to send unworn pieces back; you cover the
+              insured return shipping. Need a ring sized or a piece looked
+              after later? We can help with that too.
             </p>
           </FadeIn>
           <FadeIn delay={200} className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-limestone-deep/60 pt-8">

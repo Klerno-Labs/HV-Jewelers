@@ -15,7 +15,12 @@ const PRODUCT_FRAGMENT = /* GraphQL */ `
     productType
     tags
     availableForSale
-    totalInventory
+    # totalInventory intentionally omitted: reading it requires the
+    # unauthenticated_read_product_inventory scope, which the current
+    # Storefront token lacks — including it fails the WHOLE query.
+    # The adapter maps it to null and the UI falls back to
+    # availableForSale. Re-add here (and drop the null mapping in
+    # products.ts) once the scope is enabled in Shopify admin.
     updatedAt
     priceRange {
       minVariantPrice { amount currencyCode }
@@ -74,6 +79,17 @@ export const PRODUCTS_QUERY = /* GraphQL */ `
       pageInfo { hasNextPage endCursor }
       edges {
         cursor
+        node { ...ProductCore }
+      }
+    }
+  }
+`
+
+export const PRODUCTS_BY_QUERY_QUERY = /* GraphQL */ `
+  ${PRODUCT_FRAGMENT}
+  query ProductsByQuery($first: Int!, $query: String!) {
+    products(first: $first, query: $query, sortKey: CREATED_AT, reverse: true) {
+      edges {
         node { ...ProductCore }
       }
     }

@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { SiteHeader } from '@/components/layout/site-header'
 import { SiteFooter } from '@/components/layout/site-footer'
+import { SmoothScrollProvider } from '@/components/immersive/smooth-scroll-provider'
+import { StructuredData } from '@/components/seo/structured-data'
 import './globals.css'
 
 const serifDisplay = Cormorant_Garamond({
@@ -23,13 +25,26 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'HV Jewelers · Hoang Vi',
-    template: '%s · HV Jewelers',
+    default: 'Gold Chains, Necklaces & Fine Jewelry | HV Jewelers',
+    template: '%s | HV Jewelers',
   },
   description:
-    'Hoang Vi Jewelers. A small archive of unworn jewelry: Vintage Era, Near Vintage, and modern fine pieces.',
+    'HV Jewelers (Hoang Vi) — gold chains, necklaces, bracelets, earrings, and fine jewelry, ready to wear and shipped to your door. A family jeweler since 2005.',
   applicationName: 'HV Jewelers',
-  authors: [{ name: 'Hoang Vi Jewelers' }],
+  authors: [{ name: 'HV Jewelers (Hoang Vi)' }],
+  keywords: [
+    'gold chains',
+    'gold necklaces',
+    'gold bracelets',
+    'gold earrings',
+    'gold pendants',
+    'gold rings',
+    'fine jewelry online',
+    '14k gold jewelry',
+    'ready to wear jewelry',
+    'gold jewelry',
+  ],
+  category: 'Jewelry',
   // Public pages inherit indexable defaults from Next's built-in policy.
   // Internal/transactional surfaces (admin, login, account, design-system
   // specs) override with their own `robots: { index: false }` metadata.
@@ -37,25 +52,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'HV Jewelers',
-    title: 'HV Jewelers · Hoang Vi',
+    title: 'Gold Chains, Necklaces & Fine Jewelry | HV Jewelers',
     description:
-      'A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
+      'Gold chains, necklaces, bracelets, earrings, and fine jewelry — ready to wear and shipped to your door. A family jeweler since 2005.',
     locale: 'en_US',
     images: [
       {
-        url: '/brand/wordmark.png',
+        url: '/brand/wordmark-cream.png',
         width: 1024,
         height: 1024,
-        alt: 'HV Jewelers',
+        alt: 'HV Jewelers — gold chains, necklaces & fine jewelry',
       },
     ],
   },
   twitter: {
     card: 'summary',
-    title: 'HV Jewelers · Hoang Vi',
+    title: 'Gold Chains, Necklaces & Fine Jewelry | HV Jewelers',
     description:
-      'A small archive of unworn Vintage Era, Near Vintage, and modern fine jewelry.',
-    images: ['/brand/wordmark.png'],
+      'Gold chains, necklaces, bracelets, earrings, and fine jewelry — ready to wear and shipped to your door. A family jeweler since 2005.',
+    images: ['/brand/wordmark-cream.png'],
   },
 }
 
@@ -78,11 +93,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-dvh flex-col bg-parchment font-sans text-body text-ink antialiased">
-        <SiteHeader />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <SiteFooter />
+        <StructuredData />
+        <SmoothScrollProvider>
+          <SiteHeader />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <SiteFooter />
+        </SmoothScrollProvider>
       </body>
     </html>
   )

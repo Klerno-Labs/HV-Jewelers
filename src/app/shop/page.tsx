@@ -11,7 +11,7 @@ import { shopifyConfigured } from '@/lib/shopify/client'
 export const metadata: Metadata = {
   title: 'Shop',
   description:
-    'The full HV Jewelers catalog: signets, bands, chain, and stones, all unworn.',
+    'Gold chains, necklaces, bracelets, earrings, pendants, and rings — the full HV Jewelers collection, ready to wear.',
 }
 
 export default async function ShopPage() {
@@ -43,9 +43,9 @@ export default async function ShopPage() {
               Currently in the case.
             </h1>
             <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-              The full catalog. Unworn pieces across vintage and modern fine
-              jewelry, photographed and described in person before they go
-              on the site.
+              The full collection — gold chains, necklaces, bracelets,
+              earrings, pendants, and rings. Every piece photographed and
+              checked by hand before it goes on the site.
             </p>
             <p className="mt-8 text-eyebrow text-ink-muted">
               {products.length === 0
@@ -90,9 +90,10 @@ export default async function ShopPage() {
           <div className="border-t border-limestone-deep/60 pt-10">
             <p className="text-eyebrow text-ink-muted">House notes</p>
             <p className="mt-4 max-w-2xl text-body leading-relaxed text-ink-soft">
-              Most pieces are one of one. If something here is right but
-              the size is wrong, write the concierge and we will quote a
-              resize where the geometry allows.
+              We only stock one of each piece, so when it sells it&apos;s
+              gone. If something here is right but the size is wrong, write
+              the concierge and we will quote a resize where the geometry
+              allows.
             </p>
             <Link
               href="/contact"
