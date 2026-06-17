@@ -54,7 +54,7 @@ export default function TermsPage() {
         Pricing &amp; availability
       </h2>
       <p className="mt-4 leading-relaxed text-ink-soft">
-        Prices and availability can change, and many pieces are one of a kind.
+        Prices and availability can change, and we hold only one of each piece.
         We do our best to keep listings current, but we can&apos;t guarantee a
         piece will still be available at the moment you check out.
       </p>

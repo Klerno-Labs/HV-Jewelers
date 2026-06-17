@@ -5,7 +5,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Returns',
   description:
-    'How returns work at HV Jewelers. Most fine-jewelry pieces have a 15-day return window in original, unused condition; custom and resized pieces are final sale.',
+    'How returns work at HV Jewelers. Most fine-jewelry pieces have a 15-day return window in original, unused condition; earrings and resized pieces are final sale.',
 }
 
 export default function ReturnsPage() {
@@ -20,11 +20,10 @@ export default function ReturnsPage() {
 
       <p className="text-subtitle leading-relaxed text-ink-soft">
         Every piece has its return rules listed on its product page and
-        on your receipt. Here&apos;s the full picture in one place.
+        on your receipt. Here&apos;s the full picture in one place. Because
+        we hold one of each piece, returns are refunds, not exchanges.
       </p>
 
-      {/* TODO [confirm] — these terms (15-day window, conditions) must match
-          Hoang Vi's actual return policy before launch. */}
       <dl className="mt-12 space-y-12 text-body leading-relaxed text-ink-soft">
         <div>
           <dt className="text-eyebrow text-ink-muted">Fine jewelry</dt>
@@ -32,17 +31,25 @@ export default function ReturnsPage() {
             Most pieces are eligible for a{' '}
             <span className="font-serif text-ink">15-day return</span>{' '}
             in original, unused condition. The window starts the day you
-            receive the piece. Send back the original packaging, tags, and
-            any certificates that came with it.
+            receive the piece. Send back the original packaging and tags.
           </dd>
         </div>
 
         <div>
-          <dt className="text-eyebrow text-ink-muted">Resized, engraved, custom</dt>
+          <dt className="text-eyebrow text-ink-muted">Earrings</dt>
           <dd className="mt-3">
-            Pieces that were resized, engraved, or made to order are final
-            sale. Asking for a resize voids the return window even if the
-            piece would otherwise be eligible.
+            <span className="font-serif text-ink">Final sale.</span> For
+            hygiene, earrings can&apos;t be returned once they&apos;ve
+            shipped. Please check sizing and details before you order.
+          </dd>
+        </div>
+
+        <div>
+          <dt className="text-eyebrow text-ink-muted">Resized or engraved</dt>
+          <dd className="mt-3">
+            Pieces that were resized or engraved are final sale. Asking
+            for a resize voids the return window even if the piece would
+            otherwise be eligible.
           </dd>
         </div>
 

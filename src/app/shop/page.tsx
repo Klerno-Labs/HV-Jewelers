@@ -90,9 +90,10 @@ export default async function ShopPage() {
           <div className="border-t border-limestone-deep/60 pt-10">
             <p className="text-eyebrow text-ink-muted">House notes</p>
             <p className="mt-4 max-w-2xl text-body leading-relaxed text-ink-soft">
-              Most pieces are one of one. If something here is right but
-              the size is wrong, write the concierge and we will quote a
-              resize where the geometry allows.
+              We only stock one of each piece, so when it sells it&apos;s
+              gone. If something here is right but the size is wrong, write
+              the concierge and we will quote a resize where the geometry
+              allows.
             </p>
             <Link
               href="/contact"

@@ -138,7 +138,7 @@ export default async function Home() {
             />
             <Pillar
               title="Plain about returns"
-              body="Most pieces are eligible for a 15-day return in original, unused condition. Custom, engraved, and resized pieces are final sale."
+              body="Most pieces are eligible for a 15-day return in original, unused condition. Earrings, engraved, and resized pieces are final sale."
               cta={{ href: '/returns', label: 'Read the return policy' }}
             />
           </FadeIn>
