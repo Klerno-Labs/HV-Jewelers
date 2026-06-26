@@ -209,6 +209,16 @@ function Lightbox({
   onClose: () => void
   onStep: (delta: number) => void
 }) {
+  // Fit-to-screen by default; click the image (or the button) to zoom in to
+  // full resolution and scroll/pan around the detail. Reset zoom whenever the
+  // shown media changes.
+  const [zoomed, setZoomed] = useState(false)
+  useEffect(() => {
+    setZoomed(false)
+  }, [item])
+
+  const isImage = item.kind === 'image'
+
   return (
     <div
       role="dialog"
@@ -230,16 +240,36 @@ function Lightbox({
         </button>
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-4 pb-8 md:px-12">
-        {item.kind === 'image' ? (
-          <Image
-            src={item.url}
-            alt={item.alt ?? productTitle}
-            width={item.width ?? 2000}
-            height={item.height ?? 2500}
-            sizes="(min-width: 1024px) 80vw, 95vw"
-            className="max-h-full max-w-full object-contain"
-          />
+      {/* min-h-0 lets this flex child actually shrink so object-contain fits
+          the viewport instead of overflowing. When zoomed, it scrolls. */}
+      <div
+        className={cn(
+          'flex min-h-0 flex-1 px-4 pb-2 md:px-12',
+          zoomed
+            ? 'overflow-auto'
+            : 'items-center justify-center overflow-hidden',
+        )}
+      >
+        {isImage ? (
+          <button
+            type="button"
+            onClick={() => setZoomed((z) => !z)}
+            aria-label={zoomed ? 'Zoom out' : 'Zoom in'}
+            className={cn('m-auto block', zoomed ? 'cursor-zoom-out' : 'cursor-zoom-in')}
+          >
+            <Image
+              src={item.url}
+              alt={item.alt ?? productTitle}
+              width={item.width ?? 2000}
+              height={item.height ?? 2500}
+              sizes={zoomed ? '150vw' : '(min-width: 1024px) 80vw, 95vw'}
+              className={cn(
+                zoomed
+                  ? 'h-auto w-auto max-w-none'
+                  : 'max-h-[calc(100vh-9rem)] max-w-full object-contain',
+              )}
+            />
+          </button>
         ) : (
           <video
             key={item.src}
@@ -248,31 +278,46 @@ function Lightbox({
             playsInline
             poster={item.poster ?? undefined}
             aria-label={item.alt ?? `${productTitle} — video`}
-            className="max-h-full max-w-full object-contain"
+            className="m-auto max-h-[calc(100vh-9rem)] max-w-full object-contain"
           >
             <source src={item.src} type={item.mimeType} />
           </video>
         )}
       </div>
 
-      {total > 1 ? (
-        <div className="flex items-center justify-between gap-6 px-4 pb-8 md:px-12">
+      <div className="flex items-center justify-between gap-6 px-4 pb-6 pt-3 md:px-12">
+        {isImage ? (
           <button
             type="button"
-            onClick={() => onStep(-1)}
+            onClick={() => setZoomed((z) => !z)}
             className="text-caption tracking-wide text-parchment-warm transition-colors hover:text-antique-gold-soft"
           >
-            ← Previous
+            {zoomed ? 'Fit to screen' : 'Zoom in ⤢'}
           </button>
-          <button
-            type="button"
-            onClick={() => onStep(1)}
-            className="text-caption tracking-wide text-parchment-warm transition-colors hover:text-antique-gold-soft"
-          >
-            Next →
-          </button>
-        </div>
-      ) : null}
+        ) : (
+          <span />
+        )}
+        {total > 1 ? (
+          <div className="flex items-center gap-6">
+            <button
+              type="button"
+              onClick={() => onStep(-1)}
+              className="text-caption tracking-wide text-parchment-warm transition-colors hover:text-antique-gold-soft"
+            >
+              ← Previous
+            </button>
+            <button
+              type="button"
+              onClick={() => onStep(1)}
+              className="text-caption tracking-wide text-parchment-warm transition-colors hover:text-antique-gold-soft"
+            >
+              Next →
+            </button>
+          </div>
+        ) : (
+          <span />
+        )}
+      </div>
     </div>
   )
 }

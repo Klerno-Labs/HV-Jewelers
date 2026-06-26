@@ -102,7 +102,7 @@ export default async function ShopProductPage({ params }: PageProps) {
       </Container>
 
       <Container className="py-10 md:py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-start">
+        <div className="grid gap-10 lg:grid-cols-[1.45fr_1fr] lg:items-start lg:gap-16">
           <ProductGallery media={galleryMedia} productTitle={product.title} />
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
