@@ -90,7 +90,7 @@ export function ProductGallery({
             height={active.height ?? 2000}
             priority
             sizes="(min-width: 1024px) 60vw, 100vw"
-            className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.02]"
+            className="h-full w-full object-cover transition-transform duration-700 ease-editorial scale-[1.3] group-hover:scale-[1.34]"
           />
           <span
             aria-hidden

@@ -52,7 +52,7 @@ export function ShopProductCard({ product }: { product: ShopifyProduct }) {
             width={image.width ?? 800}
             height={image.height ?? 1000}
             sizes="(min-width: 1280px) 320px, (min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="h-full w-full object-cover transition-transform duration-[800ms] ease-[var(--ease-quiet)] group-hover:scale-[1.02]"
+            className="h-full w-full object-cover transition-transform duration-[800ms] ease-[var(--ease-quiet)] scale-[1.3] group-hover:scale-[1.34]"
           />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--color-parchment-warm)_0%,var(--color-limestone)_60%,var(--color-limestone-deep)_100%)]">

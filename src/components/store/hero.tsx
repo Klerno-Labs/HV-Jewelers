@@ -113,7 +113,7 @@ export function Hero({ feature }: { feature?: ShopifyProduct | null }) {
               height={image.height ?? 1200}
               priority
               sizes="(min-width: 1024px) 45vw, 100vw"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover scale-[1.3]"
             />
           ) : (
             <div
