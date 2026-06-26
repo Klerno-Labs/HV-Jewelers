@@ -5,21 +5,22 @@ import { serverEnv, clientEnv } from '@/lib/env'
  * Storefront API GraphQL client. Plain fetch lets Next cache responses
  * by tag and keeps the Shopify SDK out of the React payload.
  *
- * Public access token is sent in the X-Shopify-Storefront-Access-Token
- * header. The token is read-only and scoped to product listings,
- * collections, and cart mutations — safe to ship in env, but we still
- * keep the read server-side for cleanliness.
+ * Credentials come from env vars, which the owner sets from /admin/shopify
+ * (it writes .env + .env.local). If a private (delegate) access token is
+ * present it's used for these server-side reads — Shopify's recommended path
+ * for headless — otherwise the public access token is used. Both are
+ * read-only and scoped to product listings, collections, and cart mutations.
  *
- * Shopify rotates Storefront API versions on a 12-month cadence; bump
- * SHOPIFY_STOREFRONT_API_VERSION (or the fallback below) to the latest
- * stable when the current one nears EOL.
+ * Shopify rotates Storefront API versions on a 12-month cadence; set
+ * SHOPIFY_STOREFRONT_API_VERSION (or the fallback below) to the latest stable.
  */
 
 const API_VERSION = serverEnv.SHOPIFY_STOREFRONT_API_VERSION ?? '2025-10'
 
 export function shopifyConfigured(): boolean {
   return Boolean(
-    serverEnv.SHOPIFY_STOREFRONT_TOKEN &&
+    (serverEnv.SHOPIFY_STOREFRONT_PRIVATE_TOKEN ||
+      serverEnv.SHOPIFY_STOREFRONT_TOKEN) &&
       clientEnv.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN,
   )
 }
@@ -33,6 +34,15 @@ function endpoint(): string {
   // a full `https://…/` — normalize so we never build `https://https://…//api`.
   const host = domain.replace(/^https?:\/\//, '').replace(/\/+$/, '')
   return `https://${host}/api/${API_VERSION}/graphql.json`
+}
+
+/** Prefer the private (server-side) token; fall back to the public one. */
+function authHeaders(): Record<string, string> {
+  const priv = serverEnv.SHOPIFY_STOREFRONT_PRIVATE_TOKEN
+  if (priv) return { 'Shopify-Storefront-Private-Token': priv }
+  return {
+    'X-Shopify-Storefront-Access-Token': serverEnv.SHOPIFY_STOREFRONT_TOKEN ?? '',
+  }
 }
 
 interface QueryOptions {
@@ -72,7 +82,7 @@ export async function shopifyFetch<T>(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': serverEnv.SHOPIFY_STOREFRONT_TOKEN!,
+      ...authHeaders(),
       'Accept': 'application/json',
     },
     body: JSON.stringify({ query, variables: options.variables ?? {} }),

@@ -28,6 +28,7 @@ const IN_APP_LINKS: Array<{ label: string; href: string; description: string }> 
   { label: 'Policies', href: '/admin/policies', description: 'Era policy reference (final-sale, return windows).' },
   { label: 'Users & Staff', href: '/admin/users', description: 'Invite admin/staff members; manage roles.' },
   { label: 'Audit Log', href: '/admin/audit', description: 'Sign-ins and admin mutations.' },
+  { label: 'Shopify API', href: '/admin/shopify', description: 'Storefront API tokens the site reads products with. Update when Shopify rotates them.' },
 ]
 
 export default async function AdminDashboard() {

@@ -52,7 +52,7 @@ export function TextInput({
   defaultValue?: string | number
   placeholder?: string
   required?: boolean
-  type?: 'text' | 'email' | 'url' | 'number'
+  type?: 'text' | 'email' | 'url' | 'number' | 'password'
   minLength?: number
   maxLength?: number
   className?: string

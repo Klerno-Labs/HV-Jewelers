@@ -34,6 +34,9 @@ const serverEnvSchema = z.object({
 
   // Shopify Storefront API (headless catalog)
   SHOPIFY_STOREFRONT_TOKEN: z.string().min(1).optional(),
+  /// Private (delegate) access token from the Headless channel. Optional;
+  /// when set it's preferred for server-side reads. Managed from /admin/shopify.
+  SHOPIFY_STOREFRONT_PRIVATE_TOKEN: z.string().min(1).optional(),
   SHOPIFY_STOREFRONT_API_VERSION: z.string().min(1).default('2025-10'),
   /// Shared secret Shopify uses to sign webhook bodies. Required for
   /// /api/shopify/webhook to verify and act on cache-invalidation events.
