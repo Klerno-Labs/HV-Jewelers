@@ -7,6 +7,26 @@ import { ConciergeClose } from '@/components/store/concierge-close'
 import { FadeIn } from '@/components/store/fade-in'
 import { ShopProductCard } from '@/components/shop/shop-product-card'
 import { listProducts } from '@/lib/shopify/products'
+import type { ShopifyProduct } from '@/lib/shopify/types'
+
+/**
+ * Map a ranked product to the WorldFeature panel's image + link, so the two
+ * editorial panels show real pieces (the next-priciest after the hero) and
+ * fall back to their gradient when the catalog is too small to fill them.
+ */
+function panelImage(p: ShopifyProduct | undefined) {
+  const img = p?.featuredImage
+  if (!p || !img) return { image: null, imageHref: undefined }
+  return {
+    image: {
+      url: img.url,
+      alt: img.altText ?? p.title,
+      width: img.width ?? 1000,
+      height: img.height ?? 1250,
+    },
+    imageHref: `/shop/${p.handle}`,
+  }
+}
 
 /**
  * The editorial home. Reads the Shopify catalog and ranks it by price,
@@ -32,10 +52,13 @@ export default async function Home() {
         parseFloat(a.priceRange.minVariantPrice.amount),
     )
 
+  // Hero = priciest. The two World panels = the next two. The grids pick up
+  // from #4 so nothing repeats. Everything is sliced from `ranked`, so adding
+  // or selling a piece reshuffles the whole page automatically.
   const feature = ranked[0] ?? products[0] ?? null
-  const collection = ranked.slice(1, 5)
-  const bench = ranked.slice(5, 9)
-  const arrivals = ranked.slice(9, 13)
+  const collection = ranked.slice(3, 7)
+  const bench = ranked.slice(7, 11)
+  const arrivals = ranked.slice(11, 15)
 
   return (
     <>
@@ -53,6 +76,7 @@ export default async function Home() {
         href="/shop"
         ctaLabel="See the collection"
         tone="cedar"
+        {...panelImage(ranked[1])}
       />
       {collection.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
@@ -79,6 +103,7 @@ export default async function Home() {
         ctaLabel="See the bench"
         imageReversed
         tone="bronze"
+        {...panelImage(ranked[2])}
       />
       {bench.length > 0 ? (
         <section className="border-t border-limestone-deep/60">

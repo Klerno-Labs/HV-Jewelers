@@ -28,6 +28,8 @@ export interface WorldFeatureProps {
   tone?: keyof typeof TONE_CLASSES
   /// Optional editorial image (Cloudinary URL).
   image?: { url: string; alt: string; width: number; height: number } | null
+  /// Where the image links (e.g. a product PDP). Falls back to `href`.
+  imageHref?: string
 }
 
 /**
@@ -46,6 +48,7 @@ export function WorldFeature({
   imageReversed = false,
   tone = 'parchment',
   image = null,
+  imageHref,
 }: WorldFeatureProps) {
   return (
     <section className="border-t border-limestone-deep/60">
@@ -58,14 +61,19 @@ export function WorldFeature({
         >
           <FadeIn className="relative aspect-[4/5] overflow-hidden lg:aspect-[5/6]">
             {image ? (
-              <Image
-                src={image.url}
-                alt={image.alt}
-                width={image.width}
-                height={image.height}
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="h-full w-full object-cover"
-              />
+              <Link
+                href={imageHref ?? href}
+                className="group block h-full w-full bg-limestone"
+              >
+                <Image
+                  src={image.url}
+                  alt={image.alt}
+                  width={image.width}
+                  height={image.height}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.02]"
+                />
+              </Link>
             ) : (
               <div
                 aria-hidden
