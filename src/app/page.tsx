@@ -9,24 +9,33 @@ import { ShopProductCard } from '@/components/shop/shop-product-card'
 import { listProducts } from '@/lib/shopify/products'
 
 /**
- * The editorial home. Reads up to 12 Shopify products and slices them
- * across the two World features and the New Arrivals grid. Falls back
- * to typography-only treatment when no products are configured yet,
- * so the page is always coherent.
+ * The editorial home. Reads the Shopify catalog and ranks it by price,
+ * most-expensive first: the priciest available piece leads the hero, then
+ * the next pieces fill the two World features and the closing grid in
+ * descending order.
  *
- * TODO once Shopify products carry section tags, replace the slice()
- * with tag-filtered `listProducts` calls so each section pulls its own
- * set. The final section taxonomy is a merchandising decision — see the
- * vision doc.
+ * Only available pieces are ranked, so a sold piece drops off the homepage
+ * and the next-priciest piece slides up into its slot — the hero and grids
+ * stay populated as one-of-a-kind inventory turns over. Falls back to
+ * typography-only treatment when no products are configured yet.
  */
 export default async function Home() {
-  const { products } = await listProducts(12)
-  // Lead with the first piece that has imagery; the hero falls back to a
-  // gradient when nothing is configured yet.
-  const feature = products.find((p) => p.featuredImage) ?? products[0] ?? null
-  const collection = products.slice(0, 4)
-  const bench = products.slice(4, 8)
-  const arrivals = products.slice(8, 12)
+  const { products } = await listProducts(50)
+
+  // Available pieces, most expensive first. Sliced from this single ranked
+  // pool so the hero + grids never sit empty while pieces are in stock.
+  const ranked = products
+    .filter((p) => p.availableForSale)
+    .sort(
+      (a, b) =>
+        parseFloat(b.priceRange.minVariantPrice.amount) -
+        parseFloat(a.priceRange.minVariantPrice.amount),
+    )
+
+  const feature = ranked[0] ?? products[0] ?? null
+  const collection = ranked.slice(1, 5)
+  const bench = ranked.slice(5, 9)
+  const arrivals = ranked.slice(9, 13)
 
   return (
     <>
@@ -93,9 +102,9 @@ export default async function Home() {
           <Container className="py-24 md:py-32">
             <FadeIn className="flex items-end justify-between">
               <div>
-                <p className="text-eyebrow text-ink-muted">Most Recent</p>
+                <p className="text-eyebrow text-ink-muted">Also in the case</p>
                 <h2 className="mt-4 font-serif text-display text-ink">
-                  Newly added.
+                  More to consider.
                 </h2>
               </div>
               <Link
