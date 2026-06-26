@@ -15,7 +15,6 @@ const PRODUCT_FRAGMENT = /* GraphQL */ `
     productType
     tags
     availableForSale
-    totalInventory
     updatedAt
     priceRange {
       minVariantPrice { amount currencyCode }

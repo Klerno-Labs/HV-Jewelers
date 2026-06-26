@@ -62,6 +62,11 @@ function mapMedia(raw: RawProduct['media']): ProductMedia[] {
 function flattenProduct(raw: RawProduct): ShopifyProduct {
   return {
     ...raw,
+    // totalInventory is no longer fetched (needs the
+    // unauthenticated_read_product_inventory scope, which the Storefront token
+    // doesn't carry). Force null so the "only 1 left" / "sold out" badges
+    // simply don't render rather than breaking the whole query.
+    totalInventory: raw.totalInventory ?? null,
     images: raw.images.edges.map((e) => e.node),
     variants: raw.variants.edges.map((e) => e.node),
     media: mapMedia(raw.media),
