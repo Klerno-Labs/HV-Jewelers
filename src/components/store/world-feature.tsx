@@ -70,7 +70,7 @@ export function WorldFeature({
                   alt={image.alt}
                   width={image.width}
                   height={image.height}
-                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 65vw, 100vw"
                   className="h-full w-full object-cover transition-transform duration-700 ease-editorial scale-[1.3] group-hover:scale-[1.34]"
                 />
               </Link>

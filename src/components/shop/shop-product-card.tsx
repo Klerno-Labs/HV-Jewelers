@@ -62,7 +62,7 @@ export function ShopProductCard({
             sizes={
               featured
                 ? '(min-width: 768px) 50vw, 100vw'
-                : '(min-width: 1280px) 320px, (min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw'
+                : '(min-width: 1280px) 420px, (min-width: 1024px) 33vw, (min-width: 640px) 65vw, 100vw'
             }
             className={cn(
               'h-full w-full object-cover transition-transform duration-[800ms] ease-[var(--ease-quiet)]',
