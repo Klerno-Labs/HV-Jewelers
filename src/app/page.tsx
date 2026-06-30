@@ -72,7 +72,7 @@ export default async function Home() {
       <WorldFeature
         eyebrow="The Collection"
         title="Chosen with restraint."
-        body="A small, edited selection of fine jewelry: signets, bands, fine chain, and stones. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
+        body="A small, edited selection of fine jewelry: necklaces, earrings, rings, and bracelets. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
         href="/shop"
         ctaLabel="See the collection"
         tone="cedar"
@@ -98,7 +98,7 @@ export default async function Home() {
       <WorldFeature
         eyebrow="On the Bench"
         title="Made to wear, every day."
-        body="Bands, solitaires, and everyday gold. Most pieces are eligible for a 15-day return in original, unused condition. Resizing voids that window, so size before you buy."
+        body="Gold for every day, chosen to be worn and kept. Most pieces are eligible for a 15-day return in original, unused condition. Resizing voids that window, so size before you buy."
         href="/shop"
         ctaLabel="See the bench"
         imageReversed

@@ -12,7 +12,7 @@ import { shopifyConfigured } from '@/lib/shopify/client'
 export const metadata: Metadata = {
   title: 'Shop',
   description:
-    'The full HV Jewelers catalog: signets, bands, chain, and stones, fine jewelry, verified in person.',
+    'The full HV Jewelers catalog: necklaces, earrings, rings, and bracelets. Fine jewelry, verified in person.',
 }
 
 export default async function ShopPage() {
@@ -57,8 +57,8 @@ export default async function ShopPage() {
               Currently in the case.
             </h1>
             <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-              The full collection. Fine jewelry: signets, bands, chain, and
-              stones, photographed and described in person before it goes
+              The full collection. Fine jewelry: necklaces, earrings, rings,
+              and bracelets, photographed and described in person before it goes
               on the site.
             </p>
             <p className="mt-8 text-eyebrow text-ink-muted">

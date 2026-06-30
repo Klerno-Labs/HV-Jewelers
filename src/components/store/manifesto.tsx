@@ -12,13 +12,14 @@ export function Manifesto() {
         <FadeIn>
           <p className="text-eyebrow text-bronze">About the house</p>
           <p className="mt-12 font-serif text-display font-light italic text-ink">
-            We&apos;re small, and we&apos;d rather stay that way.
+            Hand-picked, and no two the same.
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
-            Hoang Vi Jewelers is a small collection of fine jewelry. We
-            keep it small on purpose: signets, bands, fine chain, and
-            stones, each one chosen and looked at in person before we
-            list it. We&apos;d rather carry less and know it well.
+            HV Jewelers is a small, family-style collection of fine
+            jewelry: necklaces, earrings, rings, and bracelets, each piece
+            chosen and looked at in person before we list it. No two are
+            exactly the same, and we want every one to feel personal,
+            meaningful, and unforgettable.
           </p>
         </FadeIn>
       </Container>
