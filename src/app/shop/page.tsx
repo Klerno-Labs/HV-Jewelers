@@ -4,8 +4,9 @@ import { Container } from '@/components/layout/container'
 import { Breadcrumbs } from '@/components/store/breadcrumbs'
 import { EmptyState } from '@/components/store/empty-state'
 import { FadeIn } from '@/components/store/fade-in'
-import { ShopProductCard } from '@/components/shop/shop-product-card'
+import { ShopBrowser } from '@/components/shop/shop-browser'
 import { listProducts } from '@/lib/shopify/products'
+import { moneyToCents } from '@/lib/shopify/money'
 import { shopifyConfigured } from '@/lib/shopify/client'
 
 export const metadata: Metadata = {
@@ -17,6 +18,19 @@ export const metadata: Metadata = {
 export default async function ShopPage() {
   const { products } = await listProducts(250)
   const configured = shopifyConfigured()
+
+  // Strategic merchandising order: in-stock pieces first (a sold one-of-a-kind
+  // sinks), then price descending so the statement pieces lead and anchor the
+  // collection's value. Replaces Shopify's BEST_SELLING sort, which is
+  // effectively random for a store without sales history.
+  const ranked = [...products].sort((a, b) => {
+    if (a.availableForSale !== b.availableForSale)
+      return a.availableForSale ? -1 : 1
+    return (
+      moneyToCents(b.priceRange.minVariantPrice) -
+      moneyToCents(a.priceRange.minVariantPrice)
+    )
+  })
 
   return (
     <>
@@ -75,13 +89,7 @@ export default async function ShopPage() {
             action={{ label: 'Write the house →', href: '/contact' }}
           />
         ) : (
-          <ul className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((p) => (
-              <li key={p.id}>
-                <ShopProductCard product={p} />
-              </li>
-            ))}
-          </ul>
+          <ShopBrowser products={ranked} />
         )}
       </Container>
 
