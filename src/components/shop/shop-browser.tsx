@@ -110,7 +110,7 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
         <ul className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2">
           {lead.map((p) => (
             <li key={p.id}>
-              <ShopProductCard product={p} />
+              <ShopProductCard product={p} featured />
             </li>
           ))}
         </ul>

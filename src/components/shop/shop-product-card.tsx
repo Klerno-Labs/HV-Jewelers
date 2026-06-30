@@ -2,13 +2,21 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ShopifyProduct } from '@/lib/shopify/types'
 import { formatMoney, moneyToCents } from '@/lib/shopify/money'
+import { cn } from '@/lib/cn'
 
 /**
  * Product card for Shopify-backed /shop pages. Mirrors the visual
  * conventions of the existing Prisma ProductCard but links to
  * /shop/[handle] and reads from Shopify product shape.
  */
-export function ShopProductCard({ product }: { product: ShopifyProduct }) {
+export function ShopProductCard({
+  product,
+  featured = false,
+}: {
+  product: ShopifyProduct
+  /** Double-width statement card: serve a larger source + crop less. */
+  featured?: boolean
+}) {
   const image = product.featuredImage
   const priceCents = moneyToCents(product.priceRange.minVariantPrice)
   const compareCents = product.compareAtPriceRange?.minVariantPrice
@@ -51,8 +59,17 @@ export function ShopProductCard({ product }: { product: ShopifyProduct }) {
             alt={image.altText ?? ''}
             width={image.width ?? 800}
             height={image.height ?? 1000}
-            sizes="(min-width: 1280px) 320px, (min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="h-full w-full object-cover transition-transform duration-[800ms] ease-[var(--ease-quiet)] scale-[1.3] group-hover:scale-[1.34]"
+            sizes={
+              featured
+                ? '(min-width: 768px) 50vw, 100vw'
+                : '(min-width: 1280px) 320px, (min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw'
+            }
+            className={cn(
+              'h-full w-full object-cover transition-transform duration-[800ms] ease-[var(--ease-quiet)]',
+              featured
+                ? 'scale-[1.1] group-hover:scale-[1.13]'
+                : 'scale-[1.3] group-hover:scale-[1.34]',
+            )}
           />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--color-parchment-warm)_0%,var(--color-limestone)_60%,var(--color-limestone-deep)_100%)]">
