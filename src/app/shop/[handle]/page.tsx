@@ -89,8 +89,31 @@ export default async function ShopProductPage({ params }: PageProps) {
 
   const eyebrow = product.productType || product.vendor || 'HV Jewelers'
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const productUrl = `${siteUrl}/shop/${handle}`
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description,
+    image: product.featuredImage?.url,
+    brand: { '@type': 'Brand', name: 'HV Jewelers' },
+    sku: product.variants[0]?.sku ?? undefined,
+    offers: {
+      '@type': 'Offer',
+      price: (priceMin / 100).toFixed(2),
+      priceCurrency: product.priceRange.minVariantPrice.currencyCode,
+      availability: 'https://schema.org/InStock',
+      url: productUrl,
+    },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <Container className="pt-10">
         <Breadcrumbs
           items={[

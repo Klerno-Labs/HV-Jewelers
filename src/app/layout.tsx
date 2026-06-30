@@ -58,6 +58,9 @@ export const metadata: Metadata = {
       'A small collection of fine jewelry — bands, solitaires, chain, and stones, verified in person.',
     images: ['/brand/wordmark.png'],
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
+  },
 }
 
 export const viewport: Viewport = {
