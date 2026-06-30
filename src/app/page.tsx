@@ -72,7 +72,7 @@ export default async function Home() {
       <WorldFeature
         eyebrow="The Collection"
         title="Chosen with restraint."
-        body="A small, edited selection of fine jewelry — signets, bands, fine chain, and stones. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
+        body="A small, edited selection of fine jewelry: signets, bands, fine chain, and stones. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
         href="/shop"
         ctaLabel="See the collection"
         tone="cedar"

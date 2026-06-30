@@ -49,7 +49,7 @@ export function SiteFooter() {
               Hoang Vi · Fine jewelry
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
-              A small, considered collection of fine jewelry — verified
+              A small, considered collection of fine jewelry, verified
               in person before it goes on the site.
             </p>
           </div>

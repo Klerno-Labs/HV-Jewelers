@@ -13,7 +13,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Privacy',
   description:
-    'How HV Jewelers collects, uses, and protects your information — written plainly.',
+    'How HV Jewelers collects, uses, and protects your information, written plainly.',
 }
 
 export default function PrivacyPage() {
@@ -28,30 +28,30 @@ export default function PrivacyPage() {
 
       <p className="text-subtitle leading-relaxed text-ink-soft">
         This explains what we collect when you visit HV Jewelers, why, and the
-        choices you have. We keep it short and specific — no boilerplate we
+        choices you have. We keep it short and specific, no boilerplate we
         don&apos;t mean.
       </p>
 
       <h2 className="mt-14 font-serif text-subtitle text-ink">What we collect</h2>
       <ul className="mt-4 space-y-3 leading-relaxed text-ink-soft">
         <li>
-          <strong className="text-ink">Email address</strong> — when you join
+          <strong className="text-ink">Email address</strong>, when you join
           our list to hear when the collection opens. You can unsubscribe at any
           time from any email we send.
         </li>
         <li>
-          <strong className="text-ink">Account details</strong> — if you create
+          <strong className="text-ink">Account details</strong>, if you create
           an account, your name and email so you can sign in and see your
           history.
         </li>
         <li>
-          <strong className="text-ink">Order &amp; payment information</strong>{' '}
-          — checkout is handled securely by Shopify. Your payment is processed by
+          <strong className="text-ink">Order &amp; payment information</strong>,{' '}
+          checkout is handled securely by Shopify. Your payment is processed by
           Shopify and its payment providers; we never see or store your full card
           number.
         </li>
         <li>
-          <strong className="text-ink">Technical data</strong> — IP address,
+          <strong className="text-ink">Technical data</strong>: IP address,
           browser type, and basic security logs, used to keep the site working
           and protected.
         </li>
@@ -91,7 +91,7 @@ export default function PrivacyPage() {
       <h2 className="mt-12 font-serif text-subtitle text-ink">Keeping it</h2>
       <p className="mt-4 leading-relaxed text-ink-soft">
         We keep information only as long as we need it for the purpose it was
-        given — to run your account, support an order, or honor a subscription —
+        given, to run your account, support an order, or honor a subscription,
         and then we remove it.
       </p>
 

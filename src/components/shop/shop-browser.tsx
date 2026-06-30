@@ -134,7 +134,7 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
 
       {view.length === 0 && (
         <p className="mt-16 text-body leading-relaxed text-ink-soft">
-          Nothing in this category right now — try another, or write the
+          Nothing in this category right now. Try another, or write the
           concierge and we&apos;ll source it.
         </p>
       )}

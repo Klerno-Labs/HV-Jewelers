@@ -16,7 +16,7 @@ export function Manifesto() {
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
             Hoang Vi Jewelers is a small collection of fine jewelry. We
-            keep it small on purpose — signets, bands, fine chain, and
+            keep it small on purpose: signets, bands, fine chain, and
             stones, each one chosen and looked at in person before we
             list it. We&apos;d rather carry less and know it well.
           </p>

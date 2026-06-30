@@ -12,7 +12,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Terms',
   description:
-    'The terms for using HV Jewelers and buying from the collection — in plain language.',
+    'The terms for using HV Jewelers and buying from the collection, in plain language.',
 }
 
 export default function TermsPage() {
@@ -45,8 +45,8 @@ export default function TermsPage() {
       <p className="mt-4 leading-relaxed text-ink-soft">
         Checkout, payment, and order processing are handled securely by Shopify.
         Placing an order is an offer to buy; an order is confirmed once payment is
-        accepted. We may decline or cancel an order — for example, if a piece is
-        no longer available or a price was listed in error — and will refund any
+        accepted. We may decline or cancel an order, for example, if a piece is
+        no longer available or a price was listed in error, and will refund any
         charge in that case.
       </p>
 
@@ -63,7 +63,7 @@ export default function TermsPage() {
         Shipping &amp; returns
       </h2>
       <p className="mt-4 leading-relaxed text-ink-soft">
-        Shipping timelines and our return policy live on their own pages —{' '}
+        Shipping timelines and our return policy live on their own pages,{' '}
         <Link
           href="/shipping"
           className="text-olive underline-offset-4 transition-colors hover:underline"
@@ -76,8 +76,8 @@ export default function TermsPage() {
           className="text-olive underline-offset-4 transition-colors hover:underline"
         >
           Returns
-        </Link>{' '}
-        — and form part of these terms.
+        </Link>
+        , and form part of these terms.
       </p>
 
       <h2 className="mt-12 font-serif text-subtitle text-ink">Your account</h2>
@@ -98,7 +98,7 @@ export default function TermsPage() {
         Using the site fairly
       </h2>
       <p className="mt-4 leading-relaxed text-ink-soft">
-        Please use the site lawfully — no attempts to disrupt it, scrape it at
+        Please use the site lawfully: no attempts to disrupt it, scrape it at
         scale, or misuse it. We may limit or end access where that happens.
       </p>
 

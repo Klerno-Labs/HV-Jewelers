@@ -55,7 +55,7 @@ export function NewsletterSignup({
   if (status === 'success') {
     return (
       <p className="text-caption leading-relaxed text-ink-soft">
-        You&apos;re on the list — we&apos;ll write when the collection opens.
+        You&apos;re on the list. We&apos;ll write when the collection opens.
       </p>
     )
   }
@@ -97,7 +97,7 @@ export function NewsletterSignup({
       </form>
       {status === 'error' && (
         <p className="mt-3 text-caption text-bronze">
-          Something went wrong — please try again.
+          Something went wrong. Please try again.
         </p>
       )}
       {count !== null && count >= 25 && (

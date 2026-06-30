@@ -5,7 +5,7 @@ import { Container } from '@/components/layout/container'
 export const metadata: Metadata = {
   title: 'Accessibility',
   description:
-    'Our commitment to an accessible HV Jewelers experience — and how to reach us if anything gets in your way.',
+    'Our commitment to an accessible HV Jewelers experience, and how to reach us if anything gets in your way.',
 }
 
 export default function AccessibilityPage() {
@@ -26,8 +26,8 @@ export default function AccessibilityPage() {
 
       <p className="mt-6 leading-relaxed text-ink-soft">
         Accessibility is ongoing work, not a finish line. If any part of the
-        site gets in your way — a page you can&apos;t navigate, an image without
-        a description, anything at all — please tell us and we&apos;ll fix it.
+        site gets in your way, a page you can&apos;t navigate, an image without
+        a description, anything at all, please tell us and we&apos;ll fix it.
       </p>
 
       <p className="mt-6 leading-relaxed text-ink-soft">

@@ -67,7 +67,7 @@ export function Hero({ feature }: { feature?: ShopifyProduct | null }) {
           </h1>
 
           <p className="hv-rise mt-9 max-w-xl text-subtitle leading-relaxed text-ink-soft [animation-delay:460ms]">
-            Bands, solitaires, everyday gold, and stones — a small,
+            Bands, solitaires, everyday gold, and stones, a small,
             considered collection, each piece looked at in person before
             it goes on the site.
           </p>
