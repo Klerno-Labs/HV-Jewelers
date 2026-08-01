@@ -12,6 +12,7 @@ import {
 } from '@/lib/shopify/cart'
 import { apiLimiter, cartCreateLimiter, getClientKey } from '@/lib/rate-limit'
 import type { ShopifyCart, UserError } from '@/lib/shopify/types'
+import { recordCheckoutStarted } from '@/lib/sales/server'
 
 /**
  * Server actions for the Shopify cart. Each returns the fresh cart so
@@ -132,6 +133,7 @@ export async function startShopifyCheckoutAction(): Promise<void> {
   if (!cart) {
     redirect('/shop?error=empty')
   }
+  await recordCheckoutStarted(cart)
   // Clear the cart cookie now — Shopify finalizes the cart on its
   // hosted checkout and our saved id becomes invalid. Doing it here
   // (in a Server Action context) is the only place cookie mutation is

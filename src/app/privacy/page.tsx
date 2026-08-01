@@ -55,6 +55,13 @@ export default function PrivacyPage() {
           browser type, and basic security logs, used to keep the site working
           and protected.
         </li>
+        <li>
+          <strong className="text-ink">Storefront activity</strong>: when
+          first-party sales measurement is enabled, we record pseudonymous
+          product views, gallery interactions, bag activity, checkout starts,
+          and completed-order totals. These records do not contain your name,
+          email, address, payment details, or raw IP address.
+        </li>
       </ul>
 
       <h2 className="mt-12 font-serif text-subtitle text-ink">How we use it</h2>
@@ -78,8 +85,11 @@ export default function PrivacyPage() {
       <h2 className="mt-12 font-serif text-subtitle text-ink">Cookies</h2>
       <p className="mt-4 leading-relaxed text-ink-soft">
         We use the cookies needed for the site and checkout to function and to
-        keep you signed in. Shopify may set cookies as part of the checkout it
-        provides. You can control cookies in your browser settings.
+        keep you signed in. If first-party sales measurement is enabled, a
+        short-lived pseudonymous session cookie helps us understand whether the
+        shop is working without identifying you. We respect browser Do Not
+        Track. Shopify may set cookies as part of the checkout it provides. You
+        can control cookies in your browser settings.
       </p>
 
       <h2 className="mt-12 font-serif text-subtitle text-ink">Your choices</h2>
@@ -92,7 +102,8 @@ export default function PrivacyPage() {
       <p className="mt-4 leading-relaxed text-ink-soft">
         We keep information only as long as we need it for the purpose it was
         given, to run your account, support an order, or honor a subscription,
-        and then we remove it.
+        and then we remove it. Pseudonymous storefront activity is removed after
+        180 days, and checkout-attribution links expire after 30 days.
       </p>
 
       <h2 className="mt-12 font-serif text-subtitle text-ink">Changes</h2>

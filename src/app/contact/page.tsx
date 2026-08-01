@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Container } from '@/components/layout/container'
+import { SalesTrackedLink } from '@/components/sales/sales-tracked-link'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -26,12 +27,13 @@ export default function ContactPage() {
         <div>
           <dt className="text-eyebrow text-ink-muted">Email</dt>
           <dd className="mt-3 text-body text-ink">
-            <a
+            <SalesTrackedLink
               href="mailto:concierge@hvjewelers.com"
+              eventType="concierge_inquiry"
               className="underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
             >
               concierge@hvjewelers.com
-            </a>
+            </SalesTrackedLink>
           </dd>
           <p className="mt-3 text-caption leading-relaxed text-ink-muted">
             For questions, holds, sizing, and sourcing requests. Include

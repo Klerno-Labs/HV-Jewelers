@@ -157,3 +157,41 @@ model Subscriber {
   @@index([status])
   @@index([createdAt])
 }
+
+// Privacy-screened first-party funnel evidence. No email, name, address,
+// payment data, raw IP, user agent, cart token, or order ID is stored.
+model SalesEvent {
+  id              String   @id @default(cuid())
+  eventType       String
+  sessionHash     String
+  productId       String?
+  variantId       String?
+  source          String   @default("direct")
+  medium          String   @default("none")
+  campaign        String   @default("none")
+  experimentId    String?
+  experimentVariant String?
+  quantity        Int?
+  value           Decimal? @db.Decimal(12, 2)
+  currency        String?  @db.Char(3)
+  externalEventId String?  @unique
+  evidenceSource  String
+  createdAt       DateTime @default(now())
+
+  @@index([eventType, createdAt])
+  @@index([sessionHash, createdAt])
+  @@index([productId, createdAt])
+  @@index([source, medium, campaign])
+}
+
+// Correlates a Storefront cart to the pseudonymous browsing session. Both
+// values are one-way hashes; raw identifiers never enter the database.
+model CheckoutAttribution {
+  cartHash    String   @id
+  sessionHash String
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  @@index([sessionHash])
+  @@index([expiresAt])
+}

@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/store/breadcrumbs'
 import { ProductGallery, type GalleryMedia } from '@/components/store/product-gallery'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { AddToShopCartForm } from '@/components/shop/add-to-shop-cart-form'
+import { ProductSalesTracker } from '@/components/sales/sales-page-tracker'
 import { getProductByHandle, listProductHandles } from '@/lib/shopify/products'
 import { formatMoney, moneyToCents } from '@/lib/shopify/money'
 import { sanitizeShopifyHtml } from '@/lib/shopify/html'
@@ -110,6 +111,7 @@ export default async function ShopProductPage({ params }: PageProps) {
 
   return (
     <>
+      <ProductSalesTracker productId={product.id} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
@@ -126,7 +128,11 @@ export default async function ShopProductPage({ params }: PageProps) {
 
       <Container className="py-10 md:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.45fr_1fr] lg:items-start lg:gap-16">
-          <ProductGallery media={galleryMedia} productTitle={product.title} />
+          <ProductGallery
+            media={galleryMedia}
+            productTitle={product.title}
+            productId={product.id}
+          />
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <p className="text-eyebrow text-bronze">{eyebrow}</p>
@@ -162,6 +168,7 @@ export default async function ShopProductPage({ params }: PageProps) {
 
             <div className="mt-10">
               <AddToShopCartForm
+                productId={product.id}
                 variants={product.variants}
                 options={product.options}
               />
