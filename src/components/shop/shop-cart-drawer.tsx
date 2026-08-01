@@ -11,7 +11,6 @@ import {
 } from 'react'
 import { useFormStatus } from 'react-dom'
 import {
-  fetchCartAction,
   removeCartLineAction,
   startShopifyCheckoutAction,
   updateCartLineAction,
@@ -19,6 +18,7 @@ import {
 import { formatMoney } from '@/lib/shopify/money'
 import type { ShopifyCart } from '@/lib/shopify/types'
 import { cn } from '@/lib/cn'
+import { trackSalesEvent } from '@/lib/sales/client'
 
 /**
  * Slide-out cart drawer. Mounted alongside the header bag button.
@@ -58,6 +58,27 @@ export function ShopCartLauncher({
     setCart(initialCart)
   }, [initialCart])
 
+  const trapTab = useCallback((e: KeyboardEvent) => {
+    const root = dialogRef.current
+    if (!root) return
+    const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+      (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1,
+    )
+    if (items.length === 0) return
+    const first = items[0]!
+    const last = items[items.length - 1]!
+    const active = document.activeElement as HTMLElement | null
+    if (e.shiftKey) {
+      if (active === first || !root.contains(active)) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else if (active === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [])
+
   // Body scroll lock + ESC to close. iOS-safe: fix the body and stash
   // scroll position so the page doesn't rubber-band under the drawer.
   useEffect(() => {
@@ -88,7 +109,7 @@ export function ShopCartLauncher({
       window.scrollTo(0, scrollY)
       window.removeEventListener('keydown', onKey)
     }
-  }, [open])
+  }, [open, trapTab])
 
   // Move focus into the dialog on open; restore to launcher on close.
   useEffect(() => {
@@ -109,29 +130,6 @@ export function ShopCartLauncher({
     }
   }, [open])
 
-  const trapTab = useCallback((e: KeyboardEvent) => {
-    const root = dialogRef.current
-    if (!root) return
-    const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-      (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1,
-    )
-    if (items.length === 0) return
-    const first = items[0]!
-    const last = items[items.length - 1]!
-    const active = document.activeElement as HTMLElement | null
-    if (e.shiftKey) {
-      if (active === first || !root.contains(active)) {
-        e.preventDefault()
-        last.focus()
-      }
-    } else {
-      if (active === last) {
-        e.preventDefault()
-        first.focus()
-      }
-    }
-  }, [])
-
   const count = cart?.totalQuantity ?? 0
 
   function announce(cart: ShopifyCart | null, prefix: string) {
@@ -143,13 +141,6 @@ export function ShopCartLauncher({
     setStatus(
       `${prefix}. ${cart.totalQuantity} ${cart.totalQuantity === 1 ? 'piece' : 'pieces'} in bag. Subtotal ${subtotal}.`,
     )
-  }
-
-  function refresh() {
-    startTransition(async () => {
-      const result = await fetchCartAction()
-      if (result.cart) setCart(result.cart)
-    })
   }
 
   function updateLine(lineId: string, nextQty: number, title: string) {
@@ -181,7 +172,10 @@ export function ShopCartLauncher({
       <button
         ref={launcherRef}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          trackSalesEvent({ eventType: 'cart_opened' })
+          setOpen(true)
+        }}
         aria-label={`Shopping bag, ${count} ${count === 1 ? 'piece' : 'pieces'}`}
         aria-haspopup="dialog"
         aria-expanded={open}

@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { revalidateTag } from 'next/cache'
 import crypto from 'node:crypto'
 import { serverEnv } from '@/lib/env'
 import { SHOPIFY_TAGS } from '@/lib/shopify/client'
+import { recordPaidOrder } from '@/lib/sales/server'
 
 /**
  * Shopify webhook receiver. Verifies the HMAC-SHA256 signature the
@@ -15,6 +16,7 @@ import { SHOPIFY_TAGS } from '@/lib/shopify/client'
  *   - products/create
  *   - products/update
  *   - products/delete
+ *   - orders/paid (only after sales measurement + privacy approval)
  *
  * Webhook URL: https://<your-domain>/api/shopify/webhook
  * Webhook format: JSON
@@ -56,9 +58,9 @@ export async function POST(req: NextRequest) {
   }
 
   const topic = req.headers.get('x-shopify-topic') ?? ''
-  let payload: { id?: number; handle?: string } = {}
+  let payload: unknown = {}
   try {
-    payload = JSON.parse(rawBody) as typeof payload
+    payload = JSON.parse(rawBody) as unknown
   } catch {
     // Shopify always sends JSON; if it isn't, accept and skip.
   }
@@ -67,11 +69,25 @@ export async function POST(req: NextRequest) {
   // /shop grid stays correct; also invalidate the per-handle tag so the
   // PDP picks up the change on next render.
   if (topic.startsWith('products/')) {
+    const product = payload as { handle?: string }
     revalidateTag(SHOPIFY_TAGS.products)
-    if (payload.handle) {
-      revalidateTag(SHOPIFY_TAGS.product(payload.handle))
+    if (product.handle) {
+      revalidateTag(SHOPIFY_TAGS.product(product.handle))
     }
   }
 
-  return NextResponse.json({ ok: true, topic, handle: payload.handle ?? null })
+  let salesResult: Awaited<ReturnType<typeof recordPaidOrder>> = null
+  if (topic === 'orders/paid') {
+    const webhookId =
+      req.headers.get('x-shopify-webhook-id') ??
+      crypto.createHash('sha256').update(rawBody, 'utf8').digest('hex')
+    salesResult = await recordPaidOrder(payload, webhookId)
+  }
+
+  return NextResponse.json({
+    ok: true,
+    topic,
+    salesRecorded: salesResult?.recorded ?? false,
+    salesAttributed: salesResult?.attributed ?? false,
+  })
 }

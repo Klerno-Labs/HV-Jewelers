@@ -3,7 +3,7 @@ import { isCronAuthorized } from '@/lib/cron/auth'
 import { prisma } from '@/lib/prisma'
 
 /**
- * Audit log retention.
+ * Audit and privacy-screened sales evidence retention.
  *
  * Operational actions (product.update, order.ship, etc.) are pruned
  * after 365 days. Auth events (auth.signin.*, auth.signout,
@@ -20,6 +20,7 @@ export const runtime = 'nodejs'
 const DAY_MS = 24 * 60 * 60 * 1000
 const GENERAL_RETENTION_DAYS = 365
 const AUTH_RETENTION_DAYS = 730
+const SALES_RETENTION_DAYS = 180
 
 export async function GET(request: Request) {
   if (!isCronAuthorized(request)) {
@@ -30,26 +31,36 @@ export async function GET(request: Request) {
     const now = Date.now()
     const generalCutoff = new Date(now - GENERAL_RETENTION_DAYS * DAY_MS)
     const authCutoff = new Date(now - AUTH_RETENTION_DAYS * DAY_MS)
+    const salesCutoff = new Date(now - SALES_RETENTION_DAYS * DAY_MS)
 
-    const [generalDeleted, authDeleted] = await Promise.all([
-      prisma.auditLog.deleteMany({
-        where: {
-          createdAt: { lt: generalCutoff },
-          NOT: { action: { startsWith: 'auth.' } },
-        },
-      }),
-      prisma.auditLog.deleteMany({
-        where: {
-          createdAt: { lt: authCutoff },
-          action: { startsWith: 'auth.' },
-        },
-      }),
-    ])
+    const [generalDeleted, authDeleted, salesDeleted, attributionsDeleted] =
+      await prisma.$transaction([
+        prisma.auditLog.deleteMany({
+          where: {
+            createdAt: { lt: generalCutoff },
+            NOT: { action: { startsWith: 'auth.' } },
+          },
+        }),
+        prisma.auditLog.deleteMany({
+          where: {
+            createdAt: { lt: authCutoff },
+            action: { startsWith: 'auth.' },
+          },
+        }),
+        prisma.salesEvent.deleteMany({
+          where: { createdAt: { lt: salesCutoff } },
+        }),
+        prisma.checkoutAttribution.deleteMany({
+          where: { expiresAt: { lt: new Date(now) } },
+        }),
+      ])
 
     return NextResponse.json({
       ok: true,
       generalDeleted: generalDeleted.count,
       authDeleted: authDeleted.count,
+      salesDeleted: salesDeleted.count,
+      attributionsDeleted: attributionsDeleted.count,
     })
   } catch (err) {
     console.error('[cron/prune-audit] failed', err)

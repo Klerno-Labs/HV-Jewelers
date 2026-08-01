@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { SiteHeader } from '@/components/layout/site-header'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { Analytics } from '@vercel/analytics/next'
+import { SalesPageTracker } from '@/components/sales/sales-page-tracker'
 import './globals.css'
 
 const serifDisplay = Cormorant_Garamond({
@@ -87,6 +88,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <SalesPageTracker />
         {/* Headless traffic analytics — captures visitors/sessions the Vercel
             frontend serves (Shopify's online-store analytics can't see them). */}
         <Analytics />

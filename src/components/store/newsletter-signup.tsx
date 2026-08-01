@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { trackSalesEvent } from '@/lib/sales/client'
 
 /**
  * Pre-launch email capture. Posts to /api/subscribe, shows a quiet confirmation
@@ -45,6 +46,7 @@ export function NewsletterSignup({
         body: JSON.stringify({ email, source, website }),
       })
       if (!r.ok) throw new Error('failed')
+      trackSalesEvent({ eventType: 'newsletter_signup' })
       setStatus('success')
       setEmail('')
     } catch {

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { ShopProductCard } from './shop-product-card'
 import { moneyToCents } from '@/lib/shopify/money'
 import { cn } from '@/lib/cn'
+import { trackSalesEvent } from '@/lib/sales/client'
 import type { ShopifyProduct } from '@/lib/shopify/types'
 
 /**
@@ -70,7 +71,10 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5">
           <Tab
             active={category === ALL}
-            onClick={() => setCategory(ALL)}
+            onClick={() => {
+              trackSalesEvent({ eventType: 'filter_used' })
+              setCategory(ALL)
+            }}
             label="All"
             count={products.length}
           />
@@ -78,7 +82,10 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
             <Tab
               key={c.name}
               active={category === c.name}
-              onClick={() => setCategory(c.name)}
+              onClick={() => {
+                trackSalesEvent({ eventType: 'filter_used' })
+                setCategory(c.name)
+              }}
               label={c.name}
               count={c.n}
             />
@@ -90,7 +97,10 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
             <button
               key={s.key}
               type="button"
-              onClick={() => setSort(s.key)}
+              onClick={() => {
+                trackSalesEvent({ eventType: 'filter_used' })
+                setSort(s.key)
+              }}
               aria-pressed={sort === s.key ? 'true' : 'false'}
               className={cn(
                 'text-caption tracking-wide transition-colors duration-300',

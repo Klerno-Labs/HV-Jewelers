@@ -15,6 +15,7 @@ const serverEnvSchema = z.object({
 
   // Database — User, AuditLog, Invite
   DATABASE_URL: z.string().url().optional(),
+  DIRECT_URL: z.string().url().optional(),
 
   // Upstash — rate limiter backing cart actions + auth/contact forms
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
@@ -26,7 +27,7 @@ const serverEnvSchema = z.object({
   EMAIL_REPLY_TO: z.string().email().optional(),
 
   // Shared secret sent by cronjobs.org as `Authorization: Bearer …`
-  // Currently used by /api/cron/prune-audit only.
+  // Used by /api/cron/prune-audit for audit and sales-evidence retention.
   CRON_SECRET: z.string().min(16).optional(),
 
   // Sentry (optional)
@@ -41,11 +42,18 @@ const serverEnvSchema = z.object({
   /// Shared secret Shopify uses to sign webhook bodies. Required for
   /// /api/shopify/webhook to verify and act on cache-invalidation events.
   SHOPIFY_WEBHOOK_SECRET: z.string().min(1).optional(),
+
+  // First-party aggregate sales measurement. Disabled unless every required
+  // value is explicitly configured; no production fail-open behavior.
+  SALES_MEASUREMENT_ENABLED: z.enum(['true', 'false']).default('false'),
+  SALES_ANALYTICS_SALT: z.string().min(32).optional(),
+  SALES_EXPORT_TOKEN: z.string().min(32).optional(),
 })
 
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: z.string().min(1).optional(),
+  NEXT_PUBLIC_SALES_MEASUREMENT_ENABLED: z.enum(['true', 'false']).default('false'),
 })
 
 function parse<T extends z.ZodTypeAny>(schema: T, raw: Record<string, unknown>, label: string): z.infer<T> {
@@ -73,6 +81,8 @@ export const clientEnv = parse(
   {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN,
+    NEXT_PUBLIC_SALES_MEASUREMENT_ENABLED:
+      process.env.NEXT_PUBLIC_SALES_MEASUREMENT_ENABLED,
   },
   'client',
 )

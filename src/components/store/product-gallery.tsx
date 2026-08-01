@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/cn'
+import { trackSalesEvent } from '@/lib/sales/client'
 
 export type GalleryMedia =
   | {
@@ -35,9 +36,11 @@ export type GalleryImage = Extract<GalleryMedia, { kind: 'image' }>
 export function ProductGallery({
   media,
   productTitle,
+  productId,
 }: {
   media: GalleryMedia[]
   productTitle: string
+  productId: string
 }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [zoomOpen, setZoomOpen] = useState(false)
@@ -79,7 +82,10 @@ export function ProductGallery({
       {active.kind === 'image' ? (
         <button
           type="button"
-          onClick={() => setZoomOpen(true)}
+          onClick={() => {
+            trackSalesEvent({ eventType: 'gallery_engaged', productId })
+            setZoomOpen(true)
+          }}
           className="group relative block aspect-4/5 w-full overflow-hidden bg-limestone focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-parchment"
           aria-label="Open close-up view"
         >
@@ -122,7 +128,10 @@ export function ProductGallery({
             <li key={`${mediaKey(item)}-${i}`}>
               <button
                 type="button"
-                onClick={() => setActiveIdx(i)}
+                onClick={() => {
+                  trackSalesEvent({ eventType: 'gallery_engaged', productId })
+                  setActiveIdx(i)
+                }}
                 aria-current={i === safeIndex ? 'true' : undefined}
                 aria-label={
                   item.kind === 'video'

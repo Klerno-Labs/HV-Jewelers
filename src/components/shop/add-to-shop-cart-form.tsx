@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { addToCartAction } from '@/app/shop/actions'
 import type { ProductVariant, SelectedOption } from '@/lib/shopify/types'
 import { cn } from '@/lib/cn'
+import { trackSalesEvent } from '@/lib/sales/client'
 
 interface OptionGroup {
   name: string
@@ -30,9 +31,11 @@ function defaultSelection(variants: ProductVariant[]): Record<string, string> {
 }
 
 export function AddToShopCartForm({
+  productId,
   variants,
   options,
 }: {
+  productId: string
   variants: ProductVariant[]
   options: OptionGroup[]
 }) {
@@ -69,6 +72,11 @@ export function AddToShopCartForm({
         return
       }
       setSuccess(true)
+      trackSalesEvent({
+        eventType: 'add_to_cart',
+        productId,
+        variantId: activeVariant.id,
+      })
       router.refresh()
     })
   }
