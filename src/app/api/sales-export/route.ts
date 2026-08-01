@@ -19,7 +19,11 @@ function authorized(header: string | null): boolean {
 }
 
 export async function GET(request: Request) {
-  if (!salesMeasurementConfigured() || !serverEnv.SALES_EXPORT_TOKEN) {
+  if (
+    !salesMeasurementConfigured() ||
+    serverEnv.SALES_EXPORT_ENABLED !== 'true' ||
+    !serverEnv.SALES_EXPORT_TOKEN
+  ) {
     return NextResponse.json({ error: 'not_configured' }, { status: 503 })
   }
   if (!authorized(request.headers.get('authorization'))) {

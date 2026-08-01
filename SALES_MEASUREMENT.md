@@ -2,9 +2,9 @@
 
 ## State
 
-This is a local, review-only implementation. It is disabled by default and has
-not been deployed, connected to production credentials, or used with customer
-data.
+This is a protected draft-preview implementation. It is disabled by default and
+has not been merged, deployed to production, connected to production
+credentials, or used with customer data.
 
 ## What it measures
 
@@ -35,8 +35,9 @@ baseline before any sales experiment changes the customer experience.
 Collection remains off unless `SALES_MEASUREMENT_ENABLED=true` and a
 `SALES_ANALYTICS_SALT` of at least 32 characters are both present. Browser
 funnel events additionally require
-`NEXT_PUBLIC_SALES_MEASUREMENT_ENABLED=true`. The export endpoint requires an
-independent bearer token in `SALES_EXPORT_TOKEN` and returns no customer fields.
+`NEXT_PUBLIC_SALES_MEASUREMENT_ENABLED=true`. The export endpoint additionally
+requires `SALES_EXPORT_ENABLED=true` and an independent bearer token in
+`SALES_EXPORT_TOKEN`; it returns no customer fields.
 
 ## Deployment gate
 
@@ -67,6 +68,10 @@ approved data-removal change.
 ## Verification
 
 - Six sales contract tests pass.
+- One disposable PostgreSQL integration test proves paid-webhook deduplication,
+  unauthorized rejection, protected export, and 30/180-day retention behavior.
+- The synthetic protected export imports into Indy with exact revenue and
+  verified margin preservation.
 - TypeScript type checking passes.
 - Prisma schema validation passes.
 - The optimized Next.js production build passes.

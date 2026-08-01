@@ -46,6 +46,7 @@ const serverEnvSchema = z.object({
   // First-party aggregate sales measurement. Disabled unless every required
   // value is explicitly configured; no production fail-open behavior.
   SALES_MEASUREMENT_ENABLED: z.enum(['true', 'false']).default('false'),
+  SALES_EXPORT_ENABLED: z.enum(['true', 'false']).default('false'),
   SALES_ANALYTICS_SALT: z.string().min(32).optional(),
   SALES_EXPORT_TOKEN: z.string().min(32).optional(),
 })
