@@ -78,4 +78,6 @@ approved data-removal change.
 
 Shopify paid-order webhooks provide verified revenue, not product cost. Gross
 margin remains unknown until a separate non-customer product-cost mapping is
-approved and imported. Indy must not estimate margin and label it actual.
+approved and imported. Purchase-line quantity is exported so Indy can combine
+it with verified unit cost; unmapped products remain unknown. Indy must not
+estimate margin and label it actual.

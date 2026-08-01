@@ -182,6 +182,7 @@ export async function recordPaidOrder(
           sessionHash,
           productId: String(line.product_id),
           variantId: line.variant_id == null ? null : String(line.variant_id),
+          quantity: line.quantity,
           source,
           medium,
           campaign,
@@ -217,26 +218,37 @@ export async function exportSalesEvents(since: Date) {
     orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     take: 10_000,
   })
-  return rows.map((row) => ({
-    event_type: row.eventType,
-    observed_at: row.createdAt.toISOString(),
-    session_id: row.sessionHash,
-    anonymous_id: `anon-${row.sessionHash.slice(0, 24)}`,
-    product_id: row.productId ?? undefined,
-    variant_id: row.variantId ?? undefined,
-    value: row.value == null ? 0 : Number(row.value),
-    gross_margin: null,
-    currency: row.currency ?? 'USD',
-    source: row.source,
-    medium: row.medium,
-    campaign: row.campaign,
-    properties:
-      row.experimentId && row.experimentVariant
-        ? {
-            experiment_id: row.experimentId,
-            variant: row.experimentVariant,
-          }
-        : {},
-    idempotency_key: `hv-${row.id}`,
-  }))
+  return rows.map((row) => {
+    const orderEventId =
+      row.eventType === 'purchase' || row.eventType === 'purchase_item'
+        ? row.externalEventId?.replace(/:item:\d+$/, '')
+        : null
+    return {
+      event_type: row.eventType,
+      observed_at: row.createdAt.toISOString(),
+      session_id: row.sessionHash,
+      anonymous_id: `anon-${row.sessionHash.slice(0, 24)}`,
+      product_id: row.productId ?? undefined,
+      variant_id: row.variantId ?? undefined,
+      value: row.value == null ? 0 : Number(row.value),
+      gross_margin: null,
+      currency: row.currency ?? 'USD',
+      source: row.source,
+      medium: row.medium,
+      campaign: row.campaign,
+      properties: {
+        ...(row.quantity == null ? {} : { quantity: row.quantity }),
+        ...(orderEventId
+          ? { order_key: hashSalesIdentifier(orderEventId) }
+          : {}),
+        ...(row.experimentId && row.experimentVariant
+          ? {
+              experiment_id: row.experimentId,
+              variant: row.experimentVariant,
+            }
+          : {}),
+      },
+      idempotency_key: `hv-${row.id}`,
+    }
+  })
 }

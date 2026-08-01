@@ -65,6 +65,7 @@ test('paid order reduction strips customer and payment fields', () => {
   assert.equal(serialized.includes('customer@example.com'), false)
   assert.equal(serialized.includes('billing_address'), false)
   assert.equal(serialized.includes('payment_gateway_names'), false)
+  assert.equal(safe.line_items[0]?.quantity, 1)
   assert.deepEqual(Object.keys(safe.line_items[0] ?? {}).sort(), [
     'price',
     'product_id',

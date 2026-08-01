@@ -171,6 +171,7 @@ model SalesEvent {
   campaign        String   @default("none")
   experimentId    String?
   experimentVariant String?
+  quantity        Int?
   value           Decimal? @db.Decimal(12, 2)
   currency        String?  @db.Char(3)
   externalEventId String?  @unique

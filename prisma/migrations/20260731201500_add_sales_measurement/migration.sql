@@ -10,6 +10,7 @@ CREATE TABLE "SalesEvent" (
     "campaign" TEXT NOT NULL DEFAULT 'none',
     "experimentId" TEXT,
     "experimentVariant" TEXT,
+    "quantity" INTEGER,
     "value" DECIMAL(12,2),
     "currency" CHAR(3),
     "externalEventId" TEXT,
