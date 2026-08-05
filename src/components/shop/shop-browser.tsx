@@ -5,6 +5,7 @@ import { ShopProductCard } from './shop-product-card'
 import { moneyToCents } from '@/lib/shopify/money'
 import { cn } from '@/lib/cn'
 import type { ShopifyProduct } from '@/lib/shopify/types'
+import type { ImageTileData } from '@/lib/image-bg'
 
 /**
  * Client-side merchandising shell for the shop grid. The server hands it a
@@ -29,11 +30,11 @@ const ALL = 'All'
 
 export function ShopBrowser({
   products,
-  imageBgs,
+  imageTiles,
 }: {
   products: ShopifyProduct[]
-  /** Sampled photo-background color per featured-image URL. */
-  imageBgs?: Record<string, string>
+  /** Sampled tile data (bg color + subject bounds) per featured-image URL. */
+  imageTiles?: Record<string, ImageTileData>
 }) {
   const [category, setCategory] = useState<string>(ALL)
   const [sort, setSort] = useState<SortKey>('featured')
@@ -120,7 +121,7 @@ export function ShopBrowser({
               <ShopProductCard
                 product={p}
                 featured
-                imageBg={p.featuredImage ? imageBgs?.[p.featuredImage.url] : undefined}
+                imageTile={p.featuredImage ? imageTiles?.[p.featuredImage.url] : undefined}
               />
             </li>
           ))}
@@ -139,7 +140,7 @@ export function ShopBrowser({
             <li key={p.id}>
               <ShopProductCard
                 product={p}
-                imageBg={p.featuredImage ? imageBgs?.[p.featuredImage.url] : undefined}
+                imageTile={p.featuredImage ? imageTiles?.[p.featuredImage.url] : undefined}
               />
             </li>
           ))}
