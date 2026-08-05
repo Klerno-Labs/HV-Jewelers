@@ -90,7 +90,7 @@ export function ProductGallery({
             height={active.height ?? 2000}
             priority
             sizes="(min-width: 1024px) 60vw, 100vw"
-            className="h-full w-full object-cover transition-transform duration-700 ease-editorial scale-[1.3] group-hover:scale-[1.34]"
+            className="h-full w-full object-contain transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
           />
           <span
             aria-hidden
@@ -107,7 +107,7 @@ export function ProductGallery({
           preload="metadata"
           poster={active.poster ?? undefined}
           aria-label={active.alt ?? `${productTitle} — video`}
-          className="aspect-4/5 w-full bg-limestone object-cover"
+          className="aspect-4/5 w-full bg-limestone object-contain"
         >
           <source src={active.src} type={active.mimeType} />
         </video>
