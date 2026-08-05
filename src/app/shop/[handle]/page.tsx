@@ -9,6 +9,7 @@ import { AddToShopCartForm } from '@/components/shop/add-to-shop-cart-form'
 import { getProductByHandle, listProductHandles } from '@/lib/shopify/products'
 import { formatMoney, moneyToCents } from '@/lib/shopify/money'
 import { sanitizeShopifyHtml } from '@/lib/shopify/html'
+import { getImageBgColors } from '@/lib/image-bg'
 
 interface PageProps {
   params: Promise<{ handle: string }>
@@ -81,6 +82,15 @@ export default async function ShopProductPage({ params }: PageProps) {
           height: img.height,
         }))
 
+  // Paint each gallery frame with its own photo's sampled background tone
+  // (see lib/image-bg) so contained photos blend instead of floating.
+  const imageBgs = await getImageBgColors(
+    galleryMedia.flatMap((m) => (m.kind === 'image' ? [m.url] : [])),
+  )
+  const media: GalleryMedia[] = galleryMedia.map((m) =>
+    m.kind === 'image' ? { ...m, bg: imageBgs[m.url] ?? null } : m,
+  )
+
   const priceMin = moneyToCents(product.priceRange.minVariantPrice)
   const compareMin = product.compareAtPriceRange?.minVariantPrice
     ? moneyToCents(product.compareAtPriceRange.minVariantPrice)
@@ -126,7 +136,7 @@ export default async function ShopProductPage({ params }: PageProps) {
 
       <Container className="py-10 md:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.45fr_1fr] lg:items-start lg:gap-16">
-          <ProductGallery media={galleryMedia} productTitle={product.title} />
+          <ProductGallery media={media} productTitle={product.title} />
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <p className="text-eyebrow text-bronze">{eyebrow}</p>

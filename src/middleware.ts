@@ -40,14 +40,18 @@ function buildCsp(nonce: string, isDev: boolean) {
       [
         "'self'",
         `'nonce-${nonce}'`,
-        // Inline `style` *attributes* are emitted by next/image and other
-        // framework primitives. Per CSP3, when both a nonce and 'unsafe-inline'
-        // appear in style-src, browsers prefer the nonce for `<style>` tags
-        // (so those remain protected) and only consult 'unsafe-inline' for
-        // attribute-level styles. Net: tags stay strict, attributes pass.
+        // Kept for legacy browsers without style-src-attr support. Per CSP3
+        // a nonce in this list makes modern browsers ignore 'unsafe-inline'
+        // here entirely — including for style *attributes* — so the real
+        // attribute allowance lives in style-src-attr below.
         "'unsafe-inline'",
       ],
     ],
+    // Inline `style` *attributes* are emitted by next/image, and product
+    // tiles carry per-photo sampled background colors as style attributes.
+    // style-src-attr governs only attributes; <style> tags stay
+    // nonce-protected via style-src above.
+    ["style-src-attr", ["'unsafe-inline'"]],
     [
       "img-src",
       [

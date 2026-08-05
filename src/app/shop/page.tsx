@@ -8,6 +8,7 @@ import { ShopBrowser } from '@/components/shop/shop-browser'
 import { listProducts } from '@/lib/shopify/products'
 import { moneyToCents } from '@/lib/shopify/money'
 import { shopifyConfigured } from '@/lib/shopify/client'
+import { getImageBgColors } from '@/lib/image-bg'
 
 export const metadata: Metadata = {
   title: 'Shop',
@@ -31,6 +32,12 @@ export default async function ShopPage() {
       moneyToCents(a.priceRange.minVariantPrice)
     )
   })
+
+  // Per-photo tile grounds — each card's letterbox painted with its own
+  // photo's background tone (see lib/image-bg).
+  const imageBgs = await getImageBgColors(
+    ranked.flatMap((p) => (p.featuredImage ? [p.featuredImage.url] : [])),
+  )
 
   return (
     <>
@@ -89,7 +96,7 @@ export default async function ShopPage() {
             action={{ label: 'Write the house →', href: '/contact' }}
           />
         ) : (
-          <ShopBrowser products={ranked} />
+          <ShopBrowser products={ranked} imageBgs={imageBgs} />
         )}
       </Container>
 

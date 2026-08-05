@@ -11,6 +11,9 @@ export type GalleryMedia =
       alt: string | null
       width: number | null
       height: number | null
+      /** Sampled photo-background color; paints the frame so the
+          contained photo blends seamlessly. */
+      bg?: string | null
     }
   | {
       kind: 'video'
@@ -81,20 +84,9 @@ export function ProductGallery({
           type="button"
           onClick={() => setZoomOpen(true)}
           className="group relative block aspect-4/5 w-full overflow-hidden bg-limestone focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-parchment"
+          style={active.bg ? { backgroundColor: active.bg } : undefined}
           aria-label="Open close-up view"
         >
-          {/* Blurred self-backdrop — fills the letterbox with the photo's
-              own background tone (catalog mixes cool-white and warm-cream
-              studio shots). */}
-          <Image
-            src={active.url}
-            alt=""
-            aria-hidden
-            width={active.width ?? 1600}
-            height={active.height ?? 2000}
-            sizes="256px"
-            className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
-          />
           <Image
             src={active.url}
             alt={active.alt ?? productTitle}
@@ -102,7 +94,7 @@ export function ProductGallery({
             height={active.height ?? 2000}
             priority
             sizes="(min-width: 1024px) 60vw, 100vw"
-            className="relative h-full w-full object-contain transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
+            className="h-full w-full object-contain transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
           />
           <span
             aria-hidden

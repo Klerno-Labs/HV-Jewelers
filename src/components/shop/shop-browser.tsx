@@ -27,7 +27,14 @@ const SORTS: { key: SortKey; label: string }[] = [
 
 const ALL = 'All'
 
-export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
+export function ShopBrowser({
+  products,
+  imageBgs,
+}: {
+  products: ShopifyProduct[]
+  /** Sampled photo-background color per featured-image URL. */
+  imageBgs?: Record<string, string>
+}) {
   const [category, setCategory] = useState<string>(ALL)
   const [sort, setSort] = useState<SortKey>('featured')
 
@@ -110,7 +117,11 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
         <ul className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2">
           {lead.map((p) => (
             <li key={p.id}>
-              <ShopProductCard product={p} featured />
+              <ShopProductCard
+                product={p}
+                featured
+                imageBg={p.featuredImage ? imageBgs?.[p.featuredImage.url] : undefined}
+              />
             </li>
           ))}
         </ul>
@@ -126,7 +137,10 @@ export function ShopBrowser({ products }: { products: ShopifyProduct[] }) {
         >
           {rest.map((p) => (
             <li key={p.id}>
-              <ShopProductCard product={p} />
+              <ShopProductCard
+                product={p}
+                imageBg={p.featuredImage ? imageBgs?.[p.featuredImage.url] : undefined}
+              />
             </li>
           ))}
         </ul>

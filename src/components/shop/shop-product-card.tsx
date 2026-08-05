@@ -11,10 +11,14 @@ import { formatMoney, moneyToCents } from '@/lib/shopify/money'
 export function ShopProductCard({
   product,
   featured = false,
+  imageBg,
 }: {
   product: ShopifyProduct
   /** Double-width statement card: serve a larger source. */
   featured?: boolean
+  /** Sampled photo-background color; paints the tile so the contained
+      photo blends seamlessly instead of floating on limestone. */
+  imageBg?: string
 }) {
   const image = product.featuredImage
   const priceCents = moneyToCents(product.priceRange.minVariantPrice)
@@ -51,34 +55,23 @@ export function ShopProductCard({
       className="group block"
     >
       {statePrefix && <span className="sr-only">{statePrefix}</span>}
-      <div className="relative aspect-[4/5] overflow-hidden bg-limestone">
+      <div
+        className="relative aspect-[4/5] overflow-hidden bg-limestone"
+        style={imageBg ? { backgroundColor: imageBg } : undefined}
+      >
         {image ? (
-          <>
-            {/* Blurred self-backdrop — fills the letterbox with the photo's
-                own background tone, since the catalog mixes cool-white and
-                warm-cream studio shots that no single tile color matches. */}
-            <Image
-              src={image.url}
-              alt=""
-              aria-hidden
-              width={image.width ?? 800}
-              height={image.height ?? 1000}
-              sizes="256px"
-              className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
-            />
-            <Image
-              src={image.url}
-              alt={image.altText ?? ''}
-              width={image.width ?? 800}
-              height={image.height ?? 1000}
-              sizes={
-                featured
-                  ? '(min-width: 768px) 50vw, 100vw'
-                  : '(min-width: 1280px) 420px, (min-width: 1024px) 33vw, (min-width: 640px) 65vw, 100vw'
-              }
-              className="relative h-full w-full object-contain transition-transform duration-[800ms] ease-[var(--ease-quiet)] group-hover:scale-[1.03]"
-            />
-          </>
+          <Image
+            src={image.url}
+            alt={image.altText ?? ''}
+            width={image.width ?? 800}
+            height={image.height ?? 1000}
+            sizes={
+              featured
+                ? '(min-width: 768px) 50vw, 100vw'
+                : '(min-width: 1280px) 420px, (min-width: 1024px) 33vw, (min-width: 640px) 65vw, 100vw'
+            }
+            className="h-full w-full object-contain transition-transform duration-[800ms] ease-[var(--ease-quiet)] group-hover:scale-[1.03]"
+          />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--color-parchment-warm)_0%,var(--color-limestone)_60%,var(--color-limestone-deep)_100%)]">
             <span className="absolute inset-0 flex items-center justify-center font-serif text-display text-ink/30">
