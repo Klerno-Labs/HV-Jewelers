@@ -2,7 +2,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ShopifyProduct } from '@/lib/shopify/types'
 import { formatMoney, moneyToCents } from '@/lib/shopify/money'
-import { cn } from '@/lib/cn'
 
 /**
  * Product card for Shopify-backed /shop pages. Mirrors the visual
@@ -14,7 +13,7 @@ export function ShopProductCard({
   featured = false,
 }: {
   product: ShopifyProduct
-  /** Double-width statement card: serve a larger source + crop less. */
+  /** Double-width statement card: serve a larger source. */
   featured?: boolean
 }) {
   const image = product.featuredImage
@@ -64,12 +63,7 @@ export function ShopProductCard({
                 ? '(min-width: 768px) 50vw, 100vw'
                 : '(min-width: 1280px) 420px, (min-width: 1024px) 33vw, (min-width: 640px) 65vw, 100vw'
             }
-            className={cn(
-              'h-full w-full object-cover transition-transform duration-[800ms] ease-[var(--ease-quiet)]',
-              featured
-                ? 'scale-[1.1] group-hover:scale-[1.13]'
-                : 'scale-[1.3] group-hover:scale-[1.34]',
-            )}
+            className="h-full w-full object-contain transition-transform duration-[800ms] ease-[var(--ease-quiet)] group-hover:scale-[1.03]"
           />
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--color-parchment-warm)_0%,var(--color-limestone)_60%,var(--color-limestone-deep)_100%)]">
