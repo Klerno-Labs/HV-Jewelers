@@ -101,6 +101,26 @@ export default async function ShopProductPage({ params }: PageProps) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
   const productUrl = `${siteUrl}/shop/${handle}`
+
+  // Mirrors the published policy on /returns: 15-day mail-back window,
+  // customer pays return shipping; earrings are final sale (hygiene).
+  const isEarrings = (product.productType || '').trim() === 'Earrings'
+  const returnPolicy = isEarrings
+    ? {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'US',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+      }
+    : {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'US',
+        returnPolicyCategory:
+          'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 15,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      }
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -113,8 +133,34 @@ export default async function ShopProductPage({ params }: PageProps) {
       '@type': 'Offer',
       price: (priceMin / 100).toFixed(2),
       priceCurrency: product.priceRange.minVariantPrice.currencyCode,
-      availability: 'https://schema.org/InStock',
+      availability: product.availableForSale
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
       url: productUrl,
+      // Free insured domestic shipping; most pieces ship within two
+      // business days (see /shipping).
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: 0,
+          currency: product.priceRange.minVariantPrice.currencyCode,
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'US',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 2,
+            unitCode: 'DAY',
+          },
+        },
+      },
+      hasMerchantReturnPolicy: returnPolicy,
     },
   }
 
