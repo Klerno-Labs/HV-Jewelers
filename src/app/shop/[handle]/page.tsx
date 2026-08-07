@@ -133,6 +133,11 @@ export default async function ShopProductPage({ params }: PageProps) {
       '@type': 'Offer',
       price: (priceMin / 100).toFixed(2),
       priceCurrency: product.priceRange.minVariantPrice.currencyCode,
+      // Rolling 30-day window; the page revalidates every 10 minutes so
+      // the date (and price) never go stale.
+      priceValidUntil: new Date(Date.now() + 30 * 86400000)
+        .toISOString()
+        .slice(0, 10),
       availability: product.availableForSale
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
