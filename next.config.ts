@@ -34,6 +34,44 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  /**
+   * Shopify-native URL shapes → this storefront's routes.
+   *
+   * The catalog is headless: Shopify owns the products, but the pages
+   * live at `/shop/<handle>`. Anything generated Shopify-side — the
+   * Google & YouTube channel's Merchant Center landing pages, old links,
+   * pasted admin URLs — points at `/products/<handle>`, which 404s here.
+   * A 404 landing page is why Merchant Center parks items in review
+   * instead of approving them, so these redirects are load-bearing for
+   * the product feed, not just cosmetic link hygiene.
+   *
+   * The handle is identical on both sides, so the mapping is 1:1.
+   *
+   * Explicit 301 rather than Next's `permanent: true` (which emits 308).
+   * Google treats the two as equivalent, but 301 is what every feed
+   * validator and legacy crawler understands, and nothing here needs
+   * 308's method preservation — these are GETs.
+   */
+  async redirects() {
+    return [
+      {
+        source: '/products/:handle',
+        destination: '/shop/:handle',
+        statusCode: 301,
+      },
+      // Shopify also emits collection-scoped product URLs.
+      {
+        source: '/collections/:collection/products/:handle',
+        destination: '/shop/:handle',
+        statusCode: 301,
+      },
+      {
+        source: '/collections/all',
+        destination: '/shop',
+        statusCode: 301,
+      },
+    ]
+  },
 }
 
 export default nextConfig

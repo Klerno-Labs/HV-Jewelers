@@ -103,6 +103,43 @@ export async function listProducts(
   }
 }
 
+/**
+ * The entire catalog, paginated to exhaustion.
+ *
+ * Unlike `listProducts`, this deliberately does NOT swallow errors. It
+ * backs the Merchant Center feed, where a half-fetched catalog is worse
+ * than no response at all: Google treats items missing from a feed as
+ * withdrawn and delists them. A throw lets the route return 5xx so
+ * Google keeps the previous good feed instead.
+ */
+export async function listAllProducts(pageSize = 100): Promise<ShopifyProduct[]> {
+  if (!shopifyConfigured()) {
+    throw new Error('Shopify Storefront API is not configured.')
+  }
+
+  const all: ShopifyProduct[] = []
+  let after: string | null = null
+
+  // Page ceiling so a stuck cursor can't loop forever; 50 × 100 is far
+  // above the catalog's real size.
+  for (let page = 0; page < 50; page++) {
+    const data: ProductsResponse = await shopifyFetch<ProductsResponse>(
+      PRODUCTS_QUERY,
+      {
+        variables: { first: pageSize, after },
+        tags: [SHOPIFY_TAGS.products],
+      },
+    )
+    all.push(...data.products.edges.map((e) => flattenProduct(e.node)))
+
+    if (!data.products.pageInfo.hasNextPage) return all
+    after = data.products.pageInfo.endCursor
+    if (!after) return all
+  }
+
+  return all
+}
+
 interface ProductByHandleResponse {
   product: RawProduct | null
 }
