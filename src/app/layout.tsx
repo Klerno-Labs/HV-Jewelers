@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { SiteHeader } from '@/components/layout/site-header'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { Analytics } from '@vercel/analytics/next'
+import { businessSchema } from '@/lib/business'
 import './globals.css'
 
 const serifDisplay = Cormorant_Garamond({
@@ -82,6 +83,16 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-dvh flex-col bg-parchment font-sans text-body text-ink antialiased">
+        {/* Machine-readable business identity on every page. Google's
+            Misrepresentation check wants to establish who it is dealing
+            with; structured data states it directly rather than leaving it
+            to be inferred from page copy. Mirrors the footer exactly. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(businessSchema(siteUrl)),
+          }}
+        />
         <SiteHeader />
         <main id="main" className="flex-1">
           {children}
