@@ -25,10 +25,17 @@ export const BUSINESS = {
   telephone: '+1-281-955-6855',
   /** Human-readable form for display. */
   telephoneDisplay: '(281) 955-6855',
+  /**
+   * Written exactly as Merchant Center holds it. Google compares the
+   * business information on its record against what it can read on the
+   * site, so this is transcribed rather than tidied — no "Rd W", no
+   * "Suite", and the state spelled out. Changing either side alone
+   * re-opens the mismatch this file exists to close.
+   */
   address: {
-    street: '12264 FM 1960 Rd W, Suite A',
+    street: '12264 FM 1960 A',
     city: 'Houston',
-    region: 'TX',
+    region: 'Texas',
     postalCode: '77065',
     country: 'US',
   },
@@ -49,7 +56,7 @@ export const BUSINESS = {
   },
 } as const
 
-/** "12264 FM 1960 Rd W, Suite A, Houston, TX 77065" */
+/** "12264 FM 1960 A, Houston, Texas 77065" */
 export function formattedAddress(): string {
   const { street, city, region, postalCode } = BUSINESS.address
   return `${street}, ${city}, ${region} ${postalCode}`
