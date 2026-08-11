@@ -4,6 +4,7 @@ import { Hero } from '@/components/store/hero'
 import { Manifesto } from '@/components/store/manifesto'
 import { WorldFeature } from '@/components/store/world-feature'
 import { ConciergeClose } from '@/components/store/concierge-close'
+import { GoogleReviews } from '@/components/store/google-reviews'
 import { FadeIn } from '@/components/store/fade-in'
 import { ShopProductCard } from '@/components/shop/shop-product-card'
 import { listProducts } from '@/lib/shopify/products'
@@ -178,6 +179,9 @@ export default async function Home() {
           </FadeIn>
         </Container>
       </section>
+
+      {/* ─── Reviews of the Houston store ─── */}
+      <GoogleReviews />
 
       {/* ─── Concierge close ─── */}
       <ConciergeClose />
