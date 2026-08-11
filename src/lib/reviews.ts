@@ -35,9 +35,29 @@ export interface GoogleReviewData {
   reviews: GoogleReview[]
 }
 
+/**
+ * Lowest star rating shown as a pull quote.
+ *
+ * Google returns "most relevant" reviews, which for this listing surfaced
+ * two detailed one-star complaints about counter repair work. Half the
+ * homepage telling shoppers to go elsewhere is worse than no reviews.
+ *
+ * The honesty boundary this respects: the aggregate rating and the total
+ * count come straight from Google and are displayed unmodified, the
+ * quotes are verbatim and unedited, and the section links out to the
+ * full listing. Selecting which real quotes to feature while showing the
+ * true average is ordinary merchandising. Inventing a rating is not, and
+ * this file still refuses to do that anywhere.
+ */
+const MIN_DISPLAYED_RATING = 4
+
 /** A review with no text or no author is not evidence of anything. */
 function usable(r: GoogleReview): boolean {
-  return r.text.length > 0 && r.author.length > 0
+  return (
+    r.text.length > 0 &&
+    r.author.length > 0 &&
+    r.rating >= MIN_DISPLAYED_RATING
+  )
 }
 
 // ── Places API (New) ────────────────────────────────────────────────────
