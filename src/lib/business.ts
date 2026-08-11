@@ -32,6 +32,14 @@ export const BUSINESS = {
     postalCode: '77065',
     country: 'US',
   },
+  /**
+   * Google Business Profile for the Houston store, trading as Premier
+   * Jewelers. Public identifier, not a secret; only the Places API key
+   * is sensitive and that lives in the environment.
+   */
+  googlePlaceId: 'ChIJI7Nm6ZjRQIYRwjtP3UeSNIs',
+  /** Name the reviews are filed under, so attribution stays honest. */
+  reviewsTradingName: 'Premier Jewelers',
   /** Houston is Central. The site previously said ET, which was simply wrong. */
   hours: 'Monday to Friday, 10 to 5 CT',
   openingHours: {
