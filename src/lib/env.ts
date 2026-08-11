@@ -9,25 +9,9 @@ import { z } from 'zod'
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
-  // Auth — NextAuth credentials provider + staff invites
-  AUTH_SECRET: z.string().min(32).optional(),
-  AUTH_URL: z.string().url().optional(),
-
-  // Database — User, AuditLog, Invite
-  DATABASE_URL: z.string().url().optional(),
-
-  // Upstash — rate limiter backing cart actions + auth/contact forms
+  // Upstash — rate limiter backing the cart actions
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
-
-  // Resend — transactional email (staff invites)
-  RESEND_API_KEY: z.string().min(1).optional(),
-  EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
-  EMAIL_REPLY_TO: z.string().email().optional(),
-
-  // Shared secret sent by cronjobs.org as `Authorization: Bearer …`
-  // Currently used by /api/cron/prune-audit only.
-  CRON_SECRET: z.string().min(16).optional(),
 
   // Sentry (optional)
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),

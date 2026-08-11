@@ -1,28 +1,23 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { shopifyConfigured } from '@/lib/shopify/client'
 
 /**
- * Liveness + database reachability probe. Kept intentionally narrow —
- * returns only boolean health signals, never secrets or env state. Safe
- * to expose to uptime monitors.
+ * Liveness probe. Kept intentionally narrow — returns only boolean health
+ * signals, never secrets or env state. Safe to expose to uptime monitors.
  *
- * Returns 200 with { ok, db } when reachable, 503 otherwise. The probe
- * is a simple `SELECT 1` so it doesn't touch business tables.
+ * There is no database to probe any more; the storefront reads everything
+ * from Shopify. `shopify` reports whether the Storefront credentials are
+ * present, which is a config check, not a network call — so the probe stays
+ * cheap enough to poll and can't be rate-limited by Shopify.
  */
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export async function GET() {
-  const started = Date.now()
-  let dbOk = false
-  try {
-    await prisma.$queryRaw`SELECT 1`
-    dbOk = true
-  } catch (err) {
-    console.warn('[healthz] DB unreachable', err)
-  }
-
-  const body = { ok: dbOk, db: dbOk, ms: Date.now() - started }
-  return NextResponse.json(body, { status: dbOk ? 200 : 503 })
+  const shopify = shopifyConfigured()
+  return NextResponse.json(
+    { ok: shopify, shopify },
+    { status: shopify ? 200 : 503 },
+  )
 }

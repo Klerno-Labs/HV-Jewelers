@@ -18,7 +18,6 @@ const secondaryNav = [
   { label: 'Shipping', href: '/shipping' },
   { label: 'Returns', href: '/returns' },
   { label: 'Care', href: '/care' },
-  { label: 'Account', href: '/account' },
 ]
 
 export async function SiteHeader() {
@@ -60,12 +59,6 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-5">
-          <Link
-            href="/account"
-            className="hidden text-caption text-ink-soft transition-colors duration-300 hover:text-olive sm:inline"
-          >
-            Account
-          </Link>
           <ShopCartLauncher initialCart={initialCart} />
           <MobileMenu primary={primaryNav} secondary={secondaryNav} />
         </div>

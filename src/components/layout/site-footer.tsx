@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Container } from './container'
 import { Brand } from './brand'
-import { NewsletterSignup } from '@/components/store/newsletter-signup'
 import { BUSINESS } from '@/lib/business'
 
 const footerNav: Record<string, { label: string; href: string }[]> = {
@@ -16,7 +15,6 @@ const footerNav: Record<string, { label: string; href: string }[]> = {
     { label: 'Shipping', href: '/shipping' },
     { label: 'Returns', href: '/returns' },
     { label: 'Resizing & Care', href: '/care' },
-    { label: 'Account', href: '/account' },
   ],
 }
 
@@ -25,24 +23,6 @@ export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-limestone-deep/60 bg-limestone/40">
       <Container className="py-16">
-        {/* Pre-launch email capture — the launch list. Turns funnel traffic
-            into an audience before the collection opens. */}
-        <div className="mb-16 border-b border-limestone-deep/60 pb-16">
-          <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
-            <div className="max-w-md">
-              <p className="text-eyebrow text-ink-muted">Stay connected</p>
-              <p className="mt-4 font-serif text-subtitle text-ink">
-                Be first to shop the collection.
-              </p>
-              <p className="mt-4 text-caption leading-relaxed text-ink-soft">
-                New pieces added regularly. Join the list for first access and
-                concierge alerts.
-              </p>
-            </div>
-            <NewsletterSignup source="storefront-footer" />
-          </div>
-        </div>
-
         <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="max-w-xs">
             <Brand size="lg" />

@@ -1,8 +1,4 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import NextAuth from 'next-auth'
-import { authConfig } from './auth.config'
-
-const { auth } = NextAuth(authConfig)
 
 // Canonical host for self-referencing rel=canonical. Fixed origin (never the
 // request host) so apex/www variants collapse to one URL.
@@ -14,13 +10,11 @@ const SITE_ORIGIN = (
  * Middleware is the first security layer:
  *   1. Generates a per-request nonce and attaches a strict CSP.
  *   2. Applies baseline security headers.
- *   3. Gates `/admin/*` to authenticated STAFF/ADMIN users (redirects otherwise).
- *   4. Emits a self-referencing canonical Link header on indexable pages.
+ *   3. Emits a self-referencing canonical Link header on indexable pages.
  *
- * Every privileged Server Component / Action / Route Handler MUST still perform
- * its own server-side role check via `requireAdmin()` or `requireStaffOrAdmin()`.
- * Middleware can be bypassed by edge-case misconfig; the server-side gate is
- * the real enforcement.
+ * There is no auth gate here any more: the storefront has no authenticated
+ * surface. Catalog and orders are managed in Shopify admin, and the site is
+ * a read-only Shopify client, so there is nothing left to sign in to.
  */
 
 function buildCsp(nonce: string, isDev: boolean) {
@@ -112,34 +106,10 @@ function applySecurityHeaders(res: NextResponse, csp: string) {
   res.headers.set('Cross-Origin-Resource-Policy', 'same-origin')
 }
 
-export default auth((req) => {
+export default function middleware(req: NextRequest) {
   const nonce = btoa(crypto.randomUUID())
   const isDev = process.env.NODE_ENV !== 'production'
   const csp = buildCsp(nonce, isDev)
-
-  // Admin gate. Server-side route handlers must re-check this.
-  if (req.nextUrl.pathname.startsWith('/admin')) {
-    const session = req.auth
-    if (!session?.user) {
-      const url = req.nextUrl.clone()
-      url.pathname = '/login'
-      url.search = ''
-      // Carry a safe `from` param — path only, no host, no protocol.
-      const safeFrom = req.nextUrl.pathname.startsWith('/')
-        ? req.nextUrl.pathname
-        : '/'
-      url.searchParams.set('from', safeFrom)
-      const redirect = NextResponse.redirect(url)
-      applySecurityHeaders(redirect, csp)
-      return redirect
-    }
-    const role = session.user.role
-    if (role !== 'ADMIN' && role !== 'STAFF') {
-      const forbidden = new NextResponse('Forbidden', { status: 403 })
-      applySecurityHeaders(forbidden, csp)
-      return forbidden
-    }
-  }
 
   const requestHeaders = new Headers(req.headers)
   requestHeaders.set('x-nonce', nonce)
@@ -152,10 +122,10 @@ export default auth((req) => {
   // URL with no query string and no trailing slash, so apex/www, http/https,
   // trailing-slash, and ?param variants all consolidate to one canonical —
   // clearing GSC's "Duplicate without user-selected canonical". Google honors
-  // the HTTP Link header equivalently to <link rel="canonical">. Skip /api and
-  // /admin (non-indexable). `append` preserves any framework Link headers.
+  // the HTTP Link header equivalently to <link rel="canonical">. Skip /api
+  // (non-indexable). `append` preserves any framework Link headers.
   const { pathname } = req.nextUrl
-  if (!pathname.startsWith('/api') && !pathname.startsWith('/admin')) {
+  if (!pathname.startsWith('/api')) {
     const path =
       pathname !== '/' && pathname.endsWith('/')
         ? pathname.slice(0, -1)
@@ -164,7 +134,7 @@ export default auth((req) => {
   }
 
   return res
-})
+}
 
 export const config = {
   // Skip static assets and Next internals; run on everything else.
