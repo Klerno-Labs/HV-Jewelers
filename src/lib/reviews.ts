@@ -10,9 +10,12 @@ import { BUSINESS } from './business'
  * exact category of problem the Misrepresentation flag is about: an
  * invented rating is worse than no rating.
  *
- * Uses Places API (New). The legacy `maps.googleapis.com/place/details`
- * endpoint still answers for older projects, but a key created today
- * enables the new one, so that is what this targets.
+ * Google ships two separate products here, enabled independently in
+ * Cloud Console: "Places API (New)" and the legacy "Places API". Calling
+ * one while the other is enabled returns 403, which is easy to mistake
+ * for a bad key. So this tries the new endpoint first and falls back to
+ * the legacy one, and works whichever is switched on. Prefer enabling
+ * the new API: the legacy one is on a deprecation path.
  */
 
 export interface GoogleReview {
@@ -32,7 +35,14 @@ export interface GoogleReviewData {
   reviews: GoogleReview[]
 }
 
-interface PlacesReview {
+/** A review with no text or no author is not evidence of anything. */
+function usable(r: GoogleReview): boolean {
+  return r.text.length > 0 && r.author.length > 0
+}
+
+// ── Places API (New) ────────────────────────────────────────────────────
+
+interface NewReview {
   rating?: number
   relativePublishTimeDescription?: string
   text?: { text?: string }
@@ -40,14 +50,103 @@ interface PlacesReview {
   authorAttribution?: { displayName?: string; photoUri?: string }
 }
 
-interface PlacesResponse {
+interface NewResponse {
   rating?: number
   userRatingCount?: number
   googleMapsUri?: string
-  reviews?: PlacesReview[]
+  reviews?: NewReview[]
 }
 
-const FIELD_MASK = 'rating,userRatingCount,googleMapsUri,reviews'
+async function fetchNew(apiKey: string): Promise<GoogleReviewData | null> {
+  const res = await fetch(
+    `https://places.googleapis.com/v1/places/${BUSINESS.googlePlaceId}`,
+    {
+      headers: {
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'rating,userRatingCount,googleMapsUri,reviews',
+      },
+      next: { revalidate: 86400 },
+    },
+  )
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '')
+    console.error(`[reviews] Places API (New) ${res.status}: ${detail.slice(0, 300)}`)
+    return null
+  }
+
+  const data = (await res.json()) as NewResponse
+  return {
+    rating: data.rating ?? 0,
+    totalReviews: data.userRatingCount ?? 0,
+    mapsUri: data.googleMapsUri ?? '',
+    reviews: (data.reviews ?? []).map((r) => ({
+      author: r.authorAttribution?.displayName ?? '',
+      authorPhoto: r.authorAttribution?.photoUri ?? null,
+      rating: r.rating ?? 0,
+      text: (r.text?.text ?? r.originalText?.text ?? '').trim(),
+      relativeTime: r.relativePublishTimeDescription ?? '',
+    })),
+  }
+}
+
+// ── Legacy Places API ───────────────────────────────────────────────────
+
+interface LegacyReview {
+  author_name?: string
+  profile_photo_url?: string
+  rating?: number
+  text?: string
+  relative_time_description?: string
+}
+
+interface LegacyResponse {
+  status?: string
+  error_message?: string
+  result?: {
+    rating?: number
+    user_ratings_total?: number
+    url?: string
+    reviews?: LegacyReview[]
+  }
+}
+
+async function fetchLegacy(apiKey: string): Promise<GoogleReviewData | null> {
+  const url =
+    `https://maps.googleapis.com/maps/api/place/details/json` +
+    `?place_id=${encodeURIComponent(BUSINESS.googlePlaceId)}` +
+    `&fields=rating,user_ratings_total,reviews,url&key=${apiKey}`
+
+  const res = await fetch(url, { next: { revalidate: 86400 } })
+  if (!res.ok) {
+    console.error('[reviews] legacy Places API HTTP', res.status)
+    return null
+  }
+
+  const data = (await res.json()) as LegacyResponse
+  // The legacy endpoint answers 200 with a status field, so a failure
+  // here is not visible in the HTTP code.
+  if (data.status !== 'OK' || !data.result) {
+    console.error(
+      `[reviews] legacy Places API status=${data.status}: ${(data.error_message ?? '').slice(0, 300)}`,
+    )
+    return null
+  }
+
+  const r = data.result
+  return {
+    rating: r.rating ?? 0,
+    totalReviews: r.user_ratings_total ?? 0,
+    mapsUri: r.url ?? '',
+    reviews: (r.reviews ?? []).map((rv) => ({
+      author: rv.author_name ?? '',
+      authorPhoto: rv.profile_photo_url ?? null,
+      rating: rv.rating ?? 0,
+      text: (rv.text ?? '').trim(),
+      relativeTime: rv.relative_time_description ?? '',
+    })),
+  }
+}
 
 export async function getGoogleReviews(
   limit = 4,
@@ -56,46 +155,13 @@ export async function getGoogleReviews(
   if (!apiKey) return null
 
   try {
-    const res = await fetch(
-      `https://places.googleapis.com/v1/places/${BUSINESS.googlePlaceId}`,
-      {
-        headers: {
-          'X-Goog-Api-Key': apiKey,
-          'X-Goog-FieldMask': FIELD_MASK,
-        },
-        // Reviews change slowly; a day-long cache keeps quota use trivial.
-        next: { revalidate: 86400 },
-      },
-    )
+    const data = (await fetchNew(apiKey)) ?? (await fetchLegacy(apiKey))
+    if (!data) return null
 
-    if (!res.ok) {
-      console.error('[reviews] Places API returned', res.status)
-      return null
-    }
-
-    const data = (await res.json()) as PlacesResponse
-
-    const reviews: GoogleReview[] = (data.reviews ?? [])
-      .map((r) => ({
-        author: r.authorAttribution?.displayName ?? '',
-        authorPhoto: r.authorAttribution?.photoUri ?? null,
-        rating: r.rating ?? 0,
-        text: (r.text?.text ?? r.originalText?.text ?? '').trim(),
-        relativeTime: r.relativePublishTimeDescription ?? '',
-      }))
-      // An anonymous or empty review is not evidence of anything; drop it
-      // rather than pad the section out to a target count.
-      .filter((r) => r.text.length > 0 && r.author.length > 0)
-      .slice(0, limit)
-
+    const reviews = data.reviews.filter(usable).slice(0, limit)
     if (reviews.length === 0) return null
 
-    return {
-      rating: data.rating ?? 0,
-      totalReviews: data.userRatingCount ?? 0,
-      mapsUri: data.googleMapsUri ?? '',
-      reviews,
-    }
+    return { ...data, reviews }
   } catch (err) {
     console.error('[reviews] fetch failed', err)
     return null
