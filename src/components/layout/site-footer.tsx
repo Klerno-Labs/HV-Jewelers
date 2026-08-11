@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Container } from './container'
 import { Brand } from './brand'
 import { NewsletterSignup } from '@/components/store/newsletter-signup'
+import { BUSINESS } from '@/lib/business'
 
 const footerNav: Record<string, { label: string; href: string }[]> = {
   Shop: [
@@ -52,6 +53,35 @@ export function SiteFooter() {
               A small, considered collection of fine jewelry, verified
               in person before it goes on the site.
             </p>
+
+            {/* Storefront identity. Present on every page because the
+                Misrepresentation check reads the site as a whole, not just
+                the contact page. Kept in sync with `BUSINESS` and with the
+                Merchant Center business-information record. */}
+            <address className="mt-6 space-y-1 text-caption not-italic leading-relaxed text-ink-soft">
+              <p>{BUSINESS.address.street}</p>
+              <p>
+                {BUSINESS.address.city}, {BUSINESS.address.region}{' '}
+                {BUSINESS.address.postalCode}
+              </p>
+              <p className="pt-2">
+                <a
+                  href={`tel:${BUSINESS.telephone}`}
+                  className="transition-colors duration-300 hover:text-olive"
+                >
+                  {BUSINESS.telephoneDisplay}
+                </a>
+              </p>
+              <p>
+                <a
+                  href={`mailto:${BUSINESS.email}`}
+                  className="transition-colors duration-300 hover:text-olive"
+                >
+                  {BUSINESS.email}
+                </a>
+              </p>
+              <p className="pt-2 text-ink-muted">{BUSINESS.hours}</p>
+            </address>
           </div>
           {Object.entries(footerNav).map(([heading, items]) => (
             <div key={heading}>

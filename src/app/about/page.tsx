@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/layout/container'
 import { FadeIn } from '@/components/store/fade-in'
 import { ConciergeClose } from '@/components/store/concierge-close'
+import { BUSINESS } from '@/lib/business'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -62,6 +63,20 @@ export default function AboutPage() {
               Whether you are shopping for an engagement, anniversary, birthday,
               special occasion, or simply something beautiful, we are here to
               help you find a piece that feels right.
+            </p>
+            {/* Trading history and a real counter, stated plainly. This is
+                the transparency Google's Misrepresentation policy asks for,
+                and it is also simply true: the online collection and the
+                Houston store are the same people. */}
+            <p>
+              We are a real store with a real counter. HV Jewelers is the
+              online collection of Premier Jewelers, our shop at{' '}
+              {BUSINESS.address.street} in {BUSINESS.address.city},{' '}
+              {BUSINESS.address.region}, where Hoang Vi has served customers
+              for more than 20 years. Every piece on this site can be seen in
+              person, and you are welcome to call at{' '}
+              {BUSINESS.telephoneDisplay} before you come by so we have it
+              ready.
             </p>
           </div>
         </FadeIn>
