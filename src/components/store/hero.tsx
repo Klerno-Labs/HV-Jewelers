@@ -59,17 +59,17 @@ export function Hero({ feature }: { feature?: ShopifyProduct | null }) {
               Fine jewelry,
             </span>
             <span className="block hv-rise [animation-delay:240ms]">
-              chosen and verified
+              one of each design,
             </span>
             <span className="block hv-rise [animation-delay:340ms]">
-              in person.
+              then it&apos;s gone.
             </span>
           </h1>
 
           <p className="hv-rise mt-9 max-w-xl text-subtitle leading-relaxed text-ink-soft [animation-delay:460ms]">
-            Necklaces, earrings, rings, and bracelets, a small,
-            considered collection, each piece looked at in person before
-            it goes on the site.
+            Necklaces, earrings, rings, and bracelets. We bring in a
+            single piece of each design, photograph it in the Houston
+            shop, and list it here.
           </p>
 
           <div className="hv-rise mt-11 flex flex-wrap items-center gap-x-4 gap-y-4 [animation-delay:560ms]">
@@ -95,7 +95,7 @@ export function Hero({ feature }: { feature?: ShopifyProduct | null }) {
 
           {/* ── Quiet trust strip ── */}
           <ul className="hv-rise mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/10 pt-6 text-eyebrow text-ink-muted [animation-delay:680ms]">
-            <li>Verified in person</li>
+            <li>One of each design</li>
             <li aria-hidden className="text-bronze/50">·</li>
             <li>Insured, signed-for shipping</li>
             <li aria-hidden className="text-bronze/50">·</li>

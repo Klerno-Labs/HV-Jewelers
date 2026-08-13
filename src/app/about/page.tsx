@@ -7,7 +7,7 @@ import { BUSINESS } from '@/lib/business'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'For over 20 years, HV Jewelers has helped customers find pieces that celebrate life’s most important moments. A small, family-style jeweler that hand-picks jewelry for its beauty, quality, and character. No two pieces are exactly the same.',
+    'For over 20 years, HV Jewelers has helped customers find pieces that celebrate life’s most important moments. A small, family-style jeweler stocking a single piece of each design, chosen for its beauty, quality, and character.',
 }
 
 export default function AboutPage() {
@@ -49,12 +49,13 @@ export default function AboutPage() {
             <p>
               We are not trying to be like the big jewelry stores. You will not
               find rows of identical items or hundreds of the same design in our
-              showcases. Instead, we carefully hand-pick small batches of
-              jewelry, choosing pieces for their beauty, quality, and character.
+              showcases. Instead, we buy a single piece of each design from our
+              wholesaler, choosing each for its beauty, quality, and character.
             </p>
             <p>
-              Every piece in our store is selected with care, and no two pieces
-              are exactly the same. We want the jewelry you choose from HV
+              Every piece in our store is selected with care, and we buy only
+              a single piece of each design from our wholesaler, so once one
+              sells it is gone. We want the jewelry you choose from HV
               Jewelers to be something you are proud to give, proud to wear, and
               something that brings real excitement and joy to the person
               receiving it.

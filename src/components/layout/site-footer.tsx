@@ -30,8 +30,8 @@ export function SiteFooter() {
               Hoang Vi · Fine jewelry
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
-              A small, considered collection of fine jewelry, verified
-              in person before it goes on the site.
+              A small, considered collection of fine jewelry, stocked one
+              piece per design and photographed in our Houston shop.
             </p>
 
             {/* Storefront identity. Present on every page because the

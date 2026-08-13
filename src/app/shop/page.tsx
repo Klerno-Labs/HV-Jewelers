@@ -13,7 +13,7 @@ import { getImageTiles } from '@/lib/image-bg'
 export const metadata: Metadata = {
   title: 'Shop',
   description:
-    'The full HV Jewelers catalog: necklaces, earrings, rings, and bracelets. Fine jewelry, verified in person.',
+    'The full HV Jewelers catalog: necklaces, earrings, rings, and bracelets. Fine jewelry, one piece per design.',
 }
 
 export default async function ShopPage() {
@@ -65,7 +65,7 @@ export default async function ShopPage() {
             </h1>
             <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
               The full collection. Fine jewelry: necklaces, earrings, rings,
-              and bracelets, photographed and described in person before it goes
+              and bracelets, photographed in the Houston shop before it goes
               on the site.
             </p>
             <p className="mt-8 text-eyebrow text-ink-muted">
@@ -105,10 +105,10 @@ export default async function ShopPage() {
           <div className="border-t border-limestone-deep/60 pt-10">
             <p className="text-eyebrow text-ink-muted">House notes</p>
             <p className="mt-4 max-w-2xl text-body leading-relaxed text-ink-soft">
-              We only stock one of each piece, so when it sells it&apos;s
-              gone. If something here is right but the size is wrong, write
-              the concierge and we will quote a resize where the geometry
-              allows.
+              We buy a single piece of each design from our wholesaler, so
+              when it sells it&apos;s gone. If something here is right but the
+              size is wrong, write the concierge and we will quote a resize
+              where the geometry allows.
             </p>
             <Link
               href="/contact"

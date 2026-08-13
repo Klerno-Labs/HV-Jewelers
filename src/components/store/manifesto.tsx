@@ -12,14 +12,14 @@ export function Manifesto() {
         <FadeIn>
           <p className="text-eyebrow text-bronze">About the house</p>
           <p className="mt-12 font-serif text-display font-light italic text-ink">
-            Hand-picked, and no two the same.
+            One of each, and then it&apos;s gone.
           </p>
           <p className="mt-10 text-subtitle leading-relaxed text-ink-soft">
-            HV Jewelers is a small, family-style collection of fine
-            jewelry: necklaces, earrings, rings, and bracelets, each piece
-            chosen and looked at in person before we list it. No two are
-            exactly the same, and we want every one to feel personal,
-            meaningful, and unforgettable.
+            HV Jewelers is a small collection of fine jewelry: necklaces,
+            earrings, rings, and bracelets. We buy a single piece of each
+            design from our wholesaler and photograph it here in the
+            Houston shop before it goes on the site. When one sells,
+            it&apos;s gone.
           </p>
         </FadeIn>
       </Container>

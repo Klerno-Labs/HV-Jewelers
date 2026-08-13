@@ -37,7 +37,7 @@ function panelImage(p: ShopifyProduct | undefined) {
  *
  * Only available pieces are ranked, so a sold piece drops off the homepage
  * and the next-priciest piece slides up into its slot — the hero and grids
- * stay populated as one-of-a-kind inventory turns over. Falls back to
+ * stay populated as single-unit inventory turns over. Falls back to
  * typography-only treatment when no products are configured yet.
  */
 export default async function Home() {
@@ -73,7 +73,7 @@ export default async function Home() {
       <WorldFeature
         eyebrow="The Collection"
         title="Chosen with restraint."
-        body="A small, edited selection of fine jewelry: necklaces, earrings, rings, and bracelets. Every piece is looked at in person and described plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
+        body="A small, edited selection of fine jewelry: necklaces, earrings, rings, and bracelets. We stock a single piece of each design and describe it plainly: the metal, the stone, the finish. We'd rather carry less and know it well."
         href="/shop"
         ctaLabel="See the collection"
         tone="cedar"
