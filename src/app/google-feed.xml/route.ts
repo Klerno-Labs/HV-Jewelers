@@ -42,6 +42,35 @@ const GOOGLE_CATEGORY: Record<string, string> = {
 }
 const FALLBACK_CATEGORY = 'Apparel & Accessories > Jewelry'
 
+/**
+ * Merchant Center return policy label for the final-sale exception.
+ *
+ * Merchant Center held a single "Standard for United States" policy —
+ * 15 days, returns free — applied to all 171 items, while /returns and
+ * the product JSON-LD say the buyer pays return shipping and that
+ * earrings cannot be returned at all. Google's automated check compares
+ * the two and reads the gap as misrepresentation.
+ *
+ * Only the exception carries a label. Items without one fall back to the
+ * account-level policy, so the other 120 stay governed by a single
+ * policy instead of two that can drift apart.
+ *
+ * This string must already exist in Merchant Center under
+ * Settings → Return policies before the feed ships it. A label Google
+ * doesn't recognise disapproves every item carrying it, which would take
+ * out all 51 earrings at once.
+ */
+const FINAL_SALE_LABEL = 'final-sale-earrings'
+
+/**
+ * Mirrors `isEarrings` on the product page, deliberately by the same rule
+ * on the same field: the feed and the landing page must classify a piece
+ * identically or the mismatch this label exists to close simply moves.
+ */
+function isFinalSale(product: ShopifyProduct): boolean {
+  return (product.productType || '').trim() === 'Earrings'
+}
+
 /** Google caps description at 5000 characters. */
 const DESCRIPTION_LIMIT = 5000
 /** `additional_image_link` accepts at most 10. */
@@ -147,6 +176,9 @@ function itemXml(product: ShopifyProduct): string | null {
     '        <g:country>US</g:country>',
     `        <g:price>${escapeXml(formatPrice('0', current.currencyCode))}</g:price>`,
     '      </g:shipping>',
+    ...(isFinalSale(product)
+      ? [`      <g:return_policy_label>${escapeXml(FINAL_SALE_LABEL)}</g:return_policy_label>`]
+      : []),
     '    </item>',
   ]
 
