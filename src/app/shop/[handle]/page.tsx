@@ -215,6 +215,18 @@ export default async function ShopProductPage({ params }: PageProps) {
               )}
             </div>
 
+            {/* Availability is stated in words, not just in the JSON-LD above.
+                A buyer — and a marketplace reviewer walking the page — should
+                not have to read the schema to learn whether a piece is still
+                here. Every piece in the catalog is one of one, so the same
+                line carries the scarcity. This reads availableForSale rather
+                than a count because the Storefront token does not carry
+                unauthenticated_read_product_inventory; if HV ever holds two of
+                something, restore that scope and gate on the real number. */}
+            <p className="mt-4 text-caption text-bronze">
+              {product.availableForSale ? 'Only one available.' : 'Sold.'}
+            </p>
+
             {product.description && (
               <p className="mt-6 max-w-prose text-body leading-relaxed text-ink-soft">
                 {product.description}
@@ -247,6 +259,27 @@ export default async function ShopProductPage({ params }: PageProps) {
                 className="mt-3 inline-block text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
               >
                 How shipping works →
+              </Link>
+            </div>
+
+            {/* The return terms are stated on the product itself, not only on
+                /returns and in the JSON-LD above. Two audiences need it here:
+                a buyer deciding on a final-sale pair of earrings, and the
+                automated checks that compare a merchant's declared return
+                policy against what the product page actually says. This text
+                and `returnPolicy` are driven by the same `isEarrings` flag, so
+                the page and the structured data cannot drift apart. */}
+            <div className="mt-6 border-t border-limestone-deep/60 pt-6 text-caption text-ink-muted">
+              <p>
+                {isEarrings
+                  ? 'Final sale. For hygiene reasons, earrings are not eligible for return.'
+                  : 'Eligible for a 15-day return in original, unused condition. Return shipping is insured, signed for, and paid by you.'}
+              </p>
+              <Link
+                href="/returns"
+                className="mt-3 inline-block text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
+              >
+                How returns work →
               </Link>
             </div>
           </aside>
