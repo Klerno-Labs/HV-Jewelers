@@ -10,6 +10,7 @@ import { getProductByHandle, listProductHandles } from '@/lib/shopify/products'
 import { formatMoney, moneyToCents } from '@/lib/shopify/money'
 import { sanitizeShopifyHtml } from '@/lib/shopify/html'
 import { getImageBgColors } from '@/lib/image-bg'
+import { facetLinks } from '@/lib/shopify/facets'
 
 interface PageProps {
   params: Promise<{ handle: string }>
@@ -98,6 +99,10 @@ export default async function ShopProductPage({ params }: PageProps) {
   const onSale = compareMin != null && compareMin > priceMin
 
   const eyebrow = product.productType || product.vendor || 'HV Jewelers'
+
+  // Normalized tags as routes back into the catalog — the way off a PDP that
+  // isn't the back button.
+  const browseLinks = facetLinks(product)
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
   const productUrl = `${siteUrl}/shop/${handle}`
@@ -228,12 +233,21 @@ export default async function ShopProductPage({ params }: PageProps) {
               />
             </div>
 
-            {product.tags.length > 0 && (
+            {browseLinks.length > 0 && (
               <div className="mt-10 border-t border-limestone-deep/60 pt-6">
-                <p className="text-eyebrow text-ink-muted">Tagged</p>
-                <p className="mt-3 text-caption text-ink-soft">
-                  {product.tags.join(' · ')}
-                </p>
+                <p className="text-eyebrow text-ink-muted">Browse by</p>
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {browseLinks.map((link) => (
+                    <li key={`${link.key}:${link.value}`}>
+                      <Link
+                        href={link.href}
+                        className="inline-block border border-limestone-deep bg-parchment px-3 py-1.5 text-caption text-ink-soft transition-colors duration-300 hover:border-olive hover:text-olive"
+                      >
+                        {link.value}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
