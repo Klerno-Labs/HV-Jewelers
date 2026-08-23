@@ -9,18 +9,42 @@ import { listProducts } from '@/lib/shopify/products'
 import { moneyToCents } from '@/lib/shopify/money'
 import { shopifyConfigured } from '@/lib/shopify/client'
 import { getImageTiles } from '@/lib/image-bg'
+import { describeFilters, hasActiveFilters, parseFilters } from '@/lib/shopify/facets'
 
-export const metadata: Metadata = {
-  title: 'Shop',
-  description:
-    'The full HV Jewelers catalog: necklaces, earrings, rings, and bracelets. Fine jewelry, one piece per design.',
+interface PageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-export default async function ShopPage() {
+/**
+ * Filtered views describe themselves, so a shared link reads correctly in a
+ * message preview or a browser tab. Indexing is unaffected: the middleware
+ * emits a self-referencing canonical on the clean path, which consolidates
+ * every `?facet=` variant back to /shop.
+ */
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const filters = parseFilters(await searchParams)
+  if (!hasActiveFilters(filters)) {
+    return {
+      title: 'Shop',
+      description:
+        'The full HV Jewelers catalog: necklaces, earrings, rings, and bracelets. Fine jewelry, one piece per design.',
+    }
+  }
+  const summary = describeFilters(filters)
+  return {
+    title: `${summary} · Shop`,
+    description: `HV Jewelers pieces matching ${summary}. Fine jewelry, one piece per design.`,
+  }
+}
+
+export default async function ShopPage({ searchParams }: PageProps) {
+  const filters = parseFilters(await searchParams)
   const { products } = await listProducts(250)
   const configured = shopifyConfigured()
 
-  // Strategic merchandising order: in-stock pieces first (a sold one-of-a-kind
+  // Strategic merchandising order: in-stock pieces first (a sold single-unit piece
   // sinks), then price descending so the statement pieces lead and anchor the
   // collection's value. Replaces Shopify's BEST_SELLING sort, which is
   // effectively random for a store without sales history.
@@ -96,7 +120,11 @@ export default async function ShopPage() {
             action={{ label: 'Write the house →', href: '/contact' }}
           />
         ) : (
-          <ShopBrowser products={ranked} imageTiles={imageTiles} />
+          <ShopBrowser
+            products={ranked}
+            imageTiles={imageTiles}
+            initialFilters={filters}
+          />
         )}
       </Container>
 
