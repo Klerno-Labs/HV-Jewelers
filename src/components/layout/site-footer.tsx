@@ -62,6 +62,17 @@ export function SiteFooter() {
               </p>
               <p className="pt-2 text-ink-muted">{BUSINESS.hours}</p>
             </address>
+
+            {/* Accepted payment methods, verified against Shopify's own
+                paymentSettings (acceptedCardBrands + supportedDigitalWallets)
+                rather than assumed. Google's Misrepresentation review checks
+                that accepted methods are clearly displayed; nothing on the
+                site named any until this. */}
+            <p className="mt-6 text-caption leading-relaxed text-ink-soft">
+              We accept Visa, Mastercard, American Express, Discover, and
+              Diners Club, plus Shop&nbsp;Pay, Apple&nbsp;Pay, and
+              Google&nbsp;Pay at checkout.
+            </p>
           </div>
           {Object.entries(footerNav).map(([heading, items]) => (
             <div key={heading}>

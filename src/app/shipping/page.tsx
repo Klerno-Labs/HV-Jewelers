@@ -25,6 +25,14 @@ export default function ShippingPage() {
             on the piece&apos;s value and where it&apos;s going. Anything
             over $5,000 ships FedEx with adult signature required.
           </dd>
+        <div>
+          <dt className="text-eyebrow text-ink-muted">Payment</dt>
+          <dd className="mt-3 text-body leading-relaxed text-ink-soft">
+            Checkout is handled by Shopify over an encrypted connection. We
+            accept Visa, Mastercard, American Express, Discover, and Diners
+            Club, plus Shop&nbsp;Pay, Apple&nbsp;Pay, and Google&nbsp;Pay.
+          </dd>
+        </div>
         </div>
         <div>
           <dt className="text-eyebrow text-ink-muted">Signature</dt>
