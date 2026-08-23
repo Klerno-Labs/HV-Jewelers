@@ -92,6 +92,14 @@ export default async function ShopPage({ searchParams }: PageProps) {
               and bracelets, photographed in the Houston shop before it goes
               on the site.
             </p>
+            <p className="mt-6">
+              <Link
+                href="/collections"
+                className="text-caption tracking-wide text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
+              >
+                Browse by stone, metal, or budget →
+              </Link>
+            </p>
             <p className="mt-8 text-eyebrow text-ink-muted">
               {products.length === 0
                 ? 'Building the case now.'

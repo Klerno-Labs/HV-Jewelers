@@ -45,6 +45,15 @@ export default async function ShopProductPage({ params }: PageProps) {
   const product = await getProductByHandle(handle)
   if (!product) notFound()
 
+  // Product Rich Pin metadata. Pinterest reads these Open Graph tags to show
+  // live price and availability on the pin itself; the JSON-LD below the fold
+  // carries the same facts for search engines. React 19 hoists meta tags
+  // rendered anywhere in the tree into <head>, and Next's typed metadata API
+  // has no "product" og:type, which is why these are plain elements.
+  const priceAmount = product.priceRange.minVariantPrice?.amount
+  const priceCurrency = product.priceRange.minVariantPrice?.currencyCode
+  const availability = product.availableForSale ? 'instock' : 'out of stock'
+
   const galleryMedia: GalleryMedia[] =
     product.media.length > 0
       ? product.media.map((m) => {
@@ -176,6 +185,16 @@ export default async function ShopProductPage({ params }: PageProps) {
 
   return (
     <>
+      <meta property="og:type" content="product" />
+      {priceAmount ? (
+        <>
+          <meta property="product:price:amount" content={priceAmount} />
+          <meta property="product:price:currency" content={priceCurrency ?? 'USD'} />
+          <meta property="og:price:amount" content={priceAmount} />
+          <meta property="og:price:currency" content={priceCurrency ?? 'USD'} />
+        </>
+      ) : null}
+      <meta property="og:availability" content={availability} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
