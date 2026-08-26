@@ -54,6 +54,10 @@ function buildCsp(nonce: string, isDev: boolean) {
         "blob:",
         "https://cdn.shopify.com",
         "https://res.cloudinary.com",
+        // The Pinterest tag reports by requesting a 1x1 from ct.pinterest.com.
+        // Without this the script loads and then fails silently on every
+        // event, which looks like working analytics and reports nothing.
+        "https://ct.pinterest.com",
       ],
     ],
     ["font-src", ["'self'", "data:"]],
@@ -66,6 +70,9 @@ function buildCsp(nonce: string, isDev: boolean) {
         // domain costs nothing and avoids a silent breakage if a client
         // GraphQL fetch is added later.
         "https://zvf91s-qy.myshopify.com",
+        // Newer Pinterest tag builds beacon events over fetch/sendBeacon
+        // rather than an image request; allow both paths.
+        "https://ct.pinterest.com",
         ...(isDev ? ["ws:", "http://localhost:*"] : []),
       ],
     ],

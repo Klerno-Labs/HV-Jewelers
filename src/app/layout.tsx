@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { SiteHeader } from '@/components/layout/site-header'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { Analytics } from '@vercel/analytics/next'
+import { PinterestTag } from '@/components/analytics/pinterest-tag'
 import { businessSchema } from '@/lib/business'
 import './globals.css'
 
@@ -101,6 +102,10 @@ export default function RootLayout({
         {/* Headless traffic analytics — captures visitors/sessions the Vercel
             frontend serves (Shopify's online-store analytics can't see them). */}
         <Analytics />
+        {/* Pinterest sees only the Shopify-hosted checkout through its app;
+            the storefront is ours, so the tag has to live here. No-op until
+            NEXT_PUBLIC_PINTEREST_TAG_ID is set. */}
+        <PinterestTag />
       </body>
     </html>
   )
