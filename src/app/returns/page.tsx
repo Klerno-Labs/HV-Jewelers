@@ -100,10 +100,18 @@ export default function ReturnsPage() {
             at your cost. We can&apos;t accept returns that arrive
             without signature confirmation.
           </li>
+          {/* Two clocks, stated separately on purpose: ours (inspect and
+              issue) is a commitment we control, the bank's posting time is
+              not. Naming them apart is what stops "where is my refund"
+              from landing on us for something the issuer is doing. Five
+              business days is a ceiling with buffer, not a target — the
+              piece is in hand, so refund the day you inspect it. */}
           <li>
             <span className="font-serif text-ink">4.</span> Once we
-            receive and inspect it, we refund to the original payment
-            method, usually within a few business days.
+            receive and inspect it, we issue your refund to the original
+            payment method within 5 business days. Depending on your bank,
+            it can take a few more days after that to appear on your
+            statement.
           </li>
         </ol>
       </section>
