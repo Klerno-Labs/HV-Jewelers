@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000'
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
+  'https://hvjewelers.com'
 
 /**
- * robots.txt — allow indexing of the public catalog, block private
- * routes (admin, checkout transactions, auth, internal specs).
+ * Allow indexing of the public catalog and permanent collection pages while
+ * blocking private APIs and internal design-system routes.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -13,12 +14,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: [
-          '/api/',
-          '/style',
-          '/typography',
-          '/colors',
-        ],
+        disallow: ['/api/', '/style', '/typography', '/colors'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
