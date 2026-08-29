@@ -1,5 +1,8 @@
 import type { MetadataRoute } from 'next'
-import { listProductHandles, listAllProducts } from '@/lib/shopify/products'
+import {
+  listAllProductsForPages,
+  listProductHandles,
+} from '@/lib/shopify/products'
 import { buildCollections } from '@/lib/shopify/collections'
 
 const SITE_URL =
@@ -10,6 +13,7 @@ const SITE_URL =
  * Static pages, the catalog, permanent commercial collections, and every
  * published Shopify product. The production origin is the safe fallback so a
  * missing preview variable can never emit localhost URLs into the live map.
+ * Permanent routes remain present even during a temporary Shopify outage.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
@@ -25,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/care`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ]
 
-  const products = await listAllProducts()
+  const products = await listAllProductsForPages()
   const collectionEntries: MetadataRoute.Sitemap = buildCollections(products).map(
     (collection) => ({
       url: `${SITE_URL}/collections/${collection.slug}`,
