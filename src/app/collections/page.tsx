@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Container } from '@/components/layout/container'
 import { Breadcrumbs } from '@/components/store/breadcrumbs'
 import { FadeIn } from '@/components/store/fade-in'
-import { listAllProducts } from '@/lib/shopify/products'
+import { listAllProductsForPages } from '@/lib/shopify/products'
 import { buildCollections } from '@/lib/shopify/collections'
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export const revalidate = 600
 
 export default async function CollectionsIndexPage() {
-  const products = await listAllProducts()
+  const products = await listAllProductsForPages()
   const collections = buildCollections(products)
 
   return (
