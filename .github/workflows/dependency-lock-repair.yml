@@ -1,0 +1,46 @@
+name: Dependency Lock Repair
+
+on:
+  push:
+    branches:
+      - feat/index-safe-conversion-upgrade
+    paths:
+      - ".github/workflows/dependency-lock-repair.yml"
+      - "package.json"
+      - "package-lock.json"
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Generate patched lockfile
+        continue-on-error: true
+        run: npm audit fix --package-lock-only --ignore-scripts --audit-level=high
+
+      - name: Report production audit
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Upload repaired dependency manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repaired-dependency-manifests
+          path: |
+            package.json
+            package-lock.json
+          if-no-files-found: error
+          retention-days: 1
