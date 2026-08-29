@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Container } from '@/components/layout/container'
 import { Breadcrumbs } from '@/components/store/breadcrumbs'
+import { EmptyState } from '@/components/store/empty-state'
 import { FadeIn } from '@/components/store/fade-in'
 import { ShopBrowser } from '@/components/shop/shop-browser'
 import { listAllProducts } from '@/lib/shopify/products'
@@ -11,8 +12,9 @@ import { getImageTiles } from '@/lib/image-bg'
 import { buildCollections, findCollection } from '@/lib/shopify/collections'
 import { deriveFacets, matchesFilters } from '@/lib/shopify/facets'
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'http://localhost:3000'
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hvjewelers.com'
+).replace(/\/$/, '')
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -23,14 +25,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const products = await listAllProducts()
   const collection = findCollection(products, slug)
   if (!collection) return { title: 'Not found' }
+
   return {
     title: collection.title,
     description: collection.description,
-    // Unlike the ?facet= shop views, which canonicalize back to /shop, a
-    // collection is its own indexable page — that is the point of it.
     alternates: { canonical: `${SITE_URL}/collections/${collection.slug}` },
     openGraph: {
-      title: `${collection.title} · HV Jewelers`,
+      type: 'website',
+      url: `${SITE_URL}/collections/${collection.slug}`,
+      title: `${collection.title} | HV Jewelers`,
       description: collection.description,
     },
   }
@@ -38,11 +41,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   const products = await listAllProducts()
-  return buildCollections(products).map((c) => ({ slug: c.slug }))
+  return buildCollections(products).map((collection) => ({
+    slug: collection.slug,
+  }))
 }
 
-// Membership follows stock: when a piece sells, every collection page that
-// held it drops it on the next revalidation rather than showing a dead tile.
 export const revalidate = 600
 
 export default async function CollectionPage({ params }: PageProps) {
@@ -51,39 +54,39 @@ export default async function CollectionPage({ params }: PageProps) {
   const collection = findCollection(products, slug)
   if (!collection) notFound()
 
-  // Same merchandising order as /shop: in-stock first, then price descending.
   const ranked = [...products].sort((a, b) => {
-    if (a.availableForSale !== b.availableForSale)
+    if (a.availableForSale !== b.availableForSale) {
       return a.availableForSale ? -1 : 1
+    }
     return (
       moneyToCents(b.priceRange.minVariantPrice) -
       moneyToCents(a.priceRange.minVariantPrice)
     )
   })
 
-  const members = ranked.filter((p) =>
-    matchesFilters(deriveFacets(p), collection.filters),
+  const members = ranked.filter((product) =>
+    matchesFilters(deriveFacets(product), collection.filters),
   )
   const imageTiles = await getImageTiles(
-    ranked.flatMap((p) => (p.featuredImage ? [p.featuredImage.url] : [])),
+    members.flatMap((product) =>
+      product.featuredImage ? [product.featuredImage.url] : [],
+    ),
   )
 
-  // ItemList structured data: tells search engines this page is a curated
-  // list of the products it links, which is what earns collection results.
   const itemList = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: `${collection.title} · HV Jewelers`,
+    name: `${collection.title} | HV Jewelers`,
     description: collection.description,
     url: `${SITE_URL}/collections/${collection.slug}`,
     mainEntity: {
       '@type': 'ItemList',
       numberOfItems: members.length,
-      itemListElement: members.slice(0, 24).map((p, i) => ({
+      itemListElement: members.slice(0, 24).map((product, index) => ({
         '@type': 'ListItem',
-        position: i + 1,
-        url: `${SITE_URL}/shop/${p.handle}`,
-        name: p.title,
+        position: index + 1,
+        url: `${SITE_URL}/shop/${product.handle}`,
+        name: product.title,
       })),
     },
   }
@@ -115,25 +118,46 @@ export default async function CollectionPage({ params }: PageProps) {
             <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
               {collection.description}
             </p>
+            {collection.evergreen ? (
+              <p className="mt-5 max-w-xl text-caption leading-relaxed text-ink-muted">
+                This collection remains available as single-piece inventory
+                changes, so saved links continue to lead somewhere useful.
+              </p>
+            ) : null}
           </FadeIn>
         </Container>
       </section>
 
       <Container className="pb-16 md:pb-20">
-        <ShopBrowser
-          products={ranked}
-          imageTiles={imageTiles}
-          initialFilters={collection.filters}
-        />
+        {members.length > 0 ? (
+          <ShopBrowser
+            products={ranked}
+            imageTiles={imageTiles}
+            initialFilters={collection.filters}
+          />
+        ) : (
+          <EmptyState
+            eyebrow="Sourcing now"
+            title="Nothing in this collection today."
+            body="Our inventory is one piece per design. Ask the showroom to source something similar, or browse the full case while this collection is replenished."
+            action={{ label: 'Ask the showroom →', href: '/contact' }}
+          />
+        )}
       </Container>
 
       <Container className="pb-24">
-        <div className="border-t border-limestone-deep/60 pt-10">
+        <div className="flex flex-wrap gap-x-6 gap-y-3 border-t border-limestone-deep/60 pt-10 text-caption tracking-wide">
           <Link
             href="/shop"
-            className="text-caption tracking-wide text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
+            className="text-ink underline decoration-bronze/60 underline-offset-4 hover:text-olive hover:decoration-olive"
           >
             Browse the full case →
+          </Link>
+          <Link
+            href="/contact"
+            className="text-ink underline decoration-bronze/60 underline-offset-4 hover:text-olive hover:decoration-olive"
+          >
+            Request a similar piece →
           </Link>
         </div>
       </Container>
