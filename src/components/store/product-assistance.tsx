@@ -80,7 +80,7 @@ export function ProductAssistance({
 
       <p className="mt-4 text-caption leading-relaxed text-ink-muted">
         For the fastest answer, call during showroom hours. Email inquiries are
-        handled by the next business day.
+        reviewed each business day.
       </p>
     </section>
   )
