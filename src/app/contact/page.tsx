@@ -24,8 +24,8 @@ export default function ContactPage() {
       </p>
       <p className="mt-5 max-w-xl text-body leading-relaxed text-ink-soft">
         For the fastest product answer, call during showroom hours. Email
-        inquiries are handled by the next business day. Include the product
-        title or URL so we can pull the correct piece from the case.
+        inquiries are reviewed each business day. Include the product title or
+        URL so we can pull the correct piece from the case.
       </p>
 
       <div className="hv-gold-rule my-12 w-16" />
@@ -57,8 +57,8 @@ export default function ContactPage() {
             </a>
           </dd>
           <p className="mt-3 text-caption leading-relaxed text-ink-muted">
-            {BUSINESS.hours}. Calls outside those hours receive a return call
-            the next business day.
+            {BUSINESS.hours}. Missed calls are returned during the next staffed
+            showroom period.
           </p>
         </div>
 
