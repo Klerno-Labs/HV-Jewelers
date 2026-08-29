@@ -8,15 +8,20 @@ import {
 import type { ImageEdge, ProductMedia, ShopifyProduct } from './types'
 
 /**
- * Storefront product reads. All flatten the Shopify edge-and-node
- * connection format so the UI never sees `edges[].node`.
+ * Storefront product reads. All flatten the Shopify edge-and-node connection
+ * format so the UI never sees `edges[].node`.
  */
 
 interface RawMediaNode {
   mediaContentType: string
   image?: ImageEdge | null
   alt?: string | null
-  sources?: Array<{ url: string; mimeType: string; width: number | null; height: number | null }>
+  sources?: Array<{
+    url: string
+    mimeType: string
+    width: number | null
+    height: number | null
+  }>
   previewImage?: ImageEdge | null
 }
 
@@ -26,17 +31,12 @@ type RawProduct = Omit<ShopifyProduct, 'images' | 'variants' | 'media'> & {
   media?: { edges: Array<{ node: RawMediaNode }> }
 }
 
-/**
- * Normalize Shopify's media union to our `ProductMedia[]`. Only IMAGE and
- * VIDEO are surfaced today; ExternalVideo/Model3d are dropped (a video with
- * no playable source is skipped rather than rendered empty).
- */
 function mapMedia(raw: RawProduct['media']): ProductMedia[] {
   if (!raw) return []
-  const out: ProductMedia[] = []
+  const output: ProductMedia[] = []
   for (const { node } of raw.edges) {
     if (node.mediaContentType === 'IMAGE' && node.image) {
-      out.push({
+      output.push({
         mediaType: 'image',
         url: node.image.url,
         altText: node.image.altText,
@@ -48,7 +48,7 @@ function mapMedia(raw: RawProduct['media']): ProductMedia[] {
       node.sources &&
       node.sources.length > 0
     ) {
-      out.push({
+      output.push({
         mediaType: 'video',
         altText: node.alt ?? null,
         sources: node.sources,
@@ -56,19 +56,15 @@ function mapMedia(raw: RawProduct['media']): ProductMedia[] {
       })
     }
   }
-  return out
+  return output
 }
 
 function flattenProduct(raw: RawProduct): ShopifyProduct {
   return {
     ...raw,
-    // totalInventory is no longer fetched (needs the
-    // unauthenticated_read_product_inventory scope, which the Storefront token
-    // doesn't carry). Force null so the "only 1 left" / "sold out" badges
-    // simply don't render rather than breaking the whole query.
     totalInventory: raw.totalInventory ?? null,
-    images: raw.images.edges.map((e) => e.node),
-    variants: raw.variants.edges.map((e) => e.node),
+    images: raw.images.edges.map((edge) => edge.node),
+    variants: raw.variants.edges.map((edge) => edge.node),
     media: mapMedia(raw.media),
   }
 }
@@ -83,7 +79,11 @@ interface ProductsResponse {
 export async function listProducts(
   first = 50,
   after?: string,
-): Promise<{ products: ShopifyProduct[]; endCursor: string | null; hasNextPage: boolean }> {
+): Promise<{
+  products: ShopifyProduct[]
+  endCursor: string | null
+  hasNextPage: boolean
+}> {
   if (!shopifyConfigured()) {
     return { products: [], endCursor: null, hasNextPage: false }
   }
@@ -93,26 +93,23 @@ export async function listProducts(
       tags: [SHOPIFY_TAGS.products],
     })
     return {
-      products: data.products.edges.map((e) => flattenProduct(e.node)),
+      products: data.products.edges.map((edge) => flattenProduct(edge.node)),
       endCursor: data.products.pageInfo.endCursor,
       hasNextPage: data.products.pageInfo.hasNextPage,
     }
-  } catch (err) {
-    console.error('[shopify] listProducts failed', err)
+  } catch (error) {
+    console.error('[shopify] listProducts failed', error)
     return { products: [], endCursor: null, hasNextPage: false }
   }
 }
 
 /**
- * The entire catalog, paginated to exhaustion.
- *
- * Unlike `listProducts`, this deliberately does NOT swallow errors. It
- * backs the Merchant Center feed, where a half-fetched catalog is worse
- * than no response at all: Google treats items missing from a feed as
- * withdrawn and delists them. A throw lets the route return 5xx so
- * Google keeps the previous good feed instead.
+ * Strict complete-catalog read for feeds and other jobs where a partial or
+ * empty result could incorrectly withdraw products from a third party.
  */
-export async function listAllProducts(pageSize = 100): Promise<ShopifyProduct[]> {
+export async function listAllProducts(
+  pageSize = 100,
+): Promise<ShopifyProduct[]> {
   if (!shopifyConfigured()) {
     throw new Error('Shopify Storefront API is not configured.')
   }
@@ -120,9 +117,7 @@ export async function listAllProducts(pageSize = 100): Promise<ShopifyProduct[]>
   const all: ShopifyProduct[] = []
   let after: string | null = null
 
-  // Page ceiling so a stuck cursor can't loop forever; 50 × 100 is far
-  // above the catalog's real size.
-  for (let page = 0; page < 50; page++) {
+  for (let page = 0; page < 50; page += 1) {
     const data: ProductsResponse = await shopifyFetch<ProductsResponse>(
       PRODUCTS_QUERY,
       {
@@ -130,7 +125,7 @@ export async function listAllProducts(pageSize = 100): Promise<ShopifyProduct[]>
         tags: [SHOPIFY_TAGS.products],
       },
     )
-    all.push(...data.products.edges.map((e) => flattenProduct(e.node)))
+    all.push(...data.products.edges.map((edge) => flattenProduct(edge.node)))
 
     if (!data.products.pageInfo.hasNextPage) return all
     after = data.products.pageInfo.endCursor
@@ -138,6 +133,24 @@ export async function listAllProducts(pageSize = 100): Promise<ShopifyProduct[]>
   }
 
   return all
+}
+
+/**
+ * Fail-soft complete-catalog read for human-facing and indexable pages.
+ * Permanent collection routes should still build and return useful content
+ * when credentials are absent in CI or Shopify is temporarily unavailable.
+ * Merchant and Pinterest feeds deliberately continue using strict
+ * `listAllProducts()` so they can return 5xx and preserve the last good feed.
+ */
+export async function listAllProductsForPages(
+  pageSize = 100,
+): Promise<ShopifyProduct[]> {
+  try {
+    return await listAllProducts(pageSize)
+  } catch (error) {
+    console.error('[shopify] page catalog fetch failed', error)
+    return []
+  }
 }
 
 interface ProductByHandleResponse {
@@ -157,8 +170,8 @@ export async function getProductByHandle(
       },
     )
     return data.product ? flattenProduct(data.product) : null
-  } catch (err) {
-    console.error('[shopify] getProductByHandle failed', handle, err)
+  } catch (error) {
+    console.error('[shopify] getProductByHandle failed', handle, error)
     return null
   }
 }
@@ -176,9 +189,9 @@ export async function listProductHandles(
       variables: { first },
       tags: [SHOPIFY_TAGS.products],
     })
-    return data.products.edges.map((e) => e.node)
-  } catch (err) {
-    console.error('[shopify] listProductHandles failed', err)
+    return data.products.edges.map((edge) => edge.node)
+  } catch (error) {
+    console.error('[shopify] listProductHandles failed', error)
     return []
   }
 }

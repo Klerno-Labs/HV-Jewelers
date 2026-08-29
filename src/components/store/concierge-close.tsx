@@ -1,32 +1,40 @@
 import Link from 'next/link'
 import { Container } from '@/components/layout/container'
+import { BUSINESS } from '@/lib/business'
 import { FadeIn } from './fade-in'
 
 /**
- * Quiet closing module. Single typographic statement, a small concierge
- * link. No buttons, no hard CTA — the brand promises nothing it cannot
- * keep.
+ * Human closing module. It gives high-ticket shoppers an immediate phone path
+ * without introducing a chatbot or unsupported response-time promise.
  */
 export function ConciergeClose() {
   return (
     <section className="border-t border-limestone-deep/60">
-      <Container className="py-32 md:py-40" width="reading">
+      <Container className="py-28 md:py-36" width="reading">
         <FadeIn>
-          <p className="text-eyebrow text-bronze">Get in touch</p>
-          <p className="mt-10 font-serif text-display-lg italic font-light text-ink">
-            Questions? We&apos;re here.
+          <p className="text-eyebrow text-bronze">Ask the showroom</p>
+          <p className="mt-8 font-serif text-display-lg font-light italic text-ink">
+            Questions about a piece?
           </p>
-          <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-            Holds, sizing, sourcing requests, care advice. Write to us
-            directly and we&apos;ll get back, usually within a day or
-            two.
+          <p className="mt-7 max-w-xl text-subtitle leading-relaxed text-ink-soft">
+            Call for the fastest answer during showroom hours, or email us for
+            sizing, holds, sourcing, additional measurements, and live-video
+            requests. Email inquiries are reviewed each business day.
           </p>
-          <Link
-            href="/contact"
-            className="mt-10 inline-block text-caption tracking-wide text-ink underline underline-offset-4 decoration-bronze/60 transition-colors duration-300 hover:text-olive hover:decoration-olive"
-          >
-            Send a note
-          </Link>
+          <div className="mt-9 flex flex-wrap gap-x-6 gap-y-4 text-caption tracking-wide">
+            <a
+              href={`tel:${BUSINESS.telephone}`}
+              className="inline-flex min-h-11 items-center bg-ink px-5 py-3 text-parchment transition-colors hover:bg-olive-deep"
+            >
+              Call {BUSINESS.telephoneDisplay}
+            </a>
+            <Link
+              href="/contact"
+              className="inline-flex min-h-11 items-center border border-ink px-5 py-3 text-ink transition-colors hover:border-olive hover:text-olive"
+            >
+              Showroom and email details
+            </Link>
+          </div>
         </FadeIn>
       </Container>
     </section>

@@ -21,28 +21,26 @@ const sansUi = Inter({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
+  'https://hvjewelers.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'HV Jewelers · Hoang Vi',
-    template: '%s · HV Jewelers',
+    default: 'HV Jewelers | One-of-a-Kind Fine Jewelry in Houston',
+    template: '%s | HV Jewelers',
   },
   description:
-    'Hoang Vi Jewelers, a small collection of fine jewelry: necklaces, earrings, rings, and bracelets, stocked one piece per design in our Houston shop.',
+    'Shop one-of-a-kind rings, earrings, necklaces, pendants, and bracelets from the Premier Jewelers Houston showroom, with insured US shipping and private viewings.',
   applicationName: 'HV Jewelers',
   authors: [{ name: 'Hoang Vi Jewelers' }],
-  // Public pages inherit indexable defaults from Next's built-in policy.
-  // Internal/transactional surfaces (admin, login, account, design-system
-  // specs) override with their own `robots: { index: false }` metadata.
-  // robots.txt is the belt-and-suspenders gate.
   openGraph: {
     type: 'website',
     siteName: 'HV Jewelers',
-    title: 'HV Jewelers · Hoang Vi',
+    title: 'HV Jewelers | One-of-a-Kind Fine Jewelry in Houston',
     description:
-      'A small collection of fine jewelry: necklaces, earrings, rings, and bracelets, stocked one piece per design.',
+      'Fine jewelry from the Premier Jewelers Houston showroom: one piece per design, available online or for a private in-store viewing.',
     locale: 'en_US',
     images: [
       {
@@ -55,9 +53,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'HV Jewelers · Hoang Vi',
+    title: 'HV Jewelers | One-of-a-Kind Fine Jewelry in Houston',
     description:
-      'A small collection of fine jewelry: necklaces, earrings, rings, and bracelets, stocked one piece per design.',
+      'Fine jewelry from the Premier Jewelers Houston showroom, one piece per design.',
     images: ['/brand/wordmark.png'],
   },
   verification: {
@@ -84,10 +82,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-dvh flex-col bg-parchment font-sans text-body text-ink antialiased">
-        {/* Machine-readable business identity on every page. Google's
-            Misrepresentation check wants to establish who it is dealing
-            with; structured data states it directly rather than leaving it
-            to be inferred from page copy. Mirrors the footer exactly. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -99,12 +93,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
-        {/* Headless traffic analytics — captures visitors/sessions the Vercel
-            frontend serves (Shopify's online-store analytics can't see them). */}
         <Analytics />
-        {/* Pinterest sees only the Shopify-hosted checkout through its app;
-            the storefront is ours, so the tag has to live here. No-op until
-            NEXT_PUBLIC_PINTEREST_TAG_ID is set. */}
         <PinterestTag />
       </body>
     </html>

@@ -4,16 +4,16 @@ import { Hero } from '@/components/store/hero'
 import { Manifesto } from '@/components/store/manifesto'
 import { WorldFeature } from '@/components/store/world-feature'
 import { ConciergeClose } from '@/components/store/concierge-close'
-import { GoogleReviews } from '@/components/store/google-reviews'
 import { FadeIn } from '@/components/store/fade-in'
 import { ShopProductCard } from '@/components/shop/shop-product-card'
 import { listProducts } from '@/lib/shopify/products'
+import { moneyToCents } from '@/lib/shopify/money'
 import type { ShopifyProduct } from '@/lib/shopify/types'
 
 /**
  * Map a ranked product to the WorldFeature panel's image + link, so the two
- * editorial panels show real pieces (the next-priciest after the hero) and
- * fall back to their gradient when the catalog is too small to fill them.
+ * editorial panels show real pieces and fall back to their gradient when the
+ * catalog is too small to fill them.
  */
 function panelImage(p: ShopifyProduct | undefined) {
   const img = p?.featuredImage
@@ -29,47 +29,58 @@ function panelImage(p: ShopifyProduct | undefined) {
   }
 }
 
+function isHomepageFeature(product: ShopifyProduct): boolean {
+  return product.tags.some((tag) =>
+    ['featured', 'homepage-feature'].includes(tag.trim().toLowerCase()),
+  )
+}
+
 /**
- * The editorial home. Reads the Shopify catalog and ranks it by price,
- * most-expensive first: the priciest available piece leads the hero, then
- * the next pieces fill the two World features and the closing grid in
- * descending order.
- *
- * Only available pieces are ranked, so a sold piece drops off the homepage
- * and the next-priciest piece slides up into its slot — the hero and grids
- * stay populated as single-unit inventory turns over. Falls back to
- * typography-only treatment when no products are configured yet.
+ * The editorial home reads directly from Shopify. The owner can explicitly
+ * choose the hero with a `Featured` or `homepage-feature` tag. Without that
+ * tag, the page favors a photographed, mid-ticket piece rather than
+ * automatically putting the most expensive item in front of every new
+ * visitor. Statement pieces remain prominent immediately below it.
  */
 export default async function Home() {
   const { products } = await listProducts(50)
 
-  // Available pieces, most expensive first. Sliced from this single ranked
-  // pool so the hero + grids never sit empty while pieces are in stock.
-  const ranked = products
-    .filter((p) => p.availableForSale)
+  const available = products
+    .filter((product) => product.availableForSale)
     .sort(
       (a, b) =>
-        parseFloat(b.priceRange.minVariantPrice.amount) -
-        parseFloat(a.priceRange.minVariantPrice.amount),
+        moneyToCents(b.priceRange.minVariantPrice) -
+        moneyToCents(a.priceRange.minVariantPrice),
     )
 
-  // Hero = priciest. The two World panels = the next two. The grids pick up
-  // from #4 so nothing repeats. Everything is sliced from `ranked`, so adding
-  // or selling a piece reshuffles the whole page automatically.
-  const feature = ranked[0] ?? products[0] ?? null
-  const collection = ranked.slice(3, 7)
-  const bench = ranked.slice(7, 11)
-  const arrivals = ranked.slice(11, 15)
+  const explicitlyFeatured = available.find(isHomepageFeature)
+  const approachable = available
+    .filter((product) => {
+      const cents = moneyToCents(product.priceRange.minVariantPrice)
+      return product.featuredImage && cents >= 100_000 && cents <= 300_000
+    })
+    .sort(
+      (a, b) =>
+        Math.abs(moneyToCents(a.priceRange.minVariantPrice) - 180_000) -
+        Math.abs(moneyToCents(b.priceRange.minVariantPrice) - 180_000),
+    )
+
+  const feature =
+    explicitlyFeatured ?? approachable[0] ?? available[0] ?? products[0] ?? null
+  const remaining = feature
+    ? available.filter((product) => product.id !== feature.id)
+    : available
+
+  const collection = remaining.slice(2, 6)
+  const bench = remaining.slice(6, 10)
+  const arrivals = remaining.slice(10, 14)
 
   return (
     <>
-      {/* ─── Editorial hero ─── */}
       <Hero feature={feature} />
 
-      {/* ─── Manifesto ─── */}
       <Manifesto />
 
-      {/* ─── World 01 — The Collection ─── */}
       <WorldFeature
         eyebrow="The Collection"
         title="Chosen with restraint."
@@ -77,16 +88,16 @@ export default async function Home() {
         href="/shop"
         ctaLabel="See the collection"
         tone="cedar"
-        {...panelImage(ranked[1])}
+        {...panelImage(remaining[0])}
       />
       {collection.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-16 md:py-20">
             <FadeIn>
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {collection.map((p) => (
-                  <li key={p.id}>
-                    <ShopProductCard product={p} />
+                {collection.map((product) => (
+                  <li key={product.id}>
+                    <ShopProductCard product={product} />
                   </li>
                 ))}
               </ul>
@@ -95,7 +106,6 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {/* ─── World 02 — On the Bench ─── */}
       <WorldFeature
         eyebrow="On the Bench"
         title="Made to wear, every day."
@@ -104,16 +114,16 @@ export default async function Home() {
         ctaLabel="See the bench"
         imageReversed
         tone="bronze"
-        {...panelImage(ranked[2])}
+        {...panelImage(remaining[1])}
       />
       {bench.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-16 md:py-20">
             <FadeIn>
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {bench.map((p) => (
-                  <li key={p.id}>
-                    <ShopProductCard product={p} />
+                {bench.map((product) => (
+                  <li key={product.id}>
+                    <ShopProductCard product={product} />
                   </li>
                 ))}
               </ul>
@@ -122,7 +132,6 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {/* ─── New Arrivals ─── */}
       {arrivals.length > 0 ? (
         <section className="border-t border-limestone-deep/60">
           <Container className="py-24 md:py-32">
@@ -142,9 +151,9 @@ export default async function Home() {
             </FadeIn>
             <FadeIn delay={150} className="mt-14">
               <ul className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-4">
-                {arrivals.map((p) => (
-                  <li key={p.id}>
-                    <ShopProductCard product={p} />
+                {arrivals.map((product) => (
+                  <li key={product.id}>
+                    <ShopProductCard product={product} />
                   </li>
                 ))}
               </ul>
@@ -153,11 +162,10 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {/* ─── Care band ─── */}
       <section className="border-t border-limestone-deep/60 bg-limestone/40">
         <Container className="py-24 md:py-28">
           <FadeIn>
-            <p className="text-eyebrow text-ink-muted text-center">
+            <p className="text-center text-eyebrow text-ink-muted">
               How we work
             </p>
           </FadeIn>
@@ -180,10 +188,6 @@ export default async function Home() {
         </Container>
       </section>
 
-      {/* ─── Reviews of the Houston store ─── */}
-      <GoogleReviews />
-
-      {/* ─── Concierge close ─── */}
       <ConciergeClose />
     </>
   )

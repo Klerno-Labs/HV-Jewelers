@@ -20,6 +20,12 @@ export const BUSINESS = {
   name: 'HV Jewelers',
   /** Long form used in structured data and legal copy. */
   legalName: 'Hoang Vi Jewelers',
+  /** The physical Houston jeweler behind this online collection. */
+  showroomName: 'Premier Jewelers Hoang Vi',
+  showroomUrl: 'https://premierjewelershouston.com',
+  showroomSince: 2005,
+  relationship:
+    'HV Jewelers is the online fine-jewelry collection of Premier Jewelers Hoang Vi, a family-owned Houston jeweler serving customers since 2005.',
   email: 'concierge@hvjewelers.com',
   /** Same line Premier publishes; consistency across both sites helps verification. */
   telephone: '+1-281-955-6855',
@@ -47,7 +53,7 @@ export const BUSINESS = {
   googlePlaceId: 'ChIJI7Nm6ZjRQIYRwjtP3UeSNIs',
   /** Name the reviews are filed under, so attribution stays honest. */
   reviewsTradingName: 'Premier Jewelers',
-  /** Houston is Central. The site previously said ET, which was simply wrong. */
+  /** Houston is Central. */
   hours: 'Monday to Friday, 10 to 5 CT',
   openingHours: {
     days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
@@ -76,11 +82,18 @@ export function businessSchema(siteUrl: string) {
     '@id': `${siteUrl}/#business`,
     name: BUSINESS.name,
     legalName: BUSINESS.legalName,
+    description: BUSINESS.relationship,
     url: siteUrl,
     email: BUSINESS.email,
     telephone: BUSINESS.telephone,
     image: `${siteUrl}/brand/wordmark.png`,
     priceRange: '$$$',
+    parentOrganization: {
+      '@type': 'Organization',
+      name: BUSINESS.showroomName,
+      url: BUSINESS.showroomUrl,
+      foundingDate: String(BUSINESS.showroomSince),
+    },
     address: {
       '@type': 'PostalAddress',
       streetAddress: street,

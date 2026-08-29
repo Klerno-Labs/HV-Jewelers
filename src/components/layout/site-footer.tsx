@@ -6,6 +6,7 @@ import { BUSINESS } from '@/lib/business'
 const footerNav: Record<string, { label: string; href: string }[]> = {
   Shop: [
     { label: 'The Shop', href: '/shop' },
+    { label: 'Collections', href: '/collections' },
   ],
   'The House': [
     { label: 'About Hoang Vi', href: '/about' },
@@ -30,14 +31,12 @@ export function SiteFooter() {
               Hoang Vi · Fine jewelry
             </p>
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
-              A small, considered collection of fine jewelry, stocked one
-              piece per design and photographed in our Houston shop.
+              The online fine-jewelry collection of {BUSINESS.showroomName}, a
+              family-owned Houston jeweler serving customers since{' '}
+              {BUSINESS.showroomSince}. One piece per design, held at our
+              Houston showroom.
             </p>
 
-            {/* Storefront identity. Present on every page because the
-                Misrepresentation check reads the site as a whole, not just
-                the contact page. Kept in sync with `BUSINESS` and with the
-                Merchant Center business-information record. */}
             <address className="mt-6 space-y-1 text-caption not-italic leading-relaxed text-ink-soft">
               <p>{BUSINESS.address.street}</p>
               <p>
@@ -63,11 +62,6 @@ export function SiteFooter() {
               <p className="pt-2 text-ink-muted">{BUSINESS.hours}</p>
             </address>
 
-            {/* Accepted payment methods, verified against Shopify's own
-                paymentSettings (acceptedCardBrands + supportedDigitalWallets)
-                rather than assumed. Google's Misrepresentation review checks
-                that accepted methods are clearly displayed; nothing on the
-                site named any until this. */}
             <p className="mt-6 text-caption leading-relaxed text-ink-soft">
               We accept Visa, Mastercard, American Express, Discover, and
               Diners Club, plus Shop&nbsp;Pay, Apple&nbsp;Pay, and

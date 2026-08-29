@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Container } from '@/components/layout/container'
 import { Breadcrumbs } from '@/components/store/breadcrumbs'
 import { ProductGallery, type GalleryMedia } from '@/components/store/product-gallery'
+import { ProductAssistance } from '@/components/store/product-assistance'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { AddToShopCartForm } from '@/components/shop/add-to-shop-cart-form'
 import { getProductByHandle, listProductHandles } from '@/lib/shopify/products'
@@ -11,6 +12,11 @@ import { formatMoney, moneyToCents } from '@/lib/shopify/money'
 import { sanitizeShopifyHtml } from '@/lib/shopify/html'
 import { getImageBgColors } from '@/lib/image-bg'
 import { facetLinks } from '@/lib/shopify/facets'
+import { BUSINESS } from '@/lib/business'
+
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hvjewelers.com'
+).replace(/\/$/, '')
 
 interface PageProps {
   params: Promise<{ handle: string }>
@@ -19,15 +25,35 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { handle } = await params
   const product = await getProductByHandle(handle)
-  if (!product) {
-    return { title: 'Not found' }
-  }
+  if (!product) return { title: 'Not found' }
+
+  const description =
+    product.description?.slice(0, 160) ??
+    `One-of-a-kind ${product.productType.toLowerCase()} from the HV Jewelers Houston showroom.`
+  const canonical = `${SITE_URL}/shop/${handle}`
+
   return {
     title: product.title,
-    description: product.description?.slice(0, 160) ?? 'HV Jewelers',
+    description,
+    alternates: { canonical },
     openGraph: {
-      title: product.title,
-      description: product.description?.slice(0, 200) ?? '',
+      type: 'website',
+      url: canonical,
+      title: `${product.title} | HV Jewelers`,
+      description: product.description?.slice(0, 200) ?? description,
+      images: product.featuredImage?.url
+        ? [
+            {
+              url: product.featuredImage.url,
+              alt: product.featuredImage.altText?.trim() || product.title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.title} | HV Jewelers`,
+      description,
       images: product.featuredImage?.url ? [product.featuredImage.url] : undefined,
     },
   }
@@ -35,7 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   const handles = await listProductHandles(100)
-  return handles.map((h) => ({ handle: h.handle }))
+  return handles.map((product) => ({ handle: product.handle }))
 }
 
 export const revalidate = 600
@@ -45,38 +71,36 @@ export default async function ShopProductPage({ params }: PageProps) {
   const product = await getProductByHandle(handle)
   if (!product) notFound()
 
-  // Product Rich Pin metadata. Pinterest reads these Open Graph tags to show
-  // live price and availability on the pin itself; the JSON-LD below the fold
-  // carries the same facts for search engines. React 19 hoists meta tags
-  // rendered anywhere in the tree into <head>, and Next's typed metadata API
-  // has no "product" og:type, which is why these are plain elements.
   const priceAmount = product.priceRange.minVariantPrice?.amount
   const priceCurrency = product.priceRange.minVariantPrice?.currencyCode
   const availability = product.availableForSale ? 'instock' : 'out of stock'
 
   const galleryMedia: GalleryMedia[] =
     product.media.length > 0
-      ? product.media.map((m) => {
-          if (m.mediaType === 'video') {
-            // Prefer a progressive mp4 source; Shopify also returns HLS
-            // (.m3u8) which a bare <video> can't play without hls.js.
-            const best = m.sources.find((s) => s.mimeType === 'video/mp4') ?? m.sources[0]
+      ? product.media.map((mediaItem, index) => {
+          const fallbackAlt = `${product.title} — ${
+            mediaItem.mediaType === 'video' ? 'video' : `view ${index + 1}`
+          }`
+          if (mediaItem.mediaType === 'video') {
+            const best =
+              mediaItem.sources.find((source) => source.mimeType === 'video/mp4') ??
+              mediaItem.sources[0]
             return {
               kind: 'video' as const,
               src: best?.url ?? '',
               mimeType: best?.mimeType ?? 'video/mp4',
-              poster: m.previewImage?.url ?? null,
-              alt: m.altText,
-              width: best?.width ?? m.previewImage?.width ?? null,
-              height: best?.height ?? m.previewImage?.height ?? null,
+              poster: mediaItem.previewImage?.url ?? null,
+              alt: mediaItem.altText?.trim() || fallbackAlt,
+              width: best?.width ?? mediaItem.previewImage?.width ?? null,
+              height: best?.height ?? mediaItem.previewImage?.height ?? null,
             }
           }
           return {
             kind: 'image' as const,
-            url: m.url,
-            alt: m.altText,
-            width: m.width,
-            height: m.height,
+            url: mediaItem.url,
+            alt: mediaItem.altText?.trim() || fallbackAlt,
+            width: mediaItem.width,
+            height: mediaItem.height,
           }
         })
       : (product.images.length > 0
@@ -84,21 +108,23 @@ export default async function ShopProductPage({ params }: PageProps) {
           : product.featuredImage
             ? [product.featuredImage]
             : []
-        ).map((img) => ({
+        ).map((image, index) => ({
           kind: 'image' as const,
-          url: img.url,
-          alt: img.altText,
-          width: img.width,
-          height: img.height,
+          url: image.url,
+          alt: image.altText?.trim() || `${product.title} — view ${index + 1}`,
+          width: image.width,
+          height: image.height,
         }))
 
-  // Paint each gallery frame with its own photo's sampled background tone
-  // (see lib/image-bg) so contained photos blend instead of floating.
   const imageBgs = await getImageBgColors(
-    galleryMedia.flatMap((m) => (m.kind === 'image' ? [m.url] : [])),
+    galleryMedia.flatMap((mediaItem) =>
+      mediaItem.kind === 'image' ? [mediaItem.url] : [],
+    ),
   )
-  const media: GalleryMedia[] = galleryMedia.map((m) =>
-    m.kind === 'image' ? { ...m, bg: imageBgs[m.url] ?? null } : m,
+  const media: GalleryMedia[] = galleryMedia.map((mediaItem) =>
+    mediaItem.kind === 'image'
+      ? { ...mediaItem, bg: imageBgs[mediaItem.url] ?? null }
+      : mediaItem,
   )
 
   const priceMin = moneyToCents(product.priceRange.minVariantPrice)
@@ -106,18 +132,11 @@ export default async function ShopProductPage({ params }: PageProps) {
     ? moneyToCents(product.compareAtPriceRange.minVariantPrice)
     : null
   const onSale = compareMin != null && compareMin > priceMin
-
   const eyebrow = product.productType || product.vendor || 'HV Jewelers'
-
-  // Normalized tags as routes back into the catalog — the way off a PDP that
-  // isn't the back button.
   const browseLinks = facetLinks(product)
+  const productUrl = `${SITE_URL}/shop/${handle}`
+  const sku = product.variants[0]?.sku ?? null
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-  const productUrl = `${siteUrl}/shop/${handle}`
-
-  // Mirrors the published policy on /returns: 15-day mail-back window,
-  // customer pays return shipping; earrings are final sale (hygiene).
   const isEarrings = (product.productType || '').trim() === 'Earrings'
   const returnPolicy = isEarrings
     ? {
@@ -138,26 +157,33 @@ export default async function ShopProductPage({ params }: PageProps) {
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
+    '@id': `${productUrl}#product`,
     name: product.title,
     description: product.description,
-    image: product.featuredImage?.url,
-    brand: { '@type': 'Brand', name: 'HV Jewelers' },
-    sku: product.variants[0]?.sku ?? undefined,
+    url: productUrl,
+    image: product.images.map((image) => image.url),
+    category: product.productType,
+    brand: { '@type': 'Brand', name: BUSINESS.name },
+    sku: sku ?? undefined,
+    itemCondition: 'https://schema.org/NewCondition',
     offers: {
       '@type': 'Offer',
       price: (priceMin / 100).toFixed(2),
       priceCurrency: product.priceRange.minVariantPrice.currencyCode,
-      // Rolling 30-day window; the page revalidates every 10 minutes so
-      // the date (and price) never go stale.
       priceValidUntil: new Date(Date.now() + 30 * 86400000)
         .toISOString()
         .slice(0, 10),
       availability: product.availableForSale
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
       url: productUrl,
-      // Free insured domestic shipping; most pieces ship within two
-      // business days (see /shipping).
+      seller: {
+        '@type': 'Organization',
+        name: BUSINESS.name,
+        url: SITE_URL,
+        telephone: BUSINESS.telephone,
+      },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
         shippingRate: {
@@ -183,6 +209,31 @@ export default async function ShopProductPage({ params }: PageProps) {
     },
   }
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'HV Jewelers',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Shop',
+        item: `${SITE_URL}/shop`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.title,
+        item: productUrl,
+      },
+    ],
+  }
+
   return (
     <>
       <meta property="og:type" content="product" />
@@ -197,8 +248,11 @@ export default async function ShopProductPage({ params }: PageProps) {
       <meta property="og:availability" content={availability} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([productSchema, breadcrumbSchema]),
+        }}
       />
+
       <Container className="pt-10">
         <Breadcrumbs
           items={[
@@ -239,14 +293,6 @@ export default async function ShopProductPage({ params }: PageProps) {
               )}
             </div>
 
-            {/* Availability is stated in words, not just in the JSON-LD above.
-                A buyer — and a marketplace reviewer walking the page — should
-                not have to read the schema to learn whether a piece is still
-                here. Every piece in the catalog is one of one, so the same
-                line carries the scarcity. This reads availableForSale rather
-                than a count because the Storefront token does not carry
-                unauthenticated_read_product_inventory; if HV ever holds two of
-                something, restore that scope and gate on the real number. */}
             <p className="mt-4 text-caption text-bronze">
               {product.availableForSale ? 'Only one available.' : 'Sold.'}
             </p>
@@ -257,12 +303,33 @@ export default async function ShopProductPage({ params }: PageProps) {
               </p>
             )}
 
-            <div className="mt-10">
+            <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-limestone-deep/60 py-5 text-caption">
+              <div>
+                <dt className="text-ink-muted">Category</dt>
+                <dd className="mt-1 text-ink">{product.productType || 'Fine jewelry'}</dd>
+              </div>
+              <div>
+                <dt className="text-ink-muted">Condition</dt>
+                <dd className="mt-1 text-ink">New</dd>
+              </div>
+              <div>
+                <dt className="text-ink-muted">Item reference</dt>
+                <dd className="mt-1 break-all text-ink">{sku ?? 'Available on request'}</dd>
+              </div>
+              <div>
+                <dt className="text-ink-muted">Held at</dt>
+                <dd className="mt-1 text-ink">Houston showroom</dd>
+              </div>
+            </dl>
+
+            <div className="mt-8">
               <AddToShopCartForm
                 variants={product.variants}
                 options={product.options}
               />
             </div>
+
+            <ProductAssistance productTitle={product.title} productUrl={productUrl} />
 
             {browseLinks.length > 0 && (
               <div className="mt-10 border-t border-limestone-deep/60 pt-6">
@@ -295,13 +362,6 @@ export default async function ShopProductPage({ params }: PageProps) {
               </Link>
             </div>
 
-            {/* The return terms are stated on the product itself, not only on
-                /returns and in the JSON-LD above. Two audiences need it here:
-                a buyer deciding on a final-sale pair of earrings, and the
-                automated checks that compare a merchant's declared return
-                policy against what the product page actually says. This text
-                and `returnPolicy` are driven by the same `isEarrings` flag, so
-                the page and the structured data cannot drift apart. */}
             <div className="mt-6 border-t border-limestone-deep/60 pt-6 text-caption text-ink-muted">
               <p>
                 {isEarrings
@@ -319,17 +379,21 @@ export default async function ShopProductPage({ params }: PageProps) {
         </div>
       </Container>
 
-      {product.descriptionHtml && product.description && product.descriptionHtml !== product.description && (
-        <section className="border-t border-limestone-deep/60 bg-parchment">
-          <Container className="py-20 md:py-24" width="reading">
-            <p className="text-eyebrow text-bronze">In the case</p>
-            <div
-              className="mt-8 space-y-6 font-serif text-body leading-[1.85] text-ink-soft [&_p]:mb-4 [&_strong]:text-ink"
-              dangerouslySetInnerHTML={{ __html: sanitizeShopifyHtml(product.descriptionHtml) }}
-            />
-          </Container>
-        </section>
-      )}
+      {product.descriptionHtml &&
+        product.description &&
+        product.descriptionHtml !== product.description && (
+          <section className="border-t border-limestone-deep/60 bg-parchment">
+            <Container className="py-20 md:py-24" width="reading">
+              <p className="text-eyebrow text-bronze">In the case</p>
+              <div
+                className="mt-8 space-y-6 font-serif text-body leading-[1.85] text-ink-soft [&_p]:mb-4 [&_strong]:text-ink"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeShopifyHtml(product.descriptionHtml),
+                }}
+              />
+            </Container>
+          </section>
+        )}
 
       <ConciergeClose />
     </>
