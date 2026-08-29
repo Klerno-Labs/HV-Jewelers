@@ -5,8 +5,7 @@ import { FadeIn } from './fade-in'
 
 /**
  * Human closing module. It gives high-ticket shoppers an immediate phone path
- * and a clear email expectation without introducing a chatbot or unsupported
- * response-time promise.
+ * without introducing a chatbot or unsupported response-time promise.
  */
 export function ConciergeClose() {
   return (
@@ -20,7 +19,7 @@ export function ConciergeClose() {
           <p className="mt-7 max-w-xl text-subtitle leading-relaxed text-ink-soft">
             Call for the fastest answer during showroom hours, or email us for
             sizing, holds, sourcing, additional measurements, and live-video
-            requests. Email inquiries are handled by the next business day.
+            requests. Email inquiries are reviewed each business day.
           </p>
           <div className="mt-9 flex flex-wrap gap-x-6 gap-y-4 text-caption tracking-wide">
             <a
