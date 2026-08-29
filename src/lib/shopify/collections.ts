@@ -7,38 +7,16 @@ import {
 } from './facets'
 import type { ShopifyProduct } from './types'
 
-/**
- * Named collection pages: /collections/emerald-necklaces and friends.
- *
- * These exist for three reasons the query-string shop filters cannot serve:
- *
- * 1. **Search engines.** Every `?facet=` view canonicalizes back to /shop, so
- *    the store has no indexable page for "emerald necklace" or any other
- *    query people actually type. A path-based collection is a real page.
- * 2. **Pinterest scheduling.** The publisher's spam-spacing rule compares
- *    destination host + path with the query string stripped, so every
- *    filtered link counts as /shop — one pin slot per 72 hours for the whole
- *    store. Distinct paths are distinct slots.
- * 3. **Durable pin destinations.** Every piece is quantity one, so a pin at a
- *    product URL points at a page that dies when the piece sells. A
- *    collection restocks underneath the pin instead.
- *
- * Definitions are derived from the live catalog, never hand-listed: a
- * collection only exists while at least MIN_PIECES available pieces match it,
- * and its facet values are the values `deriveFacets` actually emitted — so a
- * collection can never name a stone or metal the catalog does not carry.
- */
-
 export interface CollectionDef {
   slug: string
   title: string
-  /** Used for the meta description and the page intro. Factual only. */
   description: string
   filters: ShopFilters
   count: number
+  /** Permanent commercial pages remain available when single-unit stock turns. */
+  evergreen?: boolean
 }
 
-/** Below this a "collection" is just one product wearing a heading. */
 const MIN_PIECES = 2
 
 const slugify = (value: string): string =>
@@ -53,105 +31,187 @@ const withFilters = (partial: Partial<ShopFilters>): ShopFilters => ({
   ...partial,
 })
 
+const CORE_COLLECTIONS: Array<{
+  slug: string
+  title: string
+  description: string
+  filters: ShopFilters
+}> = [
+  {
+    slug: 'necklaces',
+    title: 'Fine Necklaces',
+    description:
+      'One-of-a-kind fine necklaces selected for the HV Jewelers Houston showroom. Availability changes as single pieces sell.',
+    filters: withFilters({ category: ['Necklaces'] }),
+  },
+  {
+    slug: 'earrings',
+    title: 'Fine Earrings',
+    description:
+      'One-of-a-kind fine earrings in gold and platinum, selected for the HV Jewelers Houston showroom.',
+    filters: withFilters({ category: ['Earrings'] }),
+  },
+  {
+    slug: 'rings',
+    title: 'Fine Rings',
+    description:
+      'Fine rings and statement bands held in our Houston showroom, with one piece available per design.',
+    filters: withFilters({ category: ['Rings'] }),
+  },
+  {
+    slug: 'pendants',
+    title: 'Fine Pendants',
+    description:
+      'Gold, platinum, diamond, and gemstone pendants selected one design at a time for the HV Jewelers collection.',
+    filters: withFilters({ category: ['Pendants'] }),
+  },
+  {
+    slug: 'bracelets',
+    title: 'Fine Bracelets & Bangles',
+    description:
+      'Fine bracelets and bangles from the HV Jewelers Houston showroom, including one-of-a-kind diamond and gemstone pieces.',
+    filters: withFilters({ category: ['Bracelets'] }),
+  },
+  {
+    slug: 'diamond-jewelry',
+    title: 'Diamond Jewelry',
+    description:
+      'One-of-a-kind diamond jewelry in gold and platinum, available online or for a private viewing in Houston.',
+    filters: withFilters({ stone: ['Diamond'] }),
+  },
+  {
+    slug: 'emerald-jewelry',
+    title: 'Emerald Jewelry',
+    description:
+      'Emerald rings, earrings, pendants, necklaces, and bracelets selected for color, design, and wearability.',
+    filters: withFilters({ stone: ['Emerald'] }),
+  },
+  {
+    slug: 'jade-jewelry',
+    title: 'Jade Jewelry',
+    description:
+      'Natural jade jewelry set in fine gold or platinum, held at the HV Jewelers Houston showroom.',
+    filters: withFilters({ stone: ['Jade'] }),
+  },
+  {
+    slug: 'gifts-under-1500',
+    title: 'Gifts Under $1,500',
+    description:
+      'One-of-a-kind fine-jewelry gifts priced below $1,500, with insured US shipping or Houston pickup.',
+    filters: withFilters({ price: [PRICE_BANDS[0]?.id ?? '0-1500'] }),
+  },
+  {
+    slug: 'gifts-under-2500',
+    title: 'Gifts Under $2,500',
+    description:
+      'Fine-jewelry gifts below $2,500, selected one piece per design and available while in stock.',
+    filters: withFilters({
+      price: PRICE_BANDS.slice(0, 2).map((band) => band.id),
+    }),
+  },
+]
+
 /**
- * Build every collection the current catalog supports. Deterministic for a
- * given product list, so the sitemap, the shop page links, and
- * generateStaticParams always agree with each other.
+ * Build permanent commercial collections first, then add catalog-supported
+ * long-tail collections. Core URLs never disappear merely because a
+ * one-of-one piece sells; dynamic stone/metal combinations still require at
+ * least two currently available matches.
  */
 export function buildCollections(products: ShopifyProduct[]): CollectionDef[] {
   const stocked = products
-    .filter((p) => p.availableForSale)
-    .map((p) => ({ p, f: deriveFacets(p) }))
+    .filter((product) => product.availableForSale)
+    .map((product) => ({ product, facets: deriveFacets(product) }))
 
-  const defs: CollectionDef[] = []
+  const definitions: CollectionDef[] = []
   const seen = new Set<string>()
+
+  const countMatches = (filters: ShopFilters): number =>
+    stocked.filter(({ facets }) => matchesFilters(facets, filters)).length
+
+  for (const collection of CORE_COLLECTIONS) {
+    if (seen.has(collection.slug)) continue
+    seen.add(collection.slug)
+    definitions.push({
+      ...collection,
+      count: countMatches(collection.filters),
+      evergreen: true,
+    })
+  }
 
   const add = (
     slug: string,
     title: string,
-    describe: (n: number) => string,
+    describe: (count: number) => string,
     filters: ShopFilters,
   ): void => {
     if (!slug || seen.has(slug)) return
-    const count = stocked.filter(({ f }) => matchesFilters(f, filters)).length
+    const count = countMatches(filters)
     if (count < MIN_PIECES) return
     seen.add(slug)
-    defs.push({ slug, title, description: describe(count), filters, count })
+    definitions.push({
+      slug,
+      title,
+      description: describe(count),
+      filters,
+      count,
+    })
   }
 
-  const uniq = <T,>(values: T[]): T[] => [...new Set(values)]
-  const categories = uniq(stocked.map(({ f }) => f.category)).filter(Boolean)
-  const stones = uniq(stocked.flatMap(({ f }) => f.stones))
-  const metals = uniq(stocked.flatMap(({ f }) => f.metals))
+  const unique = <T,>(values: T[]): T[] => [...new Set(values)]
+  const categories = unique(
+    stocked.map(({ facets }) => facets.category),
+  ).filter(Boolean)
+  const stones = unique(stocked.flatMap(({ facets }) => facets.stones))
+  const metals = unique(stocked.flatMap(({ facets }) => facets.metals))
 
-  // Categories: /collections/necklaces
   for (const category of categories) {
     add(
       slugify(category),
       category,
-      (n) => `${n} one-of-a-kind ${category.toLowerCase()} currently in the case at HV Jewelers.`,
+      (count) =>
+        `${count} one-of-a-kind ${category.toLowerCase()} currently in the case at HV Jewelers.`,
       withFilters({ category: [category] }),
     )
   }
 
-  // Stone × category: /collections/emerald-necklaces — the query shape
-  // people actually search. Mother of Pearl is skipped as a lead: it is an
-  // inlay material, and "Mother of Pearl Necklaces" is not a search anyone
-  // performs, while its presence would dilute the real pearl collection.
   for (const stone of stones) {
     if (stone === 'Mother of Pearl') continue
     for (const category of categories) {
       add(
         slugify(`${stone} ${category}`),
         `${stone} ${category}`,
-        (n) =>
-          `${n} ${stone.toLowerCase()} ${category.toLowerCase()}, each a single piece, photographed in house.`,
+        (count) =>
+          `${count} ${stone.toLowerCase()} ${category.toLowerCase()}, each a single piece, photographed in house.`,
         withFilters({ stone: [stone], category: [category] }),
       )
     }
     add(
       slugify(`${stone} jewelry`),
       `${stone} Jewelry`,
-      (n) => `${n} pieces featuring ${stone.toLowerCase()}, one of each, currently available.`,
+      (count) =>
+        `${count} pieces featuring ${stone.toLowerCase()}, one of each, currently available.`,
       withFilters({ stone: [stone] }),
     )
   }
 
-  // Metal × category: /collections/yellow-gold-bracelets
   for (const metal of metals) {
     for (const category of categories) {
       add(
         slugify(`${metal} ${category}`),
         `${metal} ${category}`,
-        (n) =>
-          `${n} ${metal.toLowerCase()} ${category.toLowerCase()} in the case now, one piece per design.`,
+        (count) =>
+          `${count} ${metal.toLowerCase()} ${category.toLowerCase()} in the case now, one piece per design.`,
         withFilters({ metal: [metal], category: [category] }),
       )
     }
   }
 
-  // Gifts by budget, aligned to the shop's own price bands so the page shows
-  // exactly what the heading promises.
-  const bandIds = PRICE_BANDS.map((b) => b.id)
-  add(
-    'gifts-under-1500',
-    'Gifts Under $1,500',
-    (n) => `${n} one-of-a-kind pieces under $1,500, ready to gift.`,
-    withFilters({ price: bandIds.slice(0, 1) }),
-  )
-  add(
-    'gifts-under-2500',
-    'Gifts Under $2,500',
-    (n) => `${n} one-of-a-kind pieces under $2,500, ready to gift.`,
-    withFilters({ price: bandIds.slice(0, 2) }),
-  )
-
-  return defs
+  return definitions
 }
 
 export function findCollection(
   products: ShopifyProduct[],
   slug: string,
 ): CollectionDef | null {
-  return buildCollections(products).find((c) => c.slug === slug) ?? null
+  return buildCollections(products).find((collection) => collection.slug === slug) ?? null
 }
