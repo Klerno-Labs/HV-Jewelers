@@ -48,3 +48,27 @@ jobs:
 
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
+
+  repair-lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Generate repaired package lock
+        run: npm audit fix --package-lock-only --ignore-scripts
+
+      - name: Upload repaired package lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: repaired-package-lock
+          path: package-lock.json
+          if-no-files-found: error
+          retention-days: 1
