@@ -48,3 +48,139 @@ jobs:
 
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
+
+  capture-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://hv-jewelers-git-feat-ind-031b10-hatfield-legacy-trusts-projects.vercel.app
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Install screenshot browser
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Capture desktop and mobile preview
+        shell: bash
+        run: |
+          mkdir -p preview-screenshots
+          cat > capture-preview.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('node:fs');
+
+          const baseUrl = process.env.PREVIEW_URL;
+          const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+          const headers = bypass
+            ? {
+                'x-vercel-protection-bypass': bypass,
+                'x-vercel-set-bypass-cookie': 'true',
+              }
+            : {};
+
+          const metadata = {
+            requestedUrl: baseUrl,
+            bypassConfigured: Boolean(bypass),
+            captures: [],
+          };
+
+          async function capture(browser, target) {
+            const context = await browser.newContext({
+              viewport: target.viewport,
+              isMobile: target.mobile,
+              hasTouch: target.mobile,
+              extraHTTPHeaders: headers,
+            });
+            const page = await context.newPage();
+            const response = await page.goto(target.url, {
+              waitUntil: 'domcontentloaded',
+              timeout: 90000,
+            });
+            await page.waitForTimeout(6000);
+            const body = (await page.locator('body').innerText().catch(() => ''))
+              .replace(/\s+/g, ' ')
+              .trim();
+            const screenshot = `preview-screenshots/${target.name}.png`;
+            await page.screenshot({ path: screenshot, fullPage: true });
+            metadata.captures.push({
+              name: target.name,
+              status: response?.status() ?? null,
+              finalUrl: page.url(),
+              title: await page.title(),
+              bodyExcerpt: body.slice(0, 1500),
+              screenshot,
+            });
+            const productHref = target.discoverProduct
+              ? await page.locator('a[href^="/shop/"]').first().getAttribute('href').catch(() => null)
+              : null;
+            await context.close();
+            return productHref;
+          }
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            try {
+              const productHref = await capture(browser, {
+                name: 'home-desktop',
+                url: baseUrl,
+                viewport: { width: 1440, height: 1200 },
+                mobile: false,
+                discoverProduct: true,
+              });
+              await capture(browser, {
+                name: 'home-mobile',
+                url: baseUrl,
+                viewport: { width: 390, height: 844 },
+                mobile: true,
+              });
+
+              if (productHref) {
+                const productUrl = new URL(productHref, baseUrl).toString();
+                await capture(browser, {
+                  name: 'product-desktop',
+                  url: productUrl,
+                  viewport: { width: 1440, height: 1200 },
+                  mobile: false,
+                });
+                await capture(browser, {
+                  name: 'product-mobile',
+                  url: productUrl,
+                  viewport: { width: 390, height: 844 },
+                  mobile: true,
+                });
+              }
+            } finally {
+              await browser.close();
+              fs.writeFileSync(
+                'preview-screenshots/preview-metadata.json',
+                JSON.stringify(metadata, null, 2),
+              );
+              console.log(JSON.stringify(metadata, null, 2));
+            }
+          })().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+          });
+          NODE
+          node capture-preview.cjs
+
+      - name: Upload preview screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hv-jewelers-preview-screenshots
+          path: preview-screenshots
+          if-no-files-found: error
+          retention-days: 3
