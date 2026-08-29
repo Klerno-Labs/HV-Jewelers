@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { addToCartAction } from '@/app/shop/actions'
+import { addToCartAction, buyNowAction } from '@/app/shop/actions'
 import type { ProductVariant, SelectedOption } from '@/lib/shopify/types'
 import { cn } from '@/lib/cn'
 
@@ -10,6 +10,8 @@ interface OptionGroup {
   name: string
   values: string[]
 }
+
+type PendingAction = 'cart' | 'checkout' | null
 
 function variantMatches(
   variant: ProductVariant,
@@ -22,11 +24,11 @@ function defaultSelection(variants: ProductVariant[]): Record<string, string> {
   if (variants.length === 0) return {}
   const first = variants.find((v) => v.availableForSale) ?? variants[0]
   if (!first) return {}
-  const sel: Record<string, string> = {}
-  first.selectedOptions.forEach((o: SelectedOption) => {
-    sel[o.name] = o.value
+  const selection: Record<string, string> = {}
+  first.selectedOptions.forEach((option: SelectedOption) => {
+    selection[option.name] = option.value
   })
-  return sel
+  return selection
 }
 
 export function AddToShopCartForm({
@@ -38,19 +40,22 @@ export function AddToShopCartForm({
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null)
   const [selected, setSelected] = useState<Record<string, string>>(() =>
     defaultSelection(variants),
   )
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  const activeVariant = variants.find((v) => variantMatches(v, selected))
+  const activeVariant = variants.find((variant) =>
+    variantMatches(variant, selected),
+  )
   const canAdd = activeVariant?.availableForSale ?? false
   const showOptionPicker =
     options.length > 0 && !(options.length === 1 && options[0]?.name === 'Title')
 
   function pick(name: string, value: string) {
-    setSelected((prev) => ({ ...prev, [name]: value }))
+    setSelected((previous) => ({ ...previous, [name]: value }))
     setError(null)
     setSuccess(false)
   }
@@ -62,14 +67,42 @@ export function AddToShopCartForm({
     }
     setError(null)
     setSuccess(false)
+    setPendingAction('cart')
     startTransition(async () => {
-      const result = await addToCartAction(activeVariant.id, 1)
-      if (!result.ok) {
-        setError(result.userErrors[0]?.message ?? 'Could not add to bag.')
-        return
+      try {
+        const result = await addToCartAction(activeVariant.id, 1)
+        if (!result.ok) {
+          setError(result.userErrors[0]?.message ?? 'Could not add to bag.')
+          return
+        }
+        setSuccess(true)
+        router.refresh()
+      } finally {
+        setPendingAction(null)
       }
-      setSuccess(true)
-      router.refresh()
+    })
+  }
+
+  function buyNow() {
+    if (!activeVariant) {
+      setError('Choose a variant first.')
+      return
+    }
+    setError(null)
+    setSuccess(false)
+    setPendingAction('checkout')
+    startTransition(async () => {
+      try {
+        const result = await buyNowAction(activeVariant.id)
+        if (!result.ok) {
+          setError(
+            result.userErrors[0]?.message ??
+              'Could not prepare checkout. Try adding the piece to your bag.',
+          )
+        }
+      } finally {
+        setPendingAction(null)
+      }
     })
   }
 
@@ -82,34 +115,59 @@ export function AddToShopCartForm({
               key={group.name}
               group={group}
               selected={selected[group.name]}
-              onPick={(v) => pick(group.name, v)}
+              onPick={(value) => pick(group.name, value)}
             />
           ))}
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={add}
-        disabled={!canAdd || pending}
-        className={cn(
-          'inline-flex h-12 w-full items-center justify-center px-8 text-eyebrow transition-colors duration-300',
-          canAdd
-            ? 'bg-ink text-parchment hover:bg-olive-deep'
-            : 'cursor-not-allowed bg-temple-stone text-ink-muted',
-          pending && 'opacity-60',
-        )}
-      >
-        {pending
-          ? 'Adding…'
-          : !activeVariant
-            ? 'Choose a variant'
-            : !activeVariant.availableForSale
-              ? 'Sold out'
-              : success
-                ? 'Added to bag ✓'
-                : 'Add to bag'}
-      </button>
+      <div className="grid gap-3">
+        <button
+          type="button"
+          onClick={buyNow}
+          disabled={!canAdd || pending}
+          className={cn(
+            'inline-flex h-12 w-full items-center justify-center bg-ink px-8 text-eyebrow text-parchment transition-colors duration-300 hover:bg-olive-deep',
+            (!canAdd || pending) && 'cursor-not-allowed opacity-55',
+          )}
+        >
+          {pendingAction === 'checkout'
+            ? 'Opening secure checkout…'
+            : !activeVariant
+              ? 'Choose a variant'
+              : !activeVariant.availableForSale
+                ? 'Sold out'
+                : 'Buy now'}
+        </button>
+
+        <button
+          type="button"
+          onClick={add}
+          disabled={!canAdd || pending}
+          className={cn(
+            'inline-flex h-12 w-full items-center justify-center border px-8 text-eyebrow transition-colors duration-300',
+            canAdd
+              ? 'border-ink bg-parchment text-ink hover:border-olive hover:text-olive'
+              : 'cursor-not-allowed border-temple-stone bg-temple-stone text-ink-muted',
+            pending && 'opacity-55',
+          )}
+        >
+          {pendingAction === 'cart'
+            ? 'Adding…'
+            : !activeVariant
+              ? 'Choose a variant'
+              : !activeVariant.availableForSale
+                ? 'Sold out'
+                : success
+                  ? 'Added to bag ✓'
+                  : 'Add to bag'}
+        </button>
+      </div>
+
+      <p className="text-caption leading-relaxed text-ink-muted">
+        Checkout is completed securely on Shopify. Shop Pay, Apple Pay, Google
+        Pay, and eligible card options appear there when available.
+      </p>
 
       {error && (
         <p role="alert" className="text-caption text-cedar-deep">
@@ -125,12 +183,6 @@ export function AddToShopCartForm({
   )
 }
 
-/**
- * Single variant option group rendered as a true ARIA radiogroup.
- * Click selects; ArrowLeft/Right/Up/Down move selection and focus
- * with wraparound. Tab moves between groups, not within them — the
- * checked radio is the only tab stop, matching the standard pattern.
- */
 function OptionRadioGroup({
   group,
   selected,
@@ -140,8 +192,8 @@ function OptionRadioGroup({
   selected: string | undefined
   onPick: (value: string) => void
 }) {
-  function handleKey(e: React.KeyboardEvent<HTMLDivElement>) {
-    const key = e.key
+  function handleKey(event: React.KeyboardEvent<HTMLDivElement>) {
+    const key = event.key
     if (
       key !== 'ArrowRight' &&
       key !== 'ArrowLeft' &&
@@ -150,23 +202,22 @@ function OptionRadioGroup({
     ) {
       return
     }
-    e.preventDefault()
-    const idx = group.values.findIndex((v) => v === selected)
-    const len = group.values.length
-    if (len === 0) return
+    event.preventDefault()
+    const index = group.values.findIndex((value) => value === selected)
+    const length = group.values.length
+    if (length === 0) return
     const delta = key === 'ArrowRight' || key === 'ArrowDown' ? 1 : -1
-    const nextIdx = idx === -1 ? 0 : (idx + delta + len) % len
-    const next = group.values[nextIdx]
+    const nextIndex = index === -1 ? 0 : (index + delta + length) % length
+    const next = group.values[nextIndex]
     if (next === undefined) return
     onPick(next)
-    // Defer focus to the newly-checked button.
     requestAnimationFrame(() => {
-      const root = e.currentTarget
+      const root = event.currentTarget
       if (!root) return
-      const btn = root.querySelector<HTMLButtonElement>(
+      const button = root.querySelector<HTMLButtonElement>(
         `button[data-value="${CSS.escape(next)}"]`,
       )
-      btn?.focus()
+      button?.focus()
     })
   }
 
