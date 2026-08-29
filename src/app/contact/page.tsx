@@ -4,9 +4,9 @@ import { Container } from '@/components/layout/container'
 import { BUSINESS } from '@/lib/business'
 
 export const metadata: Metadata = {
-  title: 'Contact',
+  title: 'Contact the Houston Showroom',
   description:
-    'Visit or call HV Jewelers in Houston, Texas for inquiries, holds, sourcing requests, and care.',
+    'Visit, call, or email the Premier Jewelers Hoang Vi showroom in Houston for HV Jewelers product questions, live videos, holds, sourcing, and care.',
 }
 
 export default function ContactPage() {
@@ -17,9 +17,15 @@ export default function ContactPage() {
         Come in, call, or write.
       </h1>
       <p className="mt-8 max-w-xl text-subtitle leading-relaxed text-ink-soft">
-        We keep a counter in Houston and answer our own phone. Real replies
-        from real people, usually within a day or two. We don&apos;t use
-        automated chat or bots.
+        HV Jewelers is the online collection of {BUSINESS.showroomName}, our
+        family-owned Houston jeweler serving customers since{' '}
+        {BUSINESS.showroomSince}. Every available piece can be discussed by
+        phone or viewed at the showroom.
+      </p>
+      <p className="mt-5 max-w-xl text-body leading-relaxed text-ink-soft">
+        For the fastest product answer, call during showroom hours. Email
+        inquiries are handled by the next business day. Include the product
+        title or URL so we can pull the correct piece from the case.
       </p>
 
       <div className="hv-gold-rule my-12 w-16" />
@@ -36,8 +42,7 @@ export default function ContactPage() {
             </address>
           </dd>
           <p className="mt-3 text-caption leading-relaxed text-ink-muted">
-            Pieces can be seen in person. Call ahead for anything you want
-            pulled and ready when you arrive.
+            Call ahead for anything you want pulled and ready when you arrive.
           </p>
         </div>
 
@@ -46,13 +51,13 @@ export default function ContactPage() {
           <dd className="mt-3 text-body text-ink">
             <a
               href={`tel:${BUSINESS.telephone}`}
-              className="underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
+              className="underline decoration-bronze/60 underline-offset-4 hover:text-olive hover:decoration-olive"
             >
               {BUSINESS.telephoneDisplay}
             </a>
           </dd>
           <p className="mt-3 text-caption leading-relaxed text-ink-muted">
-            {BUSINESS.hours}. Calls outside those hours get a return call
+            {BUSINESS.hours}. Calls outside those hours receive a return call
             the next business day.
           </p>
         </div>
@@ -62,14 +67,14 @@ export default function ContactPage() {
           <dd className="mt-3 text-body text-ink">
             <a
               href={`mailto:${BUSINESS.email}`}
-              className="underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
+              className="underline decoration-bronze/60 underline-offset-4 hover:text-olive hover:decoration-olive"
             >
               {BUSINESS.email}
             </a>
           </dd>
           <p className="mt-3 text-caption leading-relaxed text-ink-muted">
-            For questions, holds, sizing, and sourcing requests. Include
-            the URL or title of any piece you&apos;re asking about.
+            Ask for a live video, measurements, a hold, sizing guidance, or a
+            similar piece.
           </p>
         </div>
 
@@ -77,21 +82,38 @@ export default function ContactPage() {
           <dt className="text-eyebrow text-ink-muted">Hours</dt>
           <dd className="mt-3 text-body text-ink">{BUSINESS.hours}</dd>
           <p className="mt-3 text-caption leading-relaxed text-ink-muted">
-            Notes that come in after hours get a reply the next morning.
+            Product questions are answered by people at the Houston showroom,
+            not an automated sales bot.
           </p>
         </div>
       </dl>
 
-      <section className="mt-16">
+      <section className="mt-16 border-t border-limestone-deep/60 pt-10">
+        <p className="text-eyebrow text-ink-muted">Premier showroom services</p>
+        <p className="mt-3 max-w-xl text-body leading-relaxed text-ink-soft">
+          The physical showroom also handles custom design, certified diamonds,
+          repairs, watch service, and in-person jewelry guidance.
+        </p>
+        <a
+          href={BUSINESS.showroomUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-block text-caption text-ink underline decoration-bronze/60 underline-offset-4 hover:text-olive hover:decoration-olive"
+        >
+          Visit the Premier Jewelers website →
+        </a>
+      </section>
+
+      <section className="mt-12">
         <p className="text-eyebrow text-ink-muted">Care and resizing</p>
         <p className="mt-3 max-w-xl text-body leading-relaxed text-ink-soft">
-          Resizing, polishing, and small repairs on pieces bought from us
-          are done at cost. We don&apos;t take in repair work on pieces
-          from elsewhere.
+          Resizing, polishing, and small repairs on pieces bought from us are
+          done at cost. We do not take in repair work on pieces from elsewhere
+          through the HV storefront.
         </p>
         <Link
           href="/care"
-          className="mt-4 inline-block text-caption text-ink underline underline-offset-4 decoration-bronze/60 hover:text-olive hover:decoration-olive"
+          className="mt-4 inline-block text-caption text-ink underline decoration-bronze/60 underline-offset-4 hover:text-olive hover:decoration-olive"
         >
           Read about care
         </Link>
