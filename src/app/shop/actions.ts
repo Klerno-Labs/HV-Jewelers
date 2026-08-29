@@ -20,11 +20,6 @@ import type { ShopifyCart, UserError } from '@/lib/shopify/types'
  * Cache invalidation is handled inside the cart helpers via
  * `revalidateTag(SHOPIFY_TAGS.cart(cartId))` so SiteHeader picks up
  * fresh totals on the next render.
- *
- * Rate limits (per IP):
- *  - addToCartAction when no cart exists yet: 10/min (cartCreate is
- *    the most expensive Storefront path — mints a Shopify cart)
- *  - other cart actions: 30/min (apiLimiter)
  */
 
 export interface CartActionResult {
@@ -36,7 +31,11 @@ export interface CartActionResult {
 const RATE_LIMIT_ERROR: CartActionResult = {
   cart: null,
   userErrors: [
-    { field: null, message: 'Too many requests. Try again in a moment.', code: 'RATE_LIMITED' },
+    {
+      field: null,
+      message: 'Too many requests. Try again in a moment.',
+      code: 'RATE_LIMITED',
+    },
   ],
   ok: false,
 }
@@ -44,6 +43,16 @@ const RATE_LIMIT_ERROR: CartActionResult = {
 async function clientKey(): Promise<string> {
   const h = await headers()
   return getClientKey(h)
+}
+
+function invalidVariantResult(): CartActionResult {
+  return {
+    cart: null,
+    userErrors: [
+      { field: ['merchandiseId'], message: 'Missing variant.', code: null },
+    ],
+    ok: false,
+  }
 }
 
 export async function fetchCartAction(): Promise<CartActionResult> {
@@ -57,17 +66,9 @@ export async function addToCartAction(
   merchandiseId: string,
   quantity = 1,
 ): Promise<CartActionResult> {
-  if (!merchandiseId || quantity < 1) {
-    return {
-      cart: null,
-      userErrors: [{ field: ['merchandiseId'], message: 'Missing variant.', code: null }],
-      ok: false,
-    }
-  }
+  if (!merchandiseId || quantity < 1) return invalidVariantResult()
+
   const key = await clientKey()
-  // The no-cookie branch will mint a new Shopify cart — gate that
-  // path on the tighter cart-create limiter; the cookie-present
-  // branch is just a line add, so the general api limiter is enough.
   const existingCartId = await readCartIdCookie()
   const limiter = existingCartId ? apiLimiter : cartCreateLimiter
   const { success } = await limiter.limit(key)
@@ -81,6 +82,57 @@ export async function addToCartAction(
   }
 }
 
+/**
+ * Move a selected product directly into Shopify checkout. If that exact
+ * variant is already in the visitor's bag, reuse the existing cart rather
+ * than adding a duplicate one-of-one item.
+ */
+export async function buyNowAction(
+  merchandiseId: string,
+): Promise<CartActionResult> {
+  if (!merchandiseId) return invalidVariantResult()
+
+  const key = await clientKey()
+  const existingCartId = await readCartIdCookie()
+  const limiter = existingCartId ? apiLimiter : cartCreateLimiter
+  const { success } = await limiter.limit(key)
+  if (!success) return RATE_LIMIT_ERROR
+
+  let cart = existingCartId ? await getCart() : null
+  const alreadyInCart = cart?.lines.some(
+    (line) => line.merchandise.id === merchandiseId,
+  )
+
+  if (!alreadyInCart) {
+    const result = await addLineToCart(merchandiseId, 1)
+    if (result.userErrors.length > 0 || !result.cart) {
+      return {
+        cart: result.cart,
+        userErrors: result.userErrors,
+        ok: false,
+      }
+    }
+    cart = result.cart
+  }
+
+  if (!cart) {
+    return {
+      cart: null,
+      userErrors: [
+        {
+          field: null,
+          message: 'Could not prepare checkout. Try adding the piece to your bag.',
+          code: 'CHECKOUT_UNAVAILABLE',
+        },
+      ],
+      ok: false,
+    }
+  }
+
+  await clearCartIdCookie()
+  redirect(cart.checkoutUrl)
+}
+
 export async function updateCartLineAction(
   lineId: string,
   quantity: number,
@@ -88,7 +140,9 @@ export async function updateCartLineAction(
   if (!lineId || quantity < 0) {
     return {
       cart: null,
-      userErrors: [{ field: ['lineId'], message: 'Missing line.', code: null }],
+      userErrors: [
+        { field: ['lineId'], message: 'Missing line.', code: null },
+      ],
       ok: false,
     }
   }
@@ -112,7 +166,9 @@ export async function removeCartLineAction(
   if (!lineId) {
     return {
       cart: null,
-      userErrors: [{ field: ['lineId'], message: 'Missing line.', code: null }],
+      userErrors: [
+        { field: ['lineId'], message: 'Missing line.', code: null },
+      ],
       ok: false,
     }
   }
@@ -132,10 +188,6 @@ export async function startShopifyCheckoutAction(): Promise<void> {
   if (!cart) {
     redirect('/shop?error=empty')
   }
-  // Clear the cart cookie now — Shopify finalizes the cart on its
-  // hosted checkout and our saved id becomes invalid. Doing it here
-  // (in a Server Action context) is the only place cookie mutation is
-  // legal, so subsequent page renders don't waste a Storefront query.
   await clearCartIdCookie()
   redirect(cart.checkoutUrl)
 }
