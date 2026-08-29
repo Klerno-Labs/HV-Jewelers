@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/store/breadcrumbs'
 import { EmptyState } from '@/components/store/empty-state'
 import { FadeIn } from '@/components/store/fade-in'
 import { ShopBrowser } from '@/components/shop/shop-browser'
-import { listAllProducts } from '@/lib/shopify/products'
+import { listAllProductsForPages } from '@/lib/shopify/products'
 import { moneyToCents } from '@/lib/shopify/money'
 import { getImageTiles } from '@/lib/image-bg'
 import { buildCollections, findCollection } from '@/lib/shopify/collections'
@@ -22,7 +22,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const products = await listAllProducts()
+  const products = await listAllProductsForPages()
   const collection = findCollection(products, slug)
   if (!collection) return { title: 'Not found' }
 
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const products = await listAllProducts()
+  const products = await listAllProductsForPages()
   return buildCollections(products).map((collection) => ({
     slug: collection.slug,
   }))
@@ -50,7 +50,7 @@ export const revalidate = 600
 
 export default async function CollectionPage({ params }: PageProps) {
   const { slug } = await params
-  const products = await listAllProducts()
+  const products = await listAllProductsForPages()
   const collection = findCollection(products, slug)
   if (!collection) notFound()
 
@@ -68,7 +68,7 @@ export default async function CollectionPage({ params }: PageProps) {
     matchesFilters(deriveFacets(product), collection.filters),
   )
   const imageTiles = await getImageTiles(
-    members.flatMap((product) =>
+    ranked.flatMap((product) =>
       product.featuredImage ? [product.featuredImage.url] : [],
     ),
   )
