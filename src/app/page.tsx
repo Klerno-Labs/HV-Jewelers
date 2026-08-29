@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Container } from '@/components/layout/container'
 import { Hero } from '@/components/store/hero'
 import { Manifesto } from '@/components/store/manifesto'
-import { PremierTrust } from '@/components/store/premier-trust'
 import { WorldFeature } from '@/components/store/world-feature'
 import { ConciergeClose } from '@/components/store/concierge-close'
 import { GoogleReviews } from '@/components/store/google-reviews'
@@ -67,7 +66,8 @@ export default async function Home() {
         Math.abs(moneyToCents(b.priceRange.minVariantPrice) - 180_000),
     )
 
-  const feature = explicitlyFeatured ?? approachable[0] ?? available[0] ?? products[0] ?? null
+  const feature =
+    explicitlyFeatured ?? approachable[0] ?? available[0] ?? products[0] ?? null
   const remaining = feature
     ? available.filter((product) => product.id !== feature.id)
     : available
@@ -81,8 +81,6 @@ export default async function Home() {
       <Hero feature={feature} />
 
       <Manifesto />
-
-      <PremierTrust />
 
       <WorldFeature
         eyebrow="The Collection"
