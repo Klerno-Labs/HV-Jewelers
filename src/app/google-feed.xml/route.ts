@@ -1,3 +1,4 @@
+import { googleCategoryFor } from '@/lib/google-category'
 import { listAllProducts } from '@/lib/shopify/products'
 import type { ShopifyProduct } from '@/lib/shopify/types'
 
@@ -23,24 +24,6 @@ const SITE_URL = (
 ).replace(/\/$/, '')
 
 const BRAND = 'HV Jewelers'
-
-/**
- * Shopify `productType` → Google product taxonomy.
- *
- * Full category paths rather than numeric IDs: Google accepts either,
- * and the text form survives taxonomy renumbering and reads correctly
- * in a diff. Every type currently in the catalog is mapped; anything
- * new falls back to the parent Jewelry node rather than going out
- * uncategorized.
- */
-const GOOGLE_CATEGORY: Record<string, string> = {
-  Necklaces: 'Apparel & Accessories > Jewelry > Necklaces',
-  Pendants: 'Apparel & Accessories > Jewelry > Charms & Pendants',
-  Earrings: 'Apparel & Accessories > Jewelry > Earrings',
-  Rings: 'Apparel & Accessories > Jewelry > Rings',
-  Bracelets: 'Apparel & Accessories > Jewelry > Bracelets',
-}
-const FALLBACK_CATEGORY = 'Apparel & Accessories > Jewelry'
 
 /**
  * Merchant Center return policy label for the final-sale exception.
@@ -139,8 +122,7 @@ function itemXml(product: ShopifyProduct): string | null {
     .filter((url) => url !== image.url)
     .slice(0, MAX_ADDITIONAL_IMAGES)
 
-  const category =
-    GOOGLE_CATEGORY[product.productType.trim()] ?? FALLBACK_CATEGORY
+  const category = googleCategoryFor(product.productType)
 
   const lines = [
     '    <item>',

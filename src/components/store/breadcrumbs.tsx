@@ -6,6 +6,20 @@ export interface BreadcrumbItem {
   href?: string
 }
 
+/**
+ * Absolute origin for the JSON-LD `item` values.
+ *
+ * schema.org reads `item` as a node reference, so a bare "/shop" is parsed as
+ * an invalid `@id` — which Search Console reports as
+ * `Invalid URL in field "id" (in "itemListElement.item")`. No call site passes
+ * `baseUrl`, so before this default every breadcrumb on the site emitted
+ * relative paths. Fixed origin, never the request host, matching the canonical
+ * the middleware emits.
+ */
+const SITE_ORIGIN = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hvjewelers.com'
+).replace(/\/$/, '')
+
 export function Breadcrumbs({
   items,
   baseUrl = '',
@@ -24,7 +38,7 @@ export function Breadcrumbs({
         '@type': 'ListItem',
         position: idx + 1,
         name: i.label,
-        item: baseUrl ? `${baseUrl}${i.href}` : i.href,
+        item: `${(baseUrl || SITE_ORIGIN).replace(/\/$/, '')}${i.href}`,
       })),
   }
 

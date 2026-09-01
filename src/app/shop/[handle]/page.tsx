@@ -10,7 +10,8 @@ import { getProductByHandle, listProductHandles } from '@/lib/shopify/products'
 import { formatMoney, moneyToCents } from '@/lib/shopify/money'
 import { sanitizeShopifyHtml } from '@/lib/shopify/html'
 import { getImageBgColors } from '@/lib/image-bg'
-import { facetLinks } from '@/lib/shopify/facets'
+import { googleCategoryFor } from '@/lib/google-category'
+import { deriveFacets, facetLinks } from '@/lib/shopify/facets'
 
 interface PageProps {
   params: Promise<{ handle: string }>
@@ -113,6 +114,35 @@ export default async function ShopProductPage({ params }: PageProps) {
   // isn't the back button.
   const browseLinks = facetLinks(product)
 
+  // The same normalized tags the shop browses by, reused to describe the piece
+  // to Google. No new data and no second source of truth: if a tag changes,
+  // the facet, the filter and the structured data all move together.
+  const facets = deriveFacets(product)
+
+  // Every image Shopify holds for the piece, featured first. Google recommends
+  // several; the Merchant Center feed already ships 2-5 per item, so the
+  // product page was the only surface publishing just one.
+  const schemaImages = [
+    ...(product.featuredImage?.url ? [product.featuredImage.url] : []),
+    ...product.images.map((i) => i.url),
+  ].filter((url, i, all) => all.indexOf(url) === i)
+
+  // Metal colour, in Google's convention of separating a combination with "/".
+  const schemaColor = facets.metals.join('/') || undefined
+
+  // Composition, one entry per material. Karat qualifies gold only — it is a
+  // gold purity measure, and two pieces in the catalog carry Platinum and a
+  // 14K gold accent on the same ring, where a blanket prefix would invent
+  // "14K Platinum". Anything the tags don't carry is left out rather than
+  // guessed.
+  const karat = facets.karats.length === 1 ? facets.karats[0] : null
+  const schemaMaterial = [
+    ...facets.metals.map((metal) =>
+      karat && metal.endsWith('Gold') ? `${karat} ${metal}` : metal,
+    ),
+    ...facets.stones,
+  ]
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
   const productUrl = `${siteUrl}/shop/${handle}`
 
@@ -140,15 +170,27 @@ export default async function ShopProductPage({ params }: PageProps) {
     '@type': 'Product',
     name: product.title,
     description: product.description,
-    image: product.featuredImage?.url,
+    image: schemaImages.length > 0 ? schemaImages : undefined,
     brand: { '@type': 'Brand', name: 'HV Jewelers' },
     sku: product.variants[0]?.sku ?? undefined,
+    // Same taxonomy table the Merchant Center feed reads from, so the feed and
+    // the landing page never describe the piece to Google two different ways.
+    category: googleCategoryFor(product.productType),
+    color: schemaColor,
+    material: schemaMaterial.length > 0 ? schemaMaterial : undefined,
     offers: {
       '@type': 'Offer',
       price: (priceMin / 100).toFixed(2),
       priceCurrency: product.priceRange.minVariantPrice.currencyCode,
+      // Matches `g:condition` in the Merchant Center feed, which declares every
+      // item new. Estate and antique *styling* appears in a few descriptions;
+      // no piece in the catalog is sold as pre-owned.
+      itemCondition: 'https://schema.org/NewCondition',
       // Rolling 30-day window; the page revalidates every 10 minutes so
-      // the date (and price) never go stale.
+      // the date (and price) never go stale. `validFrom` shares that anchor:
+      // the price is asserted good from this render for the next 30 days,
+      // which is exactly as far as the claim goes.
+      validFrom: new Date().toISOString().slice(0, 10),
       priceValidUntil: new Date(Date.now() + 30 * 86400000)
         .toISOString()
         .slice(0, 10),
