@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   images: {
+    // Shopify CDN does its own resizing (see src/lib/shopify-image-loader.ts) —
+    // this keeps every product photo off Vercel's billed Image Optimization API,
+    // which the growing catalog was exceeding (402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED).
+    loader: 'custom',
+    loaderFile: './src/lib/shopify-image-loader.ts',
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
